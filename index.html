@@ -1,0 +1,83 @@
+
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zpěvník</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#82b1ff" stroke-width="1.5"/></svg>
+        <h1 style="margin:0">Zpěvník</h1>
+      </div>
+      <a href="admin.html">Přidat písně ↗</a>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <input id="q" placeholder="Hledat název / autor / číslo…" />
+        <select id="sort">
+          <option value="number">Řadit podle čísla</option>
+          <option value="title">Řadit podle abecedy</option>
+          <option value="author">Řadit podle autora</option>
+        </select>
+      </div>
+      <hr class="sep"/>
+      <ul id="list"></ul>
+      <div id="empty" class="empty" style="display:none">Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.</div>
+    </div>
+
+    <div class="footer">🎸 GitHub Pages · alphaTab • <a href="song.html?id=demo">ukázkový detail</a></div>
+  </div>
+
+<script>
+const list = document.getElementById('list');
+const q = document.getElementById('q');
+const sort = document.getElementById('sort');
+const empty = document.getElementById('empty');
+let songs = [];
+
+async function load(){
+  try{
+    const res = await fetch('data/songs.json', {cache:'no-store'});
+    songs = await res.json();
+  }catch(e){
+    songs = [];
+  }
+  render();
+}
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const srt = sort.value;
+  let data = songs.filter(s =>
+    s.title.toLowerCase().includes(term) ||
+    (s.author||'').toLowerCase().includes(term) ||
+    String(s.number||'').includes(term)
+  );
+  data.sort((a,b)=>{
+    if(srt==='number') return (a.number??99999)-(b.number??99999) || a.title.localeCompare(b.title);
+    if(srt==='author') return (a.author||'').localeCompare(b.author||'') || a.title.localeCompare(b.title);
+    return a.title.localeCompare(b.title);
+  });
+  list.innerHTML = data.map(s => `
+    <li class="item">
+      <div class="meta">
+        <span class="badge">${s.number ?? '–'}</span>
+        <a class="title" href="song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
+      </div>
+      <div class="badge">${s.author || ''}</div>
+    </li>`).join('');
+  empty.style.display = data.length ? 'none' : 'block';
+}
+
+q.addEventListener('input', render);
+sort.addEventListener('change', render);
+load();
+</script>
+</body>
+</html>

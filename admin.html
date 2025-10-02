@@ -1,0 +1,34 @@
+
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Správa písní</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1 style="margin:0">Správa písní</h1><a href="index.html">← Zpět</a></div>
+    <div class="card">
+      <h3>Jak přidat píseň (GitHub Pages bez serveru)</h3>
+      <ol>
+        <li>Připrav soubor Guitar Pro (<code>.gp</code>, <code>.gp5</code>, <code>.gpx</code>…).</li>
+        <li>Pojmenuj: <code>001-nazev-pisne-autor.gpx</code> (číslo je volitelné, ale pomáhá řazení).</li>
+        <li>Nahraj do složky <code>/songs</code> přes GitHub web: <a id="newfile" target="_blank" rel="noopener">Otevřít nahrávání ↗</a></li>
+        <li>Po commitu akce automaticky vytvoří/aktualizuje <code>data/songs.json</code>.</li>
+      </ol>
+      <p>Tip: Chceš vkládání přes formulář? Lze to přes GitHub <em>Issues</em> + Action, která ze žádosti vytvoří PR.</p>
+    </div>
+  </div>
+<script>
+  // pokusně odvodíme URL repozitáře
+  const a = document.getElementById('newfile');
+  const host = location.host;
+  const parts = location.pathname.split('/').filter(Boolean);
+  const repo = parts.length ? parts[0] : '';
+  const user = host.includes('github.io') ? host.split('.')[0] : ''; // u custom domény vyplň ručně
+  a.href = user && repo ? `https://github.com/${user}/${repo}/new/main/songs` : 'https://github.com/new';
+</script>
+</body>
+</html>
