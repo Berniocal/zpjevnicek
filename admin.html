@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="cs">
 <head>
@@ -6,29 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Správa písní</title>
   <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    .grid{display:grid;gap:10px}
+    .two{grid-template-columns:1fr 1fr}
+    textarea{min-height:320px;resize:vertical}
+    .note{color:#9fb3d2;font-size:.9em}
+    .ok{color:#7bb0ff}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="header"><h1 style="margin:0">Správa písní</h1><a href="index.html">← Zpět</a></div>
+    <div class="header"><h1 style="margin:0">Přidat píseň (ChordPro)</h1><a href="index.html">← Zpět</a></div>
+
     <div class="card">
-      <h3>Jak přidat píseň (GitHub Pages bez serveru)</h3>
+      <p>
+        Vlož <b>text s akordy (ChordPro)</b> – např. <code>[Am]Alas my love...</code> – doplň název a autora
+        a klikni <b>Uložit do GitHubu</b>. Soubor se uloží do složky <code>/songs</code> a GitHub Action
+        automaticky aktualizuje seznam.
+      </p>
+      <p class="note">Token (PAT) se ukládá jen do tvého prohlížeče (<span class="kbd">localStorage</span>).
+         Nepatří do kódu ani do repozitáře.</p>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="grid two">
+        <label>Token (PAT)
+          <input id="token" placeholder="ghp_… nebo github_pat_…" />
+          <div class="note">Scopes: <code>Repository contents → Read and write</code> pro vybraný repozitář.</div>
+        </label>
+        <div>
+          <button id="saveToken">Uložit token do prohlížeče</button>
+          <button id="clearToken">Smazat token</button>
+        </div>
+      </div>
+      <hr class="sep"/>
+      <div class="grid two">
+        <label>Název písně
+          <input id="title" placeholder="Greensleeves" />
+        </label>
+        <label>Autor
+          <input id="artist" placeholder="Traditional" />
+        </label>
+      </div>
+      <div class="grid two">
+        <label>Číslo (volitelné pro řazení)
+          <input id="number" type="number" min="1" step="1" placeholder="1" />
+        </label>
+        <label>Tonina (volitelně – meta)
+          <input id="key" placeholder="Am" />
+        </label>
+      </div>
+      <label>Text (ChordPro)
+        <textarea id="body" placeholder="[Am]Alas my love, you [G]do me wrong
+[F]to cast me off so [E7]discourteously, …"></textarea>
+      </label>
+      <div class="grid two">
+        <label>Název souboru (automaticky)
+          <input id="filename" readonly />
+          <div class="note">Uloží se do <code>/songs</code> jako <code>NNN-nazev-autor.pro</code>.</div>
+        </label>
+        <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+          <button id="saveBtn">💾 Uložit do GitHubu</button>
+        </div>
+      </div>
+      <div id="status" class="note" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Jak získat token</h3>
       <ol>
-        <li>Připrav soubor Guitar Pro (<code>.gp</code>, <code>.gp5</code>, <code>.gpx</code>…).</li>
-        <li>Pojmenuj: <code>001-nazev-pisne-autor.gpx</code> (číslo je volitelné, ale pomáhá řazení).</li>
-        <li>Nahraj do složky <code>/songs</code> přes GitHub web: <a id="newfile" target="_blank" rel="noopener">Otevřít nahrávání ↗</a></li>
-        <li>Po commitu akce automaticky vytvoří/aktualizuje <code>data/songs.json</code>.</li>
+        <li>GitHub → <b>Settings</b> (profil) → <b>Developer settings</b> → <b>Fine-grained tokens</b>.</li>
+        <li>Vyber jen tento repozitář, dej oprávnění <b>Repository contents: Read and write</b>, vygeneruj.</li>
+        <li>Token vlož do pole výše a ulož.</li>
       </ol>
-      <p>Tip: Chceš vkládání přes formulář? Lze to přes GitHub <em>Issues</em> + Action, která ze žádosti vytvoří PR.</p>
     </div>
   </div>
+
 <script>
-  // pokusně odvodíme URL repozitáře
-  const a = document.getElementById('newfile');
-  const host = location.host;
+const qs = s=>document.querySelector(s);
+const statusEl = qs('#status');
+const titleEl = qs('#title');
+const artistEl = qs('#artist');
+const numberEl = qs('#number');
+const keyEl = qs('#key');
+const bodyEl = qs('#body');
+const filenameEl = qs('#filename');
+
+function slug(s){ return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
+function status(msg, ok=false){ statusEl.textContent = msg; statusEl.className = 'note' + (ok?' ok':''); }
+
+function computeFilename(){
+  const n = numberEl.value ? String(numberEl.value).padStart(3,'0')+'-' : '';
+  const t = slug(titleEl.value||'pisen');
+  const a = slug(artistEl.value||'');
+  filenameEl.value = `${n}${t}${a?'-'+a:''}.pro`;
+}
+['input','change'].forEach(ev=>{
+  titleEl.addEventListener(ev, computeFilename);
+  artistEl.addEventListener(ev, computeFilename);
+  numberEl.addEventListener(ev, computeFilename);
+});
+computeFilename();
+
+// token storage
+const tokenEl = qs('#token');
+const saved = localStorage.getItem('gh_pat');
+if(saved) tokenEl.value = saved;
+qs('#saveToken').onclick = ()=>{ localStorage.setItem('gh_pat', tokenEl.value.trim()); status('Token uložen.', true); };
+qs('#clearToken').onclick = ()=>{ localStorage.removeItem('gh_pat'); tokenEl.value=''; status('Token smazán.', true); };
+
+function detectRepo(){
+  const host = location.host;                 // user.github.io
   const parts = location.pathname.split('/').filter(Boolean);
-  const repo = parts.length ? parts[0] : '';
-  const user = host.includes('github.io') ? host.split('.')[0] : ''; // u custom domény vyplň ručně
-  a.href = user && repo ? `https://github.com/${user}/${repo}/new/main/songs` : 'https://github.com/new';
+  const repo = parts.length? parts[0] : '';
+  const user = host.includes('github.io') ? host.split('.')[0] : '';
+  return {user, repo};
+}
+
+qs('#saveBtn').onclick = async ()=>{
+  try{
+    const {user, repo} = detectRepo();
+    if(!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
+    const token = tokenEl.value.trim();
+    if(!token) return status('Vlož prosím PAT token.', false);
+    if(!titleEl.value.trim()) return status('Doplň název písně.', false);
+
+    // ChordPro obsah s metadaty
+    const lines = [];
+    lines.push(`{title: ${titleEl.value.trim()}}`);
+    if(artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
+    if(keyEl.value.trim()) lines.push(`{key: ${keyEl.value.trim()}}`);
+    lines.push('');
+    lines.push(bodyEl.value.replace(/\r/g,''));
+    const content = lines.join('\n');
+
+    const filename = filenameEl.value || 'pisen.pro';
+    const path = `songs/${filename}`;
+
+    status('Ukládám…');
+    const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}` ,{
+      method:'PUT',
+      headers:{
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json'
+      },
+      body: JSON.stringify({
+        message: `feat(song): add ${titleEl.value.trim()}`,
+        content: b64utf8(content),
+        branch: 'main'
+      })
+    });
+
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error(`GitHub API ${res.status}: ${t}`);
+    }
+    status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
+  }catch(e){
+    console.error(e);
+    status('Chyba: '+ e.message);
+  }
+};
 </script>
 </body>
 </html>
