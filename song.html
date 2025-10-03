@@ -98,7 +98,38 @@ const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
 function normRoot(r){ return ALT[r] || r; }
 function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root:normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
 function transposeChord(ch, s){ const sp=splitChord(ch), i=NOTES_SHARP.indexOf(sp.root); if(i<0) return ch; return NOTES_SHARP[(i+s+120)%12]+sp.rest; }
-function parseChordPro(t){ const meta={}, lines=t.replace(/\r/g,'').split('\n'), out=[]; for(const l of lines){ const m=l.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/); if(m){ meta[m[1].toLowerCase()]=m[2]; continue;} out.push(l);} return {meta,lines:out}; }
+function parseChordPro(text){
+  const meta = {};
+  const raw = text.replace(/\r/g, '').split('\n');
+
+  // 1) odděl meta a tělo
+  const body = [];
+  for (const line of raw) {
+    const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
+    if (m) {
+      meta[m[1].toLowerCase()] = m[2]; // poslední výskyt vyhrává
+      continue;                         // meta řádky nedáme do těla
+    }
+    body.push(line);
+  }
+
+  // 2) ořízni prázdné řádky na začátku/konci
+  while (body.length && !body[0].trim()) body.shift();
+  while (body.length && !body[body.length - 1].trim()) body.pop();
+
+  // 3) slouč vícenásobné prázdné řádky (… → jeden)
+  const lines = [];
+  let prevEmpty = false;
+  for (const l of body) {
+    const empty = !l.trim();
+    if (empty && prevEmpty) continue;
+    lines.push(l);
+    prevEmpty = empty;
+  }
+
+  return { meta, lines };
+}
+
 function renderChordPro(text, transposeSemi=0, capo=0){
   const {lines} = parseChordPro(text); const rootTrans = transposeSemi - (capo|0);
   const cont=document.createElement('div'); cont.className='cp';
