@@ -2,17 +2,16 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <!-- necháme přirozený pinch-to-zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
   <title>Píseň</title>
   <link rel="stylesheet" href="assets/style.css" />
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
 
   <style>
-    /* velikost písma pro ChordPro – měníme +/− tlačítky */
+    /* velikost textu ChordPro – ovládáme +/− */
     :root { --cpfs: 20px; }
 
-    /* ChordPro vzhled (tmavé pozadí, světlý text jako z tématu) */
+    /* ChordPro vzhled (tmavý motiv: světlý text) */
     .cp { font-family: system-ui, Segoe UI, Arial, sans-serif; line-height: 1.9; color: var(--ink); font-size: var(--cpfs); }
     .cp .line { position: relative; white-space: pre-wrap; }
     .cp .seg  { position: relative; display: inline-block; padding-top: 1.15em; }
@@ -22,8 +21,27 @@
 
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
 
-    /* kontejner s obsahem písně – vyplní výšku okna (výpočet doplní JS) */
-    #view { overflow:auto; background: transparent; }
+    /* horní panel (název + ovládání) – sticky + auto-hide na scroll dolů */
+    #chrome{
+      position: sticky; top: 0; z-index: 5;
+      background: var(--card);
+      padding-top: 8px; margin-top: -8px; /* vizuálně naváže na card */
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    body.chrome-hidden #chrome{ transform: translateY(-110%); opacity:.0 }
+
+    /* obsah písně – žádný rámeček, žádné zaoblení: plná šířka */
+    .song-view{
+      overflow:auto;
+      background: transparent;
+      border: 0; border-radius: 0; box-shadow: none;
+      padding: 12px 6px 24px;
+    }
+
+    /* drobné vyrovnání šířky uvnitř containeru na mobilech */
+    @media (max-width: 640px){
+      .song-view{ padding-left: 2px; padding-right: 2px; }
+    }
   </style>
 </head>
 <body>
@@ -31,30 +49,33 @@
     <a href="index.html">← Zpět na seznam</a>
 
     <div class="card" style="margin-top:12px">
-      <h2 id="title" style="margin-top:0">Načítám…</h2>
-      <div class="badge" id="meta"></div>
+      <!-- sticky horní panel -->
+      <div id="chrome">
+        <h2 id="title" style="margin:8px 0">Načítám…</h2>
+        <div class="badge" id="meta"></div>
 
-      <!-- Ovládání pro noty (alphaTab) -->
-      <div id="controls-score" class="player" style="display:none">
-        <button id="play">Přehrát</button>
-        <button id="stop">Stop</button>
-        <label>Tempo <input id="tempo" type="range" min="30" max="200" value="100"></label>
+        <!-- Ovládání not (alphaTab) -->
+        <div id="controls-score" class="player" style="display:none">
+          <button id="play">Přehrát</button>
+          <button id="stop">Stop</button>
+          <label>Tempo <input id="tempo" type="range" min="30" max="200" value="100"></label>
+        </div>
+
+        <!-- Ovládání ChordPro -->
+        <div id="controls-cp" class="player" style="display:none">
+          <span class="kbd">ChordPro</span>
+          <button id="down">Transpose −</button>
+          <button id="up">Transpose +</button>
+          <label>Capo <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em"></label>
+          <span class="kbd">Velikost:
+            <button id="fontDown" type="button">−</button>
+            <button id="fontUp"   type="button">+</button>
+          </span>
+        </div>
       </div>
 
-      <!-- Ovládání pro ChordPro -->
-      <div id="controls-cp" class="player" style="display:none">
-        <span class="kbd">ChordPro</span>
-        <button id="down">Transpose −</button>
-        <button id="up">Transpose +</button>
-        <label>Capo <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em"></label>
-        <span class="kbd">Velikost:
-          <button id="fontDown" type="button">−</button>
-          <button id="fontUp"   type="button">+</button>
-        </span>
-      </div>
-
-      <!-- Obsah písně – výšku dopočítáme v JS, aby vyplnil zbytek okna -->
-      <div id="view" class="card"></div>
+      <!-- obsah písně – žádný .card vzhled, plná šířka -->
+      <div id="view" class="song-view"></div>
     </div>
   </div>
 
@@ -63,7 +84,7 @@ const params = new URLSearchParams(location.search);
 const id = params.get('id');
 let song;
 
-// --- akordové pomocné funkce ---
+// --- akordové helpery ---
 const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
 function normRoot(r){ return ALT[r] || r; }
@@ -108,14 +129,26 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   return { meta, element: cont };
 }
 
-// nastaví #view tak, aby vyplnil zbytek okna pod nadpisem/ovládáním
+// dopočet výšky view tak, aby vyplnil obrazovku pod #chrome
 function fitViewHeight() {
   const view = document.getElementById('view');
   const rect = view.getBoundingClientRect();
-  const top = rect.top; // vzdálenost od horního okraje okna
-  const h = Math.max(240, window.innerHeight - top - 16); // 16 = spodní vnitřní okraj
+  const top = rect.top + window.scrollY;     // top relativně k dokumentu
+  const h = Math.max(240, window.innerHeight - (rect.top) - 12);
   view.style.maxHeight = h + 'px';
   view.style.height = h + 'px';
+}
+
+// auto-hide horní lišty při scrollu obsahu
+function wireHideOnScroll(){
+  const view = document.getElementById('view');
+  let last = 0;
+  view.addEventListener('scroll', ()=>{
+    const y = view.scrollTop;
+    if (y > last + 3) document.body.classList.add('chrome-hidden');
+    else if (y < last - 3) document.body.classList.remove('chrome-hidden');
+    last = y;
+  }, {passive:true});
 }
 
 async function load(){
@@ -155,14 +188,15 @@ async function load(){
     document.getElementById('play').onclick  = ()=> at.playPause();
     document.getElementById('stop').onclick  = ()=> at.stop();
     document.getElementById('tempo').oninput = (e)=> at.playbackSpeed = e.target.value/100;
-    // výška pro noty
     at.renderFinished.on(()=> fitViewHeight());
   }
+
+  wireHideOnScroll();
+  fitViewHeight();
 }
 
 load();
 window.addEventListener('resize', fitViewHeight);
-document.addEventListener('DOMContentLoaded', fitViewHeight);
 </script>
 </body>
 </html>
