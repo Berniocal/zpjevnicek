@@ -158,29 +158,65 @@ function updateChromeHeight(){
   document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
 }
 
-function wireHideOnScroll(){
+// změří výšku lišty a uloží do CSS proměnné
+function updateChromeHeight(){
+  const ch = document.getElementById('chrome');
+  const h = ch ? ch.getBoundingClientRect().height : 0;
+  document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
+}
+
+// schovat/ukázat lištu + zachovat vizuální pozici textu
+function setChromeHidden(hidden){
+  const body = document.body;
   const view = document.getElementById('view');
-  let last = 0;
-  view.addEventListener('scroll', ()=>{
-    const y = view.scrollTop;
-    if (y > last + 4) {
-      // skrýt
-      if (!document.body.classList.contains('chrome-hidden')) {
-        document.body.classList.add('chrome-hidden');
-        // po aplikování CSS necháme prohlížeč přepočítat layout a pak nastavíme výšku na 0
-        requestAnimationFrame(()=> document.documentElement.style.setProperty('--chromeH','0px'));
-      }
-    } else if (y < last - 4) {
-      // ukázat
-      if (document.body.classList.contains('chrome-hidden')) {
-        document.body.classList.remove('chrome-hidden');
-        // počkej na reflow a pak přepočítej skutečnou výšku lišty
-        requestAnimationFrame(updateChromeHeight);
-      }
+  const bar = document.getElementById('chrome');
+  if (!view || !bar) return;
+
+  if (hidden) {
+    // kolik místa lišta právě zabírá
+    const h = bar.getBoundingClientRect().height || 0;
+    body.classList.add('chrome-hidden');
+    document.documentElement.style.setProperty('--chromeH', '0px');
+    // posuň obsah o stejnou výšku, ať neskočí
+    view.scrollTop += h;
+  } else {
+    body.classList.remove('chrome-hidden');
+    // počkej na reflow a pak zjisti reálnou výšku a dorovnej scroll
+    requestAnimationFrame(()=>{
+      const h = bar.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty('--chromeH', h + 'px');
+      view.scrollTop = Math.max(0, view.scrollTop - h);
+    });
+  }
+}
+
+// dvojklik/dvoj-tap toggle
+function wireDoubleToggle(){
+  const view = document.getElementById('view');
+  if (!view) return;
+
+  // desktop dblclick
+  view.addEventListener('dblclick', ()=>{
+    setChromeHidden(!document.body.classList.contains('chrome-hidden'));
+  });
+
+  // mobilní „double tap“ (bez kolize s pinch-to-zoom)
+  let lastTap = 0, lastX = 0, lastY = 0;
+  view.addEventListener('touchstart', (e)=>{
+    if (e.touches.length !== 1) return; // ignoruj pinch
+    const t = Date.now();
+    const x = e.touches[0].clientX, y = e.touches[0].clientY;
+    const withinTime = (t - lastTap) < 300;
+    const withinDist = Math.hypot(x - lastX, y - lastY) < 30;
+    if (withinTime && withinDist) {
+      setChromeHidden(!document.body.classList.contains('chrome-hidden'));
+      lastTap = 0; // reset
+    } else {
+      lastTap = t; lastX = x; lastY = y;
     }
-    last = y;
   }, {passive:true});
 }
+
 
 
 async function load(){
@@ -218,9 +254,8 @@ async function load(){
     document.getElementById('tempo').oninput = e=> at.playbackSpeed = e.target.value/100;
     at.renderFinished.on(()=> updateChromeHeight());
   }
-
-  wireHideOnScroll();
-  updateChromeHeight();
+wireDoubleToggle();
+updateChromeHeight();
 }
 load();
 
