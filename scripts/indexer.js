@@ -17,7 +17,6 @@ function parseName(name){
 }
 
 function parseChordProMeta(text){
-  // {title: ...}{artist: ...}
   const meta = {};
   for (const line of text.split(/\r?\n/)) {
     const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
