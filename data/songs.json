@@ -1,13 +1,5 @@
 [
   {
-    "id": "001-greensleeves",
-    "number": 1,
-    "title": "Greensleeves",
-    "author": "Traditional",
-    "file": "songs/001-greensleeves.pro",
-    "type": "chordpro"
-  },
-  {
     "id": "001-vanocni-otcenas-pavel-helan",
     "number": 1,
     "title": "Vánoční Otčenáš",
