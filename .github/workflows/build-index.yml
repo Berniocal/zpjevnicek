@@ -1,4 +1,3 @@
-
 name: Build songs index
 on:
   push:
