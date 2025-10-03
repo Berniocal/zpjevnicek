@@ -10,8 +10,8 @@
   <div class="container">
     <div class="header">
       <div class="brand">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#82b1ff" stroke-width="1.5"/></svg>
-        <h1 style="margin:0">Zpěvník</h1>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/></svg>
+        <h1>Zpěvník</h1>
       </div>
       <a href="admin.html">Přidat písně ↗</a>
     </div>
@@ -30,7 +30,7 @@
       <div id="empty" class="empty" style="display:none">Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.</div>
     </div>
 
-    <div class="footer">🎸 GitHub Pages · alphaTab • <a href="song.html?id=demo">ukázkový detail</a></div>
+    <div class="footer">🎸 GitHub Pages · alphaTab</div>
   </div>
 
 <script>
@@ -44,12 +44,9 @@ async function load(){
   try{
     const res = await fetch('data/songs.json', {cache:'no-store'});
     songs = await res.json();
-  }catch(e){
-    songs = [];
-  }
+  }catch(e){ songs = []; }
   render();
 }
-
 function render(){
   const term = q.value.trim().toLowerCase();
   const srt = sort.value;
@@ -73,7 +70,6 @@ function render(){
     </li>`).join('');
   empty.style.display = data.length ? 'none' : 'block';
 }
-
 q.addEventListener('input', render);
 sort.addEventListener('change', render);
 load();
