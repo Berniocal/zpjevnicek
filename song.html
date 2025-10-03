@@ -31,7 +31,18 @@
       border-bottom:1px solid #192544;
       transition: transform .25s ease, opacity .25s ease;
     }
-    body.chrome-hidden #chrome{ transform:translateY(-110%); opacity:0 }
+/* když je lišta skrytá, nesmí zabírat místo v dokumentu */
+body.chrome-hidden #chrome{
+  transform: translateY(-110%);
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  overflow: hidden;
+}
+
+
 
     /* kontejner s písní – plná šířka, žádný rámeček, výška dopočtena z viewportu */
     #view{
@@ -110,21 +121,36 @@ function renderChordPro(text, transposeSemi=0, capo=0){
 
 // spočítá výšku horní lišty a uloží do CSS proměnné
 function updateChromeHeight(){
-  const h = document.getElementById('chrome').offsetHeight || 0;
-  document.documentElement.style.setProperty('--chromeH', h+'px');
+  // změř aktuální (viditelnou) výšku lišty
+  const ch = document.getElementById('chrome');
+  const h = ch ? ch.getBoundingClientRect().height : 0;
+  document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
 }
 
-// auto-schovávání lišty při scrollu
 function wireHideOnScroll(){
   const view = document.getElementById('view');
   let last = 0;
   view.addEventListener('scroll', ()=>{
     const y = view.scrollTop;
-    if (y > last + 4) { document.body.classList.add('chrome-hidden');  document.documentElement.style.setProperty('--chromeH','0px'); }
-    else if (y < last - 4) { document.body.classList.remove('chrome-hidden'); updateChromeHeight(); }
+    if (y > last + 4) {
+      // skrýt
+      if (!document.body.classList.contains('chrome-hidden')) {
+        document.body.classList.add('chrome-hidden');
+        // po aplikování CSS necháme prohlížeč přepočítat layout a pak nastavíme výšku na 0
+        requestAnimationFrame(()=> document.documentElement.style.setProperty('--chromeH','0px'));
+      }
+    } else if (y < last - 4) {
+      // ukázat
+      if (document.body.classList.contains('chrome-hidden')) {
+        document.body.classList.remove('chrome-hidden');
+        // počkej na reflow a pak přepočítej skutečnou výšku lišty
+        requestAnimationFrame(updateChromeHeight);
+      }
+    }
     last = y;
   }, {passive:true});
 }
+
 
 async function load(){
   const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
