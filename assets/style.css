@@ -1,36 +1,29 @@
-
 :root{
-  --bg:#0b1220; --card:#111a2b; --ink:#eaf1ff;
-  --muted:#97a7c6; --accent:#82b1ff; --line:#1e2a44;
+  --bg:#0e1320; --card:#121a2a; --ink:#eaf1ff;
+  --muted:#9fb3d2; --accent:#7bb0ff; --line:#1f2a45;
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:radial-gradient(1200px 600px at 20% -10%, #152243 0%, var(--bg) 60%);
-     color:var(--ink);font:16px/1.55 system-ui, Segoe UI, Roboto, Arial}
-.container{max-width:980px;margin:auto;padding:24px}
-.header{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:10px 0 18px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand svg{width:28px;height:28px}
-.card{background:rgba(17,26,43,.9);border:1px solid rgba(255,255,255,.06);
-      border-radius:16px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-input,select,button{
-  background:#0f1729;border:1px solid #24324a;border-radius:12px;
-  color:var(--ink);padding:10px 12px
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 system-ui, Segoe UI, Roboto, Arial}
+.container{max-width:960px;margin:auto;padding:28px 20px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{display:flex;gap:10px;align-items:center}
+.brand svg{width:24px;height:24px}
+.brand h1{font-size:24px;font-weight:700}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+hr.sep{border:none;border-top:1px solid var(--line);margin:14px 0}
+.controls{display:flex;gap:10px;flex-wrap:wrap}
+input,select,button{background:#0f1729;border:1px solid #24324a;border-radius:12px;color:var(--ink);padding:10px 12px}
 button{cursor:pointer}
 input:focus,select:focus,button:focus{outline:2px solid var(--accent);outline-offset:1px}
-a{color:var(--accent);text-decoration:none}
-ul{list-style:none;margin:0;padding:0}
-.item{display:flex;align-items:center;justify-content:space-between;
-      padding:12px;border-bottom:1px dashed var(--line)}
+ul{list-style:none}
+.item{display:flex;align-items:center;justify-content:space-between;padding:12px 8px;border-bottom:1px dashed var(--line)}
 .item:last-child{border-bottom:none}
 .title{font-weight:600}
-.badge{font-variant-numeric:tabular-nums;background:#17213a;border:1px solid #2c3b60;
-       border-radius:999px;padding:3px 8px;color:var(--muted)}
+.badge{font-variant-numeric:tabular-nums;background:#17213a;border:1px solid #2c3b60;border-radius:999px;padding:3px 8px;color:var(--muted)}
 .meta{display:flex;gap:10px;align-items:center}
 .empty{color:var(--muted);padding:18px;text-align:center}
-hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+.player{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+#alphaTab canvas,#alphaTab svg{max-width:none}
 .footer{color:var(--muted);font-size:13px;margin-top:16px}
-/* song page */
-.player{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#alphaTab canvas, #alphaTab svg{max-width:none}
+a{color:var(--accent);text-decoration:none}
