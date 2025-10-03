@@ -118,4 +118,31 @@ async function load(){
   if(!song){ document.getElementById('title').textContent = 'Píseň nenalezena'; return; }
 
   document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
-  document.getElementById('meta').textContent = song.author
+  document.getElementById('meta').textContent = song.author || '';
+
+  if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
+    document.getElementById('controls-cp').style.display = 'flex';
+    const text = await fetch(song.file).then(r=>r.text());
+    let trans = 0, capo = 0;
+    const render = ()=> {
+      const v = renderChordPro(text, trans, capo);
+      const view = document.getElementById('view'); view.innerHTML = ''; view.appendChild(v.element);
+    };
+    render();
+    document.getElementById('up').onclick = ()=>{ trans+=1; render(); };
+    document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
+    document.getElementById('capo').oninput = (e)=>{ capo = parseInt(e.target.value||0,10); render(); };
+  } else {
+    // Guitar Pro / MusicXML → alphaTab
+    document.getElementById('controls-score').style.display = 'flex';
+    const el = document.getElementById('view');
+    const at = new alphaTab.AlphaTabApi(el, { file: song.file, player: { enablePlayer: true } });
+    document.getElementById('play').onclick = ()=> at.playPause();
+    document.getElementById('stop').onclick = ()=> at.stop();
+    document.getElementById('tempo').oninput = (e)=> at.playbackSpeed = e.target.value/100;
+  }
+}
+load();
+</script>
+</body>
+</html>
