@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "001-greensleeves",
+    "number": 1,
+    "title": "Greensleeves",
+    "author": "Traditional",
+    "file": "songs/001-greensleeves.pro",
+    "type": "chordpro"
+  }
+]
