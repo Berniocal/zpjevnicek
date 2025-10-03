@@ -7,11 +7,15 @@
   <link rel="stylesheet" href="assets/style.css" />
   <style>
     .grid{display:grid;gap:10px}
-    .two{grid-template-columns:1fr 1fr}
-    textarea{min-height:320px;resize:vertical}
-    .note{color:#9fb3d2;font-size:.9em}
-    .ok{color:#7bb0ff}
-    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
+.two{grid-template-columns:1fr 1fr}
+.full{grid-column:1 / -1;}           /* položka přes celou šířku gridu */
+textarea{
+  width:100%;                        /* roztáhne na celou šířku */
+  min-height:520px;                  /* bylo ~320px → +~50 % */
+  resize:vertical;                   /* povolit ruční zvětšení výšky */
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; /* ať sedí akordy */
+  line-height:1.6;
+}
   </style>
 </head>
 <body>
