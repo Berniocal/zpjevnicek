@@ -31,18 +31,28 @@
       border-bottom:1px solid #192544;
       transition: transform .25s ease, opacity .25s ease;
     }
-/* když je lišta skrytá, nesmí zabírat místo v dokumentu */
-body.chrome-hidden #chrome{
-  transform: translateY(-110%);
-  opacity: 0;
-  height: 0;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  overflow: hidden;
-}
 
+    /* řádek s odkazem a tlačítkem v liště */
+    .chrome-row{
+      display:flex; justify-content:space-between; align-items:center; gap:8px;
+    }
+    /* nenápadné tlačítko pro PC */
+    button.ghost{
+      background:transparent; border:1px solid #2c3b60; border-radius:8px;
+      padding:4px 8px; color:var(--ink); cursor:pointer;
+    }
+    button.ghost:hover{ background:#17213a; }
 
+    /* když je lišta skrytá, nesmí zabírat místo v dokumentu */
+    body.chrome-hidden #chrome{
+      transform: translateY(-110%);
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      overflow: hidden;
+    }
 
     /* kontejner s písní – plná šířka, žádný rámeček, výška dopočtena z viewportu */
     #view{
@@ -58,10 +68,13 @@ body.chrome-hidden #chrome{
 </head>
 <body>
   <div class="container">
-    <a href="index.html">← Zpět na seznam</a>
-
     <div class="sheet" style="margin-top:12px">
       <div id="chrome">
+        <div class="chrome-row">
+          <a id="backLink" href="index.html">← Zpět na seznam</a>
+          <button id="toggleChrome" class="ghost" title="Skrýt / zobrazit lištu">▾</button>
+        </div>
+
         <h2 id="title" style="margin:8px 0">Načítám…</h2>
         <div class="badge" id="meta"></div>
 
@@ -83,7 +96,7 @@ body.chrome-hidden #chrome{
         </div>
       </div>
 
-      <!-- TEXT PÍSNĚ – už není v .card, bere celou šířku -->
+      <!-- TEXT PÍSNĚ – plná šířka -->
       <div id="view"></div>
     </div>
   </div>
@@ -98,26 +111,18 @@ const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
 function normRoot(r){ return ALT[r] || r; }
 function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root:normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
 function transposeChord(ch, s){ const sp=splitChord(ch), i=NOTES_SHARP.indexOf(sp.root); if(i<0) return ch; return NOTES_SHARP[(i+s+120)%12]+sp.rest; }
+
 function parseChordPro(text){
   const meta = {};
   const raw = text.replace(/\r/g, '').split('\n');
-
-  // 1) odděl meta a tělo
   const body = [];
   for (const line of raw) {
     const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-    if (m) {
-      meta[m[1].toLowerCase()] = m[2]; // poslední výskyt vyhrává
-      continue;                         // meta řádky nedáme do těla
-    }
+    if (m) { meta[m[1].toLowerCase()] = m[2]; continue; }
     body.push(line);
   }
-
-  // 2) ořízni prázdné řádky na začátku/konci
   while (body.length && !body[0].trim()) body.shift();
   while (body.length && !body[body.length - 1].trim()) body.pop();
-
-  // 3) slouč vícenásobné prázdné řádky (… → jeden)
   const lines = [];
   let prevEmpty = false;
   for (const l of body) {
@@ -126,7 +131,6 @@ function parseChordPro(text){
     lines.push(l);
     prevEmpty = empty;
   }
-
   return { meta, lines };
 }
 
@@ -150,81 +154,77 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   return cont;
 }
 
-// spočítá výšku horní lišty a uloží do CSS proměnné
-function updateChromeHeight(){
-  // změř aktuální (viditelnou) výšku lišty
-  const ch = document.getElementById('chrome');
-  const h = ch ? ch.getBoundingClientRect().height : 0;
-  document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
-}
-
-// změří výšku lišty a uloží do CSS proměnné
+/* ---- Výška lišty -> CSS proměnná ---- */
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
   const h = ch ? ch.getBoundingClientRect().height : 0;
   document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
 }
 
-// schovat/ukázat lištu + zachovat vizuální pozici textu
+/* ---- Přepínání lišty bez „skočení“ (počítáme delta výšky) ---- */
 function setChromeHidden(hidden){
   const body = document.body;
   const view = document.getElementById('view');
   const bar  = document.getElementById('chrome');
   if (!view || !bar) return;
 
+  const beforeH = bar.getBoundingClientRect().height || 0;
+
   if (hidden) {
-    const h = bar.getBoundingClientRect().height || 0;
     body.classList.add('chrome-hidden');
-    document.documentElement.style.setProperty('--chromeH','0px');
-    view.scrollTop += h; // dorovnat, ať neskočí
+    requestAnimationFrame(()=>{
+      const afterH = bar.getBoundingClientRect().height || 0; // po zkolabování ~0
+      const delta  = beforeH - afterH;
+      document.documentElement.style.setProperty('--chromeH', afterH + 'px');
+      view.scrollTop += delta; // dorovnat přesně o rozdíl
+    });
   } else {
     body.classList.remove('chrome-hidden');
     requestAnimationFrame(()=>{
-      const h = bar.getBoundingClientRect().height || 0;
-      document.documentElement.style.setProperty('--chromeH', h+'px');
-      view.scrollTop = Math.max(0, view.scrollTop - h);
+      const afterH = bar.getBoundingClientRect().height || 0; // reálná výška
+      const delta  = afterH - beforeH;
+      document.documentElement.style.setProperty('--chromeH', afterH + 'px');
+      view.scrollTop = Math.max(0, view.scrollTop - delta);
     });
   }
 }
 
-// --- NOVÉ: robustní dvoj-klik / dvoj-tap bez blikání ---
+/* ---- Dvoj-klik / dvoj-tap bez blikání ---- */
 function wireDoubleToggle(){
   const view = document.getElementById('view');
   if (!view) return;
 
   let lastTapTime = 0, lastX = 0, lastY = 0;
-  let recentToggleTs = 0; // když jsme právě togglovali po double-tapu, ignoruj následný dblclick
+  let recentToggleTs = 0;
 
-  // 1) myš: obyčejný dblclick
-  view.addEventListener('dblclick', (e)=>{
-    if (Date.now() - recentToggleTs < 400) return; // ignoruj „ducha“ po touchi
+  // PC: dblclick
+  view.addEventListener('dblclick', ()=>{
+    if (Date.now() - recentToggleTs < 400) return;
     setChromeHidden(!document.body.classList.contains('chrome-hidden'));
   });
 
-  // 2) mobil: double-tap na touchend (ne touchstart), s prahovými hodnotami
+  // Mobil: double-tap na touchend
   view.addEventListener('touchend', (e)=>{
-    if (e.touches.length) return;           // stále probíhá další dotyk (pinch) → ignoruj
+    if (e.touches && e.touches.length) return;
     const t = Date.now();
     const touch = e.changedTouches[0];
     const x = touch.clientX, y = touch.clientY;
-
-    const withinTime = (t - lastTapTime) < 300;        // do 300 ms
-    const withinDist = Math.hypot(x - lastX, y - lastY) < 30; // do 30 px
+    const withinTime = (t - lastTapTime) < 300;
+    const withinDist = Math.hypot(x - lastX, y - lastY) < 30;
 
     if (withinTime && withinDist) {
-      // rozpoznaný double-tap
-      e.preventDefault();  // zamez syntetickému dblclicku + nežádoucím gestům
+      e.preventDefault();
       setChromeHidden(!document.body.classList.contains('chrome-hidden'));
-      recentToggleTs = t;  // ať ignorujeme následující dblclick
-      lastTapTime = 0;     // reset
+      recentToggleTs = t;
+      lastTapTime = 0;
     } else {
       lastTapTime = t; lastX = x; lastY = y;
     }
-  }, {passive:false}); // musí být false, aby šlo preventDefault
+  }, {passive:false});
 }
 
-
-
+const params2 = new URLSearchParams(location.search); // zachováno jak máš
+const id2 = params2.get ? params2.get('id') : null;
 
 async function load(){
   const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
@@ -261,8 +261,13 @@ async function load(){
     document.getElementById('tempo').oninput = e=> at.playbackSpeed = e.target.value/100;
     at.renderFinished.on(()=> updateChromeHeight());
   }
-wireDoubleToggle();
-updateChromeHeight();
+
+  wireDoubleToggle();
+  updateChromeHeight();
+
+  // PC tlačítko pro přepínání lišty
+  const toggleBtn = document.getElementById('toggleChrome');
+  if (toggleBtn) toggleBtn.onclick = ()=> setChromeHidden(!document.body.classList.contains('chrome-hidden'));
 }
 load();
 
