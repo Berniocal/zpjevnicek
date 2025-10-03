@@ -2,40 +2,30 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <!-- dovolíme přirozený pinch-to-zoom -->
+  <!-- necháme přirozený pinch-to-zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
   <title>Píseň</title>
   <link rel="stylesheet" href="assets/style.css" />
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
 
   <style>
-    /* ---------- základní vzhled ChordPro ---------- */
-    :root { --cpfs: 18px; } /* výchozí velikost textu */
-    .cp { font-family: system-ui, Segoe UI, Arial, sans-serif; line-height: 1.9; color:#111; font-size: var(--cpfs); }
+    /* velikost písma pro ChordPro – měníme +/− tlačítky */
+    :root { --cpfs: 20px; }
+
+    /* ChordPro vzhled (tmavé pozadí, světlý text jako z tématu) */
+    .cp { font-family: system-ui, Segoe UI, Arial, sans-serif; line-height: 1.9; color: var(--ink); font-size: var(--cpfs); }
     .cp .line { position: relative; white-space: pre-wrap; }
-    .cp .seg { position: relative; display: inline-block; padding-top: 1.2em; }
-    .cp .ch  { position: absolute; left: 0; top: 0; font-weight: 700;
-               font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; color:#000; }
-    .cp .ly  { visibility: visible; }
+    .cp .seg  { position: relative; display: inline-block; padding-top: 1.15em; }
+    .cp .ch   { position: absolute; left: 0; top: 0; font-weight: 700;
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; color: var(--ink); }
+    .cp .ly   { visibility: visible; }
 
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-           background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
 
-    /* ---------- Čtecí režim (bez fullscreen API, zoom prsty funguje) ---------- */
-    body.read { background:#fff; }
-    body.read .container { max-width: none; padding: 0; }
-    body.read .card { border-radius: 0; box-shadow: none; border: none; }
-    body.read .badge, body.read a[href="index.html"] { display: none; }
-    body.read #view { max-height: none; overflow: visible; padding: 20px 16px 32px; background:#fff; }
-    /* fix pro tmavé téma z assets/style.css */
-    body.read #view *, body.read .cp, body.read .cp .ch { color:#111 !important; }
-
-    /* lišta s ovládáním */
-    .player { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0; }
-    .spacer { flex:1 1 auto; }
+    /* kontejner s obsahem písně – vyplní výšku okna (výpočet doplní JS) */
+    #view { overflow:auto; background: transparent; }
   </style>
 </head>
-
 <body>
   <div class="container">
     <a href="index.html">← Zpět na seznam</a>
@@ -44,139 +34,135 @@
       <h2 id="title" style="margin-top:0">Načítám…</h2>
       <div class="badge" id="meta"></div>
 
-      <!-- Noty (alphaTab) -->
+      <!-- Ovládání pro noty (alphaTab) -->
       <div id="controls-score" class="player" style="display:none">
         <button id="play">Přehrát</button>
         <button id="stop">Stop</button>
         <label>Tempo <input id="tempo" type="range" min="30" max="200" value="100"></label>
-        <span class="spacer"></span>
-        <button id="readOnScore">Čtecí režim</button>
       </div>
 
-      <!-- ChordPro -->
+      <!-- Ovládání pro ChordPro -->
       <div id="controls-cp" class="player" style="display:none">
         <span class="kbd">ChordPro</span>
         <button id="down">Transpose −</button>
         <button id="up">Transpose +</button>
         <label>Capo <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em"></label>
-        <span class="spacer"></span>
         <span class="kbd">Velikost:
           <button id="fontDown" type="button">−</button>
           <button id="fontUp"   type="button">+</button>
         </span>
-        <button id="readOn">Čtecí režim</button>
       </div>
 
-      <div id="view" class="card" style="overflow:auto; max-height:70vh"></div>
+      <!-- Obsah písně – výšku dopočítáme v JS, aby vyplnil zbytek okna -->
+      <div id="view" class="card"></div>
     </div>
   </div>
 
-  <script>
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
-    let song;
+<script>
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+let song;
 
-    // --- Akordy (transpozice) ---
-    const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
-    function normRoot(r){ return ALT[r] || r; }
-    function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root: normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
-    function transposeChord(ch, semi){
-      const s = splitChord(ch); const i = NOTES_SHARP.indexOf(s.root); if(i===-1) return ch;
-      const j = (i + semi + 120) % 12; return NOTES_SHARP[j] + s.rest;
-    }
-    function parseChordPro(text){
-      const meta = {}; const lines = text.replace(/\r/g,'').split('\n'); const blocks = [];
-      for (const line of lines){
-        const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-        if (m) { meta[m[1].toLowerCase()] = m[2]; continue; }
-        blocks.push(line);
+// --- akordové pomocné funkce ---
+const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
+function normRoot(r){ return ALT[r] || r; }
+function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root: normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
+function transposeChord(ch, semi){
+  const s = splitChord(ch); const i = NOTES_SHARP.indexOf(s.root); if(i===-1) return ch;
+  const j = (i + semi + 120) % 12; return NOTES_SHARP[j] + s.rest;
+}
+function parseChordPro(text){
+  const meta = {}; const lines = text.replace(/\r/g,'').split('\n'); const blocks = [];
+  for (const line of lines){
+    const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
+    if (m) { meta[m[1].toLowerCase()] = m[2]; continue; }
+    blocks.push(line);
+  }
+  return { meta, lines: blocks };
+}
+function renderChordPro(text, transposeSemi=0, capo=0){
+  const { meta, lines } = parseChordPro(text);
+  const rootTrans = transposeSemi - (capo|0);
+  const cont = document.createElement('div'); cont.className = 'cp';
+  for (const raw of lines){
+    if (!raw.trim()) { cont.appendChild(document.createElement('br')); continue; }
+    const line = document.createElement('div'); line.className = 'line';
+    let i = 0, curChord = '';
+    while (i < raw.length){
+      if (raw[i] === '['){
+        const j = raw.indexOf(']', i+1);
+        if (j !== -1){ curChord = raw.slice(i+1, j); i = j+1; continue; }
       }
-      return { meta, lines: blocks };
+      let j = i; while (j < raw.length && raw[j] !== '[') j++;
+      const lyr = raw.slice(i, j) || ' ';
+      const seg = document.createElement('span'); seg.className='seg';
+      const ch = document.createElement('span'); ch.className='ch';
+      ch.textContent = curChord ? transposeChord(curChord, rootTrans) : '';
+      const ly = document.createElement('span'); ly.className='ly'; ly.textContent = lyr;
+      seg.appendChild(ch); seg.appendChild(ly);
+      line.appendChild(seg); i = j;
     }
-    function renderChordPro(text, transposeSemi=0, capo=0){
-      const { meta, lines } = parseChordPro(text);
-      const rootTrans = transposeSemi - (capo|0);
-      const cont = document.createElement('div'); cont.className = 'cp';
-      for (const raw of lines){
-        if (!raw.trim()) { cont.appendChild(document.createElement('br')); continue; }
-        const line = document.createElement('div'); line.className = 'line';
-        let i = 0, curChord = '';
-        while (i < raw.length){
-          if (raw[i] === '['){
-            const j = raw.indexOf(']', i+1);
-            if (j !== -1){ curChord = raw.slice(i+1, j); i = j+1; continue; }
-          }
-          let j = i; while (j < raw.length && raw[j] !== '[') j++;
-          const lyr = raw.slice(i, j) || ' ';
-          const seg = document.createElement('span'); seg.className='seg';
-          const ch = document.createElement('span'); ch.className='ch';
-          ch.textContent = curChord ? transposeChord(curChord, rootTrans) : '';
-          const ly = document.createElement('span'); ly.className='ly'; ly.textContent = lyr;
-          seg.appendChild(ch); seg.appendChild(ly);
-          line.appendChild(seg); i = j;
-        }
-        cont.appendChild(line);
-      }
-      return { meta, element: cont };
-    }
+    cont.appendChild(line);
+  }
+  return { meta, element: cont };
+}
 
-    // --- Čtecí režim (bez fullscreen API; pinch-zoom funguje) ---
-    function enterReadMode(){
-      document.body.classList.add('read');
-      // posun na začátek obsahu
-      const v = document.getElementById('view');
-      if (v) v.scrollIntoView({block:'start'});
-    }
-    // nepovinné: kdybychom chtěli rychlý návrat tlačítkem zpět, stačí:
-    // function exitReadMode(){ document.body.classList.remove('read'); }
+// nastaví #view tak, aby vyplnil zbytek okna pod nadpisem/ovládáním
+function fitViewHeight() {
+  const view = document.getElementById('view');
+  const rect = view.getBoundingClientRect();
+  const top = rect.top; // vzdálenost od horního okraje okna
+  const h = Math.max(240, window.innerHeight - top - 16); // 16 = spodní vnitřní okraj
+  view.style.maxHeight = h + 'px';
+  view.style.height = h + 'px';
+}
 
-    // --- Načtení a vykreslení ---
-    async function load(){
-      const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
-      song = data.find(s => s.id === id);
-      if(!song){ document.getElementById('title').textContent = 'Píseň nenalezena'; return; }
-      document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
-      document.getElementById('meta').textContent = song.author || '';
+async function load(){
+  const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
+  song = data.find(s => s.id === id);
+  if(!song){ document.getElementById('title').textContent = 'Píseň nenalezena'; return; }
+  document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
+  document.getElementById('meta').textContent = song.author || '';
 
-      // --- ChordPro větev ---
-      if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
-        document.getElementById('controls-cp').style.display = 'flex';
-        const text = await fetch(song.file).then(r=>r.text());
-        let trans = 0, capo = 0;
+  if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
+    document.getElementById('controls-cp').style.display = 'flex';
+    const text = await fetch(song.file).then(r=>r.text());
+    let trans = 0, capo = 0;
 
-        const render = ()=> {
-          const v = renderChordPro(text, trans, capo);
-          const view = document.getElementById('view'); view.innerHTML = ''; view.appendChild(v.element);
-        };
-        render();
+    const render = ()=> {
+      const v = renderChordPro(text, trans, capo);
+      const view = document.getElementById('view'); view.innerHTML = ''; view.appendChild(v.element);
+      fitViewHeight();
+    };
+    render();
 
-        // Transpozice + capo
-        document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
-        document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
-        document.getElementById('capo').oninput = (e)=>{ capo = parseInt(e.target.value||0,10); render(); };
+    // ovládání
+    document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
+    document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
+    document.getElementById('capo').oninput = (e)=>{ capo = parseInt(e.target.value||0,10); render(); };
 
-        // Zvětšení textu (+/-)
-        const setFs = (px)=>{ document.documentElement.style.setProperty('--cpfs', px + 'px'); };
-        let fs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cpfs')) || 18;
-        document.getElementById('fontUp').onclick   = ()=>{ fs = Math.min(72, fs+2); setFs(fs); };
-        document.getElementById('fontDown').onclick = ()=>{ fs = Math.max(12, fs-2); setFs(fs); };
+    const setFs = (px)=> document.documentElement.style.setProperty('--cpfs', px + 'px');
+    let fs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cpfs')) || 20;
+    document.getElementById('fontUp').onclick   = ()=>{ fs = Math.min(72, fs+2); setFs(fs); };
+    document.getElementById('fontDown').onclick = ()=>{ fs = Math.max(12, fs-2); setFs(fs); };
 
-        // Čtecí režim
-        document.getElementById('readOn').onclick = enterReadMode;
+  } else {
+    // alphaTab (GP/MusicXML)
+    document.getElementById('controls-score').style.display = 'flex';
+    const el = document.getElementById('view');
+    const at = new alphaTab.AlphaTabApi(el, { file: song.file, player: { enablePlayer: true } });
+    document.getElementById('play').onclick  = ()=> at.playPause();
+    document.getElementById('stop').onclick  = ()=> at.stop();
+    document.getElementById('tempo').oninput = (e)=> at.playbackSpeed = e.target.value/100;
+    // výška pro noty
+    at.renderFinished.on(()=> fitViewHeight());
+  }
+}
 
-      } else {
-        // --- AlphaTab větev (GuitarPro/MusicXML) ---
-        document.getElementById('controls-score').style.display = 'flex';
-        const el = document.getElementById('view');
-        const at = new alphaTab.AlphaTabApi(el, { file: song.file, player: { enablePlayer: true } });
-        document.getElementById('play').onclick  = ()=> at.playPause();
-        document.getElementById('stop').onclick  = ()=> at.stop();
-        document.getElementById('tempo').oninput = (e)=> at.playbackSpeed = e.target.value/100;
-        document.getElementById('readOnScore').onclick = enterReadMode;
-      }
-    }
-    load();
-  </script>
+load();
+window.addEventListener('resize', fitViewHeight);
+document.addEventListener('DOMContentLoaded', fitViewHeight);
+</script>
 </body>
 </html>
