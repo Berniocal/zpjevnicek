@@ -123,7 +123,39 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   }
   return { meta, element: cont };
 }
+// ---- Fullscreen/zoom pro ChordPro ----
+const overlay = document.getElementById('overlay');
+const overlayView = document.getElementById('overlayView');
+const fsVal = document.getElementById('fsVal');
+let fontSize = Number(localStorage.getItem('cp_fs') || 24);
 
+function applyFontSize(){
+  overlay.style.setProperty('--fs', fontSize + 'px');
+  if(fsVal) fsVal.textContent = fontSize;
+  localStorage.setItem('cp_fs', String(fontSize));
+}
+
+function enableChordProOverlay(getText, getTrans, getCapo){
+  document.getElementById('previewBtn').onclick = ()=>{
+    overlayView.innerHTML = '';
+    overlayView.appendChild(
+      renderChordPro(getText(), getTrans(), getCapo()).element
+    );
+    overlay.classList.add('open');
+    applyFontSize();
+  };
+  document.getElementById('closeOverlay').onclick = ()=>{
+    overlay.classList.remove('open');
+    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  };
+  document.getElementById('fsToggle').onclick = async ()=>{
+    if (!document.fullscreenElement) { try { await overlay.requestFullscreen(); } catch(e){} }
+    else { try { await document.exitFullscreen(); } catch(e){} }
+  };
+  document.getElementById('fsUp').onclick = ()=>{ fontSize = Math.min(80, fontSize+2); applyFontSize(); };
+  document.getElementById('fsDown').onclick = ()=>{ fontSize = Math.max(12, fontSize-2); applyFontSize(); };
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('open')) document.getElementById('closeOverlay').click(); });
+}
 async function load(){
   const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
   song = data.find(s => s.id === id);
@@ -159,39 +191,7 @@ async function load(){
   }
 }
 load();
-// ---- Fullscreen/zoom pro ChordPro ----
-const overlay = document.getElementById('overlay');
-const overlayView = document.getElementById('overlayView');
-const fsVal = document.getElementById('fsVal');
-let fontSize = Number(localStorage.getItem('cp_fs') || 24);
 
-function applyFontSize(){
-  overlay.style.setProperty('--fs', fontSize + 'px');
-  if(fsVal) fsVal.textContent = fontSize;
-  localStorage.setItem('cp_fs', String(fontSize));
-}
-
-function enableChordProOverlay(getText, getTrans, getCapo){
-  document.getElementById('previewBtn').onclick = ()=>{
-    overlayView.innerHTML = '';
-    overlayView.appendChild(
-      renderChordPro(getText(), getTrans(), getCapo()).element
-    );
-    overlay.classList.add('open');
-    applyFontSize();
-  };
-  document.getElementById('closeOverlay').onclick = ()=>{
-    overlay.classList.remove('open');
-    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-  };
-  document.getElementById('fsToggle').onclick = async ()=>{
-    if (!document.fullscreenElement) { try { await overlay.requestFullscreen(); } catch(e){} }
-    else { try { await document.exitFullscreen(); } catch(e){} }
-  };
-  document.getElementById('fsUp').onclick = ()=>{ fontSize = Math.min(80, fontSize+2); applyFontSize(); };
-  document.getElementById('fsDown').onclick = ()=>{ fontSize = Math.max(12, fontSize-2); applyFontSize(); };
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('open')) document.getElementById('closeOverlay').click(); });
-}
 
 
 </script>
