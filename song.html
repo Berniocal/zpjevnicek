@@ -169,53 +169,60 @@ function updateChromeHeight(){
 function setChromeHidden(hidden){
   const body = document.body;
   const view = document.getElementById('view');
-  const bar = document.getElementById('chrome');
+  const bar  = document.getElementById('chrome');
   if (!view || !bar) return;
 
   if (hidden) {
-    // kolik místa lišta právě zabírá
     const h = bar.getBoundingClientRect().height || 0;
     body.classList.add('chrome-hidden');
-    document.documentElement.style.setProperty('--chromeH', '0px');
-    // posuň obsah o stejnou výšku, ať neskočí
-    view.scrollTop += h;
+    document.documentElement.style.setProperty('--chromeH','0px');
+    view.scrollTop += h; // dorovnat, ať neskočí
   } else {
     body.classList.remove('chrome-hidden');
-    // počkej na reflow a pak zjisti reálnou výšku a dorovnej scroll
     requestAnimationFrame(()=>{
       const h = bar.getBoundingClientRect().height || 0;
-      document.documentElement.style.setProperty('--chromeH', h + 'px');
+      document.documentElement.style.setProperty('--chromeH', h+'px');
       view.scrollTop = Math.max(0, view.scrollTop - h);
     });
   }
 }
 
-// dvojklik/dvoj-tap toggle
+// --- NOVÉ: robustní dvoj-klik / dvoj-tap bez blikání ---
 function wireDoubleToggle(){
   const view = document.getElementById('view');
   if (!view) return;
 
-  // desktop dblclick
-  view.addEventListener('dblclick', ()=>{
+  let lastTapTime = 0, lastX = 0, lastY = 0;
+  let recentToggleTs = 0; // když jsme právě togglovali po double-tapu, ignoruj následný dblclick
+
+  // 1) myš: obyčejný dblclick
+  view.addEventListener('dblclick', (e)=>{
+    if (Date.now() - recentToggleTs < 400) return; // ignoruj „ducha“ po touchi
     setChromeHidden(!document.body.classList.contains('chrome-hidden'));
   });
 
-  // mobilní „double tap“ (bez kolize s pinch-to-zoom)
-  let lastTap = 0, lastX = 0, lastY = 0;
-  view.addEventListener('touchstart', (e)=>{
-    if (e.touches.length !== 1) return; // ignoruj pinch
+  // 2) mobil: double-tap na touchend (ne touchstart), s prahovými hodnotami
+  view.addEventListener('touchend', (e)=>{
+    if (e.touches.length) return;           // stále probíhá další dotyk (pinch) → ignoruj
     const t = Date.now();
-    const x = e.touches[0].clientX, y = e.touches[0].clientY;
-    const withinTime = (t - lastTap) < 300;
-    const withinDist = Math.hypot(x - lastX, y - lastY) < 30;
+    const touch = e.changedTouches[0];
+    const x = touch.clientX, y = touch.clientY;
+
+    const withinTime = (t - lastTapTime) < 300;        // do 300 ms
+    const withinDist = Math.hypot(x - lastX, y - lastY) < 30; // do 30 px
+
     if (withinTime && withinDist) {
+      // rozpoznaný double-tap
+      e.preventDefault();  // zamez syntetickému dblclicku + nežádoucím gestům
       setChromeHidden(!document.body.classList.contains('chrome-hidden'));
-      lastTap = 0; // reset
+      recentToggleTs = t;  // ať ignorujeme následující dblclick
+      lastTapTime = 0;     // reset
     } else {
-      lastTap = t; lastX = x; lastY = y;
+      lastTapTime = t; lastX = x; lastY = y;
     }
-  }, {passive:true});
+  }, {passive:false}); // musí být false, aby šlo preventDefault
 }
+
 
 
 
