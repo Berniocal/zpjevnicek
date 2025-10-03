@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="cs">
 <head>
@@ -7,6 +6,14 @@
   <title>Píseň</title>
   <link rel="stylesheet" href="assets/style.css" />
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+  <style>
+    .cp { font-family: system-ui, Segoe UI, Arial; line-height: 1.9 }
+    .cp .line { position: relative; white-space: pre-wrap }
+    .cp .seg { position: relative; display: inline-block; padding-top: 1.1em }
+    .cp .ch { position: absolute; left: 0; top: 0; font-weight:700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.9em }
+    .cp .ly { visibility: visible }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -14,12 +21,21 @@
     <div class="card" style="margin-top:12px">
       <h2 id="title" style="margin-top:0">Načítám…</h2>
       <div class="badge" id="meta"></div>
-      <div class="player" style="margin:12px 0">
+
+      <div id="controls-score" class="player" style="display:none">
         <button id="play">Přehrát</button>
         <button id="stop">Stop</button>
         <label>Tempo <input id="tempo" type="range" min="30" max="200" value="100"></label>
       </div>
-      <div id="alphaTab" class="card" style="overflow:auto; max-height:70vh"></div>
+
+      <div id="controls-cp" class="player" style="display:none">
+        <span class="kbd">ChordPro</span>
+        <button id="down">Transpose −</button>
+        <button id="up">Transpose +</button>
+        <label>Capo <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em"></label>
+      </div>
+
+      <div id="view" class="card" style="overflow:auto; max-height:70vh"></div>
     </div>
   </div>
 
@@ -28,32 +44,78 @@ const params = new URLSearchParams(location.search);
 const id = params.get('id');
 let song;
 
+const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
+
+function normRoot(r){ return ALT[r] || r; }
+function splitChord(ch){
+  const m = ch.match(/^([A-G](?:#|b)?)(.*)$/);
+  if(!m) return {root:ch, rest:''};
+  return {root: normRoot(m[1]), rest:m[2]}; // e.g. root=A#, rest=m7, sus4, /E
+}
+function transposeChord(ch, semi){
+  const s = splitChord(ch);
+  const i = NOTES_SHARP.indexOf(s.root);
+  if(i === -1) return ch;
+  const j = (i + semi + 120) % 12;
+  return NOTES_SHARP[j] + s.rest;
+}
+
+function parseChordPro(text){
+  const meta = {};
+  const lines = text.replace(/\r/g,'').split('\n');
+  const blocks = [];
+  for (const line of lines){
+    if (/^\{.*\}$/.test(line)) {
+      const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
+      if(m) meta[m[1].toLowerCase()] = m[2];
+      continue;
+    }
+    blocks.push(line);
+  }
+  return { meta, lines: blocks };
+}
+
+function renderChordPro(text, transposeSemi=0, capo=0){
+  const { meta, lines } = parseChordPro(text);
+  const rootTrans = transposeSemi - (capo|0); // když nasadím capo, transponuje se opačně (viz běžná praxe)
+  const cont = document.createElement('div');
+  cont.className = 'cp';
+
+  for (const raw of lines){
+    if (!raw.trim()) { cont.appendChild(document.createElement('br')); continue; }
+    // procházíme text a tokeny [Chord]
+    const line = document.createElement('div'); line.className = 'line';
+    let i = 0, curChord = '';
+    while (i < raw.length){
+      if (raw[i] === '['){
+        const j = raw.indexOf(']', i+1);
+        if (j !== -1){
+          curChord = raw.slice(i+1, j);
+          i = j+1; continue;
+        }
+      }
+      // posbírat segment do dalšího akordu nebo konce
+      let j = i;
+      while (j < raw.length && raw[j] !== '[') j++;
+      const lyr = raw.slice(i, j) || ' ';
+      const seg = document.createElement('span'); seg.className='seg';
+      const ch = document.createElement('span'); ch.className='ch';
+      ch.textContent = curChord ? transposeChord(curChord, rootTrans) : '';
+      const ly = document.createElement('span'); ly.className='ly'; ly.textContent = lyr;
+      seg.appendChild(ch); seg.appendChild(ly);
+      line.appendChild(seg);
+      i = j;
+    }
+    cont.appendChild(line);
+  }
+  return {meta, element: cont};
+}
+
 async function load(){
-  try{
-    const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
-    song = data.find(s => s.id === id);
-  }catch(e){
-    song = null;
-  }
-  if(!song){
-    document.getElementById('title').textContent = 'Píseň nenalezena';
-    return;
-  }
+  const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
+  song = data.find(s => s.id === id);
+  if(!song){ document.getElementById('title').textContent = 'Píseň nenalezena'; return; }
+
   document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
-  document.getElementById('meta').textContent = song.author || '';
-  initAlphaTab(song.file);
-}
-
-let at;
-function initAlphaTab(file){
-  const el = document.getElementById('alphaTab');
-  at = new alphaTab.AlphaTabApi(el, { file, player: { enablePlayer: true } });
-  document.getElementById('play').onclick = ()=> at.playPause();
-  document.getElementById('stop').onclick = ()=> at.stop();
-  document.getElementById('tempo').oninput = (e)=> at.playbackSpeed = e.target.value/100;
-}
-
-load();
-</script>
-</body>
-</html>
+  document.getElementById('meta').textContent = song.author
