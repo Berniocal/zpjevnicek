@@ -2,8 +2,8 @@
   "name": "Zpjěvníček",
   "short_name": "Zpjěvníček",
   "description": "Zpjěvníček – zpěvník s akordy (ChordPro + Guitar Pro), funguje i offline.",
-  "start_url": ".",
-  "scope": ".",
+  "start_url": "/zpjevnicek/",      // <<< DŮLEŽITÉ
+  "scope": "/zpjevnicek/",          // <<< DŮLEŽITÉ
   "display": "standalone",
   "background_color": "#0f1729",
   "theme_color": "#0f1729",
