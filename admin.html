@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Správa písní</title>
   <link rel="stylesheet" href="assets/style.css" />
+ <link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0f1729" />
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
+
   <style>
     .grid{display:grid;gap:10px}
 .two{grid-template-columns:1fr 1fr}
@@ -40,6 +46,7 @@ textarea{
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.9em }
 .overlay .cp .ly{ visibility:visible }
   </style>
+
 </head>
 <body>
   <div class="container">
@@ -304,6 +311,12 @@ document.addEventListener('keydown', (e)=>{
     document.getElementById('closeOverlay').click();
   }
 });
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    const scope = location.pathname.replace(/[^/]+$/, '');
+    navigator.serviceWorker.register(scope + 'sw.js', { scope }).catch(console.error);
+  }
 </script>
 
 </body>
