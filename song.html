@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
   <title>Píseň</title>
   <link rel="stylesheet" href="assets/style.css" />
-  <link rel="manifest" href="manifest.webmanifest" />
+<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
 <meta name="theme-color" content="#0f1729" />
-<link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
+
 
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
   <style>
@@ -366,12 +367,16 @@ load();
 
 window.addEventListener('resize', updateChromeHeight);
 </script>
-  <script>
+<script>
   if ('serviceWorker' in navigator) {
-    const scope = location.pathname.replace(/[^/]+$/, '');
-    navigator.serviceWorker.register(scope + 'sw.js', { scope }).catch(console.error);
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
+        .then(r => console.log('Zpjěvníček SW scope:', r.scope))
+        .catch(console.error);
+    });
   }
 </script>
+
 
 </body>
 </html>
