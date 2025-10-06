@@ -6,5 +6,13 @@
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "002-ibuh-pavel-helan",
+    "number": 2,
+    "title": "IBůh",
+    "author": "Pavel Helan",
+    "file": "songs/002-ibuh-pavel-helan.pro",
+    "type": "chordpro"
   }
 ]
