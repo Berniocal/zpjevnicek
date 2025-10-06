@@ -90,6 +90,14 @@ textarea{
         <label>Tonina (volitelně – meta)
           <input id="key" placeholder="Am" />
         </label>
+        <label>Formát vstupu
+  <select id="fmt">
+    <option value="auto" selected>Auto</option>
+    <option value="chordpro">ChordPro</option>
+    <option value="ug">Ultimate Guitar</option>
+  </select>
+</label>
+
       </div>
       <label class="full">Text (ChordPro)
   <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
@@ -176,6 +184,92 @@ function detectRepo(){
   const repo = parts.length? parts[0] : '';
   const user = host.includes('github.io') ? host.split('.')[0] : '';
   return {user, repo};
+}
+// --- detekce "chord" tokenu ---
+const CHORD_RE = /^(?:[A-G](?:#|b)?)(?:maj|min|dim|aug|sus[24]?|add\d+|m|maj7|m7|7|6|9|11|13)?(?:\/[A-G](?:#|b)?)?$/;
+
+// --- řádek je "akordová linka" (jen akordy, mezery, |, -, /, ( ) ) ---
+function isChordLine(line) {
+  const t = line.trim();
+  if (!t) return false;
+  // pokud má moc dlouhá slova, není to akordová linka
+  const parts = t.split(/\s+/);
+  let chordy = 0, ostatni = 0;
+  for (const p of parts) {
+    if (!p) continue;
+    const clean = p.replace(/[|()\-·•.]+/g, '');
+    if (!clean) continue;
+    if (CHORD_RE.test(clean)) chordy++;
+    else ostatni++;
+  }
+  return chordy > 0 && ostatni === 0;
+}
+
+// --- zarovnání akordové linky nad text → vloží [Akord] do textu kolem sloupečků ---
+function mergeChordAndLyrics(chordsLine, lyricLine){
+  // najdi sloupcové pozice akordů
+  const pos = [];
+  let i = 0;
+  while (i < chordsLine.length){
+    // přeskoč mezery
+    while (i < chordsLine.length && chordsLine[i] === ' ') i++;
+    if (i >= chordsLine.length) break;
+    const start = i;
+    while (i < chordsLine.length && chordsLine[i] !== ' ') i++;
+    const token = chordsLine.slice(start, i).replace(/[|()\-·•.]+/g, '');
+    if (CHORD_RE.test(token)) pos.push({col:start, chord:token});
+  }
+  if (!pos.length) return lyricLine;
+
+  // vlož akordy do textu podle sloupců (nejbližší vhodný index)
+  let out = lyricLine;
+  // vkládáme odzadu, aby se indexy neposouvaly
+  pos.sort((a,b)=>b.col-a.col).forEach(p=>{
+    const idx = Math.min(Math.max(p.col, 0), out.length);
+    out = out.slice(0, idx) + `[${p.chord}]` + out.slice(idx);
+  });
+  return out;
+}
+
+// --- konverze UG → ChordPro ---
+// 1) [ch]Am[/ch] → [Am]
+// 2) akordové řádky + následující text sloučíme do jedné řádky s [Akord]
+// 3) [Verse]/[Chorus]/(Verse) → {comment: Verse}
+function ugToChordPro(text){
+  let t = text.replace(/\r/g,'');
+  // [ch]C[/ch] → [C]
+  t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
+
+  const lines = t.split('\n');
+  const out = [];
+  for (let i = 0; i < lines.length; i++){
+    const L = lines[i];
+
+    // sekční hlavičky
+    const sec = L.match(/^\s*(?:\[(verse|chorus|bridge|intro|outro|solo)\]|\((verse|chorus|bridge|intro|outro|solo)\))\s*$/i);
+    if (sec) { out.push(`{comment: ${ (sec[1]||sec[2]).toLowerCase() }}`); continue; }
+
+    // akordová + textová linka
+    if (isChordLine(L) && i+1 < lines.length){
+      out.push( mergeChordAndLyrics(L, lines[i+1] || '') );
+      i++; // přeskoč lyric line, už jsme ji sloučili
+      continue;
+    }
+
+    // jinak ponech řádek (už může obsahovat [C]… díky [ch] náhradě)
+    out.push(L);
+  }
+
+  // zjemni vícenásobné prázdné řádky
+  const compact = [];
+  let prevEmpty = false;
+  for (const r of out){
+    const empty = !r.trim();
+    if (empty && prevEmpty) continue;
+    compact.push(r);
+    prevEmpty = empty;
+  }
+  return compact.join('\n');
 }
 
 qs('#saveBtn').onclick = async ()=>{
