@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zpěvník</title>
+  <title>Zpjěvníček</title>
   <link rel="stylesheet" href="assets/style.css" />
 <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
 <meta name="theme-color" content="#0f1729" />
@@ -80,6 +80,9 @@ function render(){
 q.addEventListener('input', render);
 sort.addEventListener('change', render);
 load();
+</script>
+
+<!-- registrace SW se scope jen pro /zpjevnicek/ -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -89,6 +92,7 @@ load();
     });
   }
 </script>
+
 
 
 </body>
