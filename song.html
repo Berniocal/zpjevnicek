@@ -42,14 +42,28 @@
     /* „plátno“ -> bez rámečku/pozadí (žádná bublina) */
     .sheet{ padding:0; background:transparent; border:none; box-shadow:none; }
 
-    /* horní lišta (název + ovládání) */
-    #chrome{
-      position:sticky; top:0; z-index:5;
-      background:var(--card);
-      padding:12px 12px 8px;
-      border-bottom:1px solid #192544;
-      transition: transform .25s ease, opacity .25s ease;
-    }
+ /* horní lišta – fixní, aby neměnila výšku stránky */
+#chrome{
+  position:fixed;           /* ⬅ bylo sticky */
+  top:0; left:0; right:0;   /* přes celou šířku */
+  z-index:5;
+  background:var(--card);
+  padding:12px 12px 8px;
+  border-bottom:1px solid #192544;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+/* když je lišta skrytá, jen ji odsuneme, ale layout se nemění */
+body.chrome-hidden #chrome{
+  transform: translateY(-110%);
+  opacity: 0;
+}
+
+/* obsah stránky dostane horní padding = výška lišty (jen když je viditelná) */
+body:not(.chrome-hidden) #view{
+  padding-top: var(--chromeH);   /* výšku doplní JS */
+}
+
 
     /* řádek s odkazem a tlačítkem v liště */
     .chrome-row{
@@ -183,40 +197,18 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   return cont;
 }
 
-/* ---- Výška lišty -> CSS proměnná ---- */
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
   const h = ch ? ch.getBoundingClientRect().height : 0;
   document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
 }
 
-/* ---- Přepínání lišty bez „skočení“ (počítáme delta výšky) ---- */
 function setChromeHidden(hidden){
-  const body = document.body;
-  const view = document.getElementById('view');
-  const bar  = document.getElementById('chrome');
-  if (!view || !bar) return;
-
-  const beforeH = bar.getBoundingClientRect().height || 0;
-
-  if (hidden) {
-    body.classList.add('chrome-hidden');
-    requestAnimationFrame(()=>{
-      const afterH = bar.getBoundingClientRect().height || 0; // po zkolabování ~0
-      const delta  = beforeH - afterH;
-      document.documentElement.style.setProperty('--chromeH', afterH + 'px');
-      view.scrollTop += delta; // dorovnat přesně o rozdíl
-    });
-  } else {
-    body.classList.remove('chrome-hidden');
-    requestAnimationFrame(()=>{
-      const afterH = bar.getBoundingClientRect().height || 0; // reálná výška
-      const delta  = afterH - beforeH;
-      document.documentElement.style.setProperty('--chromeH', afterH + 'px');
-      view.scrollTop = Math.max(0, view.scrollTop - delta);
-    });
-  }
+  document.body.classList.toggle('chrome-hidden', hidden);
+  // už nic neupravujeme – obsah má padding-top přes CSS, takže scroll zůstane
+  updateChromeHeight(); // pro jistotu, kdyby se lišta výškou změnila (wrap řádků apod.)
 }
+
 
 /* ---- Dvoj-klik / dvoj-tap bez blikání ---- */
 function wireDoubleToggle(){
