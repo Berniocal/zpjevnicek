@@ -134,17 +134,30 @@ body:not(.chrome-hidden) #view{
         </div>
 
         <!-- Ovládání pro ChordPro -->
-        <div id="controls-cp" class="player" style="display:none">
-          <span class="kbd">ChordPro</span>
-          <button id="down">Transpose −</button>
-          <button id="up">Transpose +</button>
-          <label>Capo <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em"></label>
-          <span class="kbd">Velikost:
-            <button id="fontDown" type="button">−</button>
-            <button id="fontUp"   type="button">+</button>
-          </span>
-          <button id="toggleChords" type="button">Skrýt akordy</button>
-        </div>
+<div id="controls-cp" class="player" style="display:none">
+  <span class="kbd">ChordPro</span>
+
+  <span class="kbd">Transponovat:
+    <button id="down" type="button">−</button>
+    <button id="up"   type="button">+</button>
+  </span>
+
+  <label>Capo
+    <input id="capo" type="number" min="0" max="11" value="0" style="width:4.5em">
+  </label>
+
+  <span class="kbd">Velikost:
+    <button id="fontDown" type="button">−</button>
+    <button id="fontUp"   type="button">+</button>
+  </span>
+
+  <span class="kbd">Akordy:
+    <button id="toggleChords" type="button" aria-label="Přepnout akordy">
+      <span id="chordsIcon">✅</span>
+    </button>
+  </span>
+</div>
+
       </div>
 
       <!-- TEXT PÍSNĚ – plná šířka -->
@@ -262,17 +275,19 @@ function wireDoubleToggle(){
   }, {passive:false});
 }
 
-/* ---- Skrývání akordů (persist v localStorage) ---- */
 function applyChordVisibility() {
   const view = document.getElementById('view');
   const cp = view?.querySelector('.cp');
-  if (!cp) return;
-  if (HIDE_CHORDS) cp.classList.add('nochords');
-  else cp.classList.remove('nochords');
+  if (cp) {
+    if (HIDE_CHORDS) cp.classList.add('nochords');
+    else cp.classList.remove('nochords');
+  }
 
-  const btn = document.getElementById('toggleChords');
-  if (btn) btn.textContent = HIDE_CHORDS ? 'Zobrazit akordy' : 'Skrýt akordy';
+  // aktualizace stavové ikonky
+  const ico = document.getElementById('chordsIcon');
+  if (ico) ico.textContent = HIDE_CHORDS ? '❌' : '✅';
 }
+
 
 /* ---- Swipe navigace ---- */
 function wireSwipeNavigation(){
@@ -346,12 +361,12 @@ async function load(){
     document.getElementById('fontUp').onclick   = ()=>{ fs=Math.min(72,fs+2); setFs(fs); };
     document.getElementById('fontDown').onclick = ()=>{ fs=Math.max(12,fs-2); setFs(fs); };
 
-    // skrýt/zobrazit akordy (persist)
-    document.getElementById('toggleChords').onclick = ()=>{
-      HIDE_CHORDS = !HIDE_CHORDS;
-      localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
-      applyChordVisibility();
-    };
+document.getElementById('toggleChords').onclick = ()=>{
+  HIDE_CHORDS = !HIDE_CHORDS;
+  localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
+  applyChordVisibility();
+};
+
 
   } else {
     document.getElementById('controls-score').style.display='flex';
