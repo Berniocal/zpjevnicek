@@ -16,6 +16,14 @@
     "type": "chordpro"
   },
   {
+    "id": "003-dubovy-stul-pavel-helan",
+    "number": 3,
+    "title": "Dubový stůl",
+    "author": "Pavel Helan",
+    "file": "songs/003-dubovy-stul-pavel-helan.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "004-buchet-je-spousta-pavel-helan",
     "number": 4,
     "title": "Buchet je spousta",
