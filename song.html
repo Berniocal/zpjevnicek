@@ -14,30 +14,40 @@
 
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
   <style>
-    :root{
-      --cpfs:20px;           /* velikost písma pro ChordPro (+/− ji mění) */
-      --chromeH: 0px;        /* nastavuje JS podle výšky lišty */
-      --chordColor:#22c55e;  /* zelená pro akordy */
-      --chordScale:1.05;     /* 1.0 = stejně jako text; >1 = větší */
-    }
+:root{
+  --cpfs:20px;
+  --chromeH:0px;
+  --chordColor:#22c55e;
+  --chordScale:1.05;
 
-    /* ChordPro render (světlý text na tmavém pozadí) */
-    .cp{ font-family:system-ui,Segoe UI,Arial,sans-serif; line-height:1.9; color:var(--ink); font-size:var(--cpfs) }
-    .cp .line{ position:relative; white-space:pre-wrap }
-    .cp .seg{ position:relative; display:inline-block; padding-top:1.15em }
-    .cp .ch{
-      position:absolute; left:0; top:0;
-      font-weight:700;
-      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-      font-size:calc(1em * var(--chordScale)); /* zvětšené akordy */
-      color:var(--chordColor);                  /* zelené akordy */
-    }
-    .cp .ly{ visibility:visible }
-    .kbd{ font-family: ui-monospace,SFMono-Regular,Menlo,monospace; background:#17213a; border:1px solid #2c3b60; border-radius:8px; padding:.15em .4em }
+  /* ↓↓↓ nové „knoflíky“ pro svislé mezery */
+  --cp-line:1.55;        /* bylo 1.9 – celkové řádkování textu */
+  --cp-pad:0.85em;       /* bylo 1.15em – výška pro akord nad textem */
+  --cp-pad-nochords:0.20em;
+}
 
-    /* Režim bez akordů */
-    .cp.nochords .ch{ display:none }
-    .cp.nochords .seg{ padding-top:0.2em } /* stáhnout mezeru, když nejsou akordy */
+/* ChordPro render */
+.cp{
+  font-family:system-ui,Segoe UI,Arial,sans-serif;
+  color:var(--ink);
+  font-size:var(--cpfs);
+  line-height:var(--cp-line);  /* ← používáme proměnnou */
+}
+.cp .line{ position:relative; white-space:pre-wrap }
+.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
+.cp .ch{
+  position:absolute; left:0; top:0;
+  font-weight:700;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:calc(1em * var(--chordScale));
+  color:var(--chordColor);
+}
+.cp .ly{ visibility:visible }
+
+/* režim bez akordů – ještě těsnější */
+.cp.nochords .ch{ display:none }
+.cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
+
 
     /* „plátno“ -> bez rámečku/pozadí (žádná bublina) */
     .sheet{ padding:0; background:transparent; border:none; box-shadow:none; }
