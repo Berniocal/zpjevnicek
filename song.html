@@ -225,6 +225,42 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   }
   return cont;
 }
+// minimální mezera mezi akordy v px (klidně si uprav)
+const MIN_CHORD_GAP = 4;
+
+// Po vložení vyrenderovaného bloku zarovná akordy v každé .line,
+// aby se nepřekrývaly – případně posune ten další doprava.
+function fixChordOverlaps(root){
+  const lines = root.querySelectorAll('.line');
+  lines.forEach(line => {
+    const chords = Array.from(line.querySelectorAll('.ch'));
+    let prevRight = -Infinity;
+
+    chords.forEach(ch => {
+      // aktuální „levá“/„pravá“ hrana akordu v layoutu
+      const rect = ch.getBoundingClientRect();
+      const left = rect.left;
+      const right = rect.right;
+
+      // kolik chybí do požadované mezery?
+      const need = (prevRight + MIN_CHORD_GAP) - left;
+
+      if (need > 0) {
+        // posuň tenhle akord doprava – necháme ho klidně „přetéct“ do dalšího segmentu
+        // (posun děláme transformací, ať nepřepočítáváme layout)
+        const current = parseFloat(ch.dataset._shift || '0');
+        const nextShift = current + need;
+        ch.style.transform = `translateX(${nextShift}px)`;
+        ch.dataset._shift = String(nextShift);
+
+        // update nové pravé hrany po posunu
+        prevRight = right + need;
+      } else {
+        prevRight = right;
+      }
+    });
+  });
+}
 
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
@@ -346,6 +382,7 @@ async function load(){
     let trans=0, capo=0;
     const render=()=>{
       const view=document.getElementById('view'); view.innerHTML=''; view.appendChild(renderChordPro(text,trans,capo));
+      fixChordOverlaps(v.element);
       applyChordVisibility();
       updateChromeHeight();
     };
