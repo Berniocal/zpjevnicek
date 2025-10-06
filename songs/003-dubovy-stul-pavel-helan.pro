@@ -24,7 +24,7 @@ a já tvůj [G]marnotratný [D]syn,
 [G]vyzpívám se [D]ze svých [A2]vin.
 
 [: [Hmi], [Hmi/A], [E], [A2] :]
-
+                               
 Chci, abys [Hmi]byl, abys objal [Hmi/A]bolesti mé,
 chci, abys [D]byl, abys mi ře[Hmi]kl, že je to vlastně
 [Hmi/A]jednoduché, chci, abys [D]byl,
@@ -32,6 +32,6 @@ a já tvůj [G]marnotratný [D]syn,
 [G]vyzpívám se [D]ze svých [A2]vin.
 
 [: [Hmi], [Hmi/A], [E], [A2] :]
-
+                                    
 Jako [Hmi]dubový stůl nechci, [Hmi/A]aby ses hnul.
 Jako [E]úsměv dalajlámy c[A2]hci, abys byl[D]
