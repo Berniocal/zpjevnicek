@@ -272,30 +272,43 @@ function ugToChordPro(text){
   return compact.join('\n');
 }
 
-qs('#saveBtn').onclick = async ()=>{
-  try{
-    const {user, repo} = detectRepo();
-    if(!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
+qs('#saveBtn').onclick = async () => {
+  try {
+    const { user, repo } = detectRepo();
+    if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
+
     const token = tokenEl.value.trim();
-    if(!token) return status('Vlož prosím PAT token.', false);
-    if(!titleEl.value.trim()) return status('Doplň název písně.', false);
+    if (!token) return status('Vlož prosím PAT token.', false);
+    if (!titleEl.value.trim()) return status('Doplň název písně.', false);
+
+    // ---- 2.3: ZÍSKAT TEXT A PŘÍPADNĚ PŘEVÉST UG -> CHORDPRO ----
+    let body = bodyEl.value.replace(/\r/g, '');
+    const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
+
+    // autodetekce UG: [ch]…[/ch] nebo samostatné "akordové řádky"
+    const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
+
+    if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) {
+      body = ugToChordPro(body);
+    }
+    // ---- konec 2.3 ----
 
     // ChordPro obsah s metadaty
     const lines = [];
     lines.push(`{title: ${titleEl.value.trim()}}`);
-    if(artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
-    if(keyEl.value.trim()) lines.push(`{key: ${keyEl.value.trim()}}`);
+    if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
+    if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
     lines.push('');
-    lines.push(bodyEl.value.replace(/\r/g,''));
+    lines.push(body);                              // ← tady už je případně převedený text
     const content = lines.join('\n');
 
     const filename = filenameEl.value || 'pisen.pro';
     const path = `songs/${filename}`;
 
     status('Ukládám…');
-    const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}` ,{
-      method:'PUT',
-      headers:{
+    const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
+      method: 'PUT',
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/vnd.github+json'
       },
@@ -306,16 +319,17 @@ qs('#saveBtn').onclick = async ()=>{
       })
     });
 
-    if(!res.ok){
+    if (!res.ok) {
       const t = await res.text();
       throw new Error(`GitHub API ${res.status}: ${t}`);
     }
     status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
-  }catch(e){
+  } catch (e) {
     console.error(e);
-    status('Chyba: '+ e.message);
+    status('Chyba: ' + e.message);
   }
 };
+
 </script>
   <script>
 /* ---------- ChordPro render (stejný jako v song.html) ---------- */
