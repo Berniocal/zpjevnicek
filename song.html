@@ -96,15 +96,21 @@ body:not(.chrome-hidden) #view{
       overflow: hidden;
     }
 
-    /* kontejner s písní – výška = viewport - výška lišty */
-    #view{
-      height: calc(100vh - var(--chromeH));
-      max-height: calc(100vh - var(--chromeH));
-      overflow:auto;
-      background:transparent;
-      border:0; border-radius:0; box-shadow:none;
-      padding:12px 4px 24px;
-    }
+/* obsah: plná výška viewportu; lištu řešíme jen paddingem */
+#view{
+  height: 100vh;             /* dřív bylo calc(100vh - var(--chromeH)) */
+  max-height: 100vh;
+  overflow:auto;
+  background:transparent;
+  border:0; border-radius:0; box-shadow:none;
+  padding:12px 4px 24px;     /* základní padding */
+}
+
+/* když je lišta vidět, přičti její výšku navrch – nic neodečítáme z height */
+body:not(.chrome-hidden) #view{
+  padding-top: calc(var(--chromeH) + 12px);
+}
+
     @media (max-width:640px){ #view{ padding-left:2px; padding-right:2px } }
   </style>
 </head>
