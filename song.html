@@ -33,7 +33,12 @@
   font-size:var(--cpfs);
   line-height:var(--cp-line);  /* ← používáme proměnnou */
 }
-.cp .line{ position:relative; white-space:pre-wrap }
+.cp .line{
+  position:relative;
+  white-space:pre-wrap;
+  overflow: visible;   /* ← přidej sem */
+}
+
 .cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
@@ -380,12 +385,25 @@ async function load(){
     document.getElementById('controls-cp').style.display='flex';
     const text = await fetch(song.file).then(r=>r.text());
     let trans=0, capo=0;
-    const render=()=>{
-      const view=document.getElementById('view'); view.innerHTML=''; view.appendChild(renderChordPro(text,trans,capo));
-      fixChordOverlaps(v.element);
-      applyChordVisibility();
-      updateChromeHeight();
-    };
+const render = () => {
+  const view = document.getElementById('view');
+
+  // vytvoř element s písní
+  const el = renderChordPro(text, trans, capo);
+
+  // vlož do DOM
+  view.innerHTML = '';
+  view.appendChild(el);
+
+  // po vložení nech prohlížeč spočítat layout a teprve pak oprav přesahy
+  requestAnimationFrame(() => {
+    fixChordOverlaps(el);
+  });
+
+  applyChordVisibility();
+  updateChromeHeight();
+};
+
     render();
 
     document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
