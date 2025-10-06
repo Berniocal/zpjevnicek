@@ -30,5 +30,13 @@
     "author": "Pavel Helan",
     "file": "songs/004-buchet-je-spousta-pavel-helan.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "005-1-signalni-chinaski",
+    "number": 5,
+    "title": "1. Signální",
+    "author": "Chinaski",
+    "file": "songs/005-1-signalni-chinaski.pro",
+    "type": "chordpro"
   }
 ]
