@@ -11,7 +11,7 @@ až se mi [G]rozední budu ti [D]vyprávět
 na 1. [Am]Signální jak jsem [C]vobletěl svět
 jak tě to [G]vomámí a [D]nepustí zpět
 
-/:Jaký s[F]i to uděl[B]áš takový t[Dmi]o máš:/
+/:Jaký si to [F]uděláš [B]takový to [Dmi]máš:/
 
 Až se [G]dneska večer [C]budu tvářit [Em]zas jak Karel Gott
 [G]budu zpívat [C]vampapidam[Em]pam
@@ -23,7 +23,7 @@ až se mi [G]rozední budu ti [D]vyprávět
 na 1. [Am]Signální jak jsem [C]vobletěl svět
 jak tě to [G]vomámí a [D]nepustí zpět
 
-/:Jaký s[F]i to uděl[B]áš takový t[Dmi]o máš:/
+/:Jaký si to [F]uděláš [B]takový to [Dmi]máš:/
 
 n[G]á n[C]a n[Em]a ná[x4]na na…..
 
@@ -32,5 +32,5 @@ až se mi [G]rozední budu ti [D]vyprávět
 na 1. [Am]Signální jak jsem [C]vobletěl svět
 jak tě to [G]vomámí a [D]nepustí zpět
 
-/:Jaký s[F]i to uděl[B]áš takový t[Dmi]o máš:/
+/:Jaký si to [F]uděláš [B]takový to [Dmi]máš:/
 
