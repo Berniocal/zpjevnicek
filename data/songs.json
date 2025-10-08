@@ -38,5 +38,13 @@
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "006-cesta-krystof",
+    "number": 6,
+    "title": "Cesta",
+    "author": "Kryštof",
+    "file": "songs/006-cesta-krystof.pro",
+    "type": "chordpro"
   }
 ]
