@@ -1,54 +1,75 @@
-/* Zpjěvníček – Service Worker v1.0
+/* Zpěvníček – Service Worker v1.1 (auto-update)
    - cache-first pro statiku (shell)
    - network-first pro HTML navigaci (s offline fallbackem)
-   - stale-while-revalidate pro data/songs.json a songs/* (rychlé + průběžná aktualizace)
+   - stale-while-revalidate pro data/songs.json a /songs/*
+   - auto-update: skipWaiting + message handler
 */
-const CACHE_STATIC = 'zpj-static-v1';
-const CACHE_DYNAMIC = 'zpj-dyn-v1';
+const VERSION = '2025-10-08-1';
+const CACHE_STATIC  = `zpj-static-${VERSION}`;
+const CACHE_DYNAMIC = `zpj-dyn-${VERSION}`;
 
+// VŠECHNY cesty ABSOLUTNĚ pod /zpjevnicek/
 const CORE_ASSETS = [
-  'index.html',
-  'song.html',
-  'admin.html',
-  'assets/style.css',
-  'manifest.webmanifest',
-  'assets/icons/icon-192.png',
-  'assets/icons/icon-512.png',
-  'assets/icons/maskable-512.png'
+  '/zpjevnicek/',
+  '/zpjevnicek/index.html',
+  '/zpjevnicek/song.html',
+  '/zpjevnicek/admin.html',
+  '/zpjevnicek/assets/style.css',
+  '/zpjevnicek/manifest.webmanifest',
+  '/zpjevnicek/assets/icons/icon-192.png',
+  '/zpjevnicek/assets/icons/icon-512.png',
+  '/zpjevnicek/assets/icons/maskable-512.png'
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_STATIC).then(c => c.addAll(CORE_ASSETS)).then(() => self.skipWaiting())
-  );
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE_STATIC);
+    // „měkké“ precache – když něco selže, instalace stejně proběhne
+    await Promise.all(CORE_ASSETS.map(async (u) => {
+      try {
+        const res = await fetch(new Request(u, { cache: 'reload' }));
+        if (res.ok) await c.put(u, res.clone());
+      } catch {}
+    }));
+    self.skipWaiting(); // ← klíč k auto-updatu
+  })());
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => ![CACHE_STATIC, CACHE_DYNAMIC].includes(k)).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys.filter(k => ![CACHE_STATIC, CACHE_DYNAMIC].includes(k)).map(k => caches.delete(k))
+    );
+    await self.clients.claim();
+  })());
+});
+
+// UI může přepnout na novou verzi okamžitě
+self.addEventListener('message', (e) => {
+  if (e?.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
+  if (req.method !== 'GET') return;
+
   const url = new URL(req.url);
 
-  if (url.origin !== location.origin) return;
+  // Obsluhujeme jen vlastní origin a jen cestu /zpjevnicek/**
+  if (url.origin !== location.origin || !url.pathname.startsWith('/zpjevnicek/')) return;
 
   const path = url.pathname;
 
   // Data a písně → stale-while-revalidate
-  if (path.endsWith('/data/songs.json') || path.includes('/songs/')) {
+  if (path === '/zpjevnicek/data/songs.json' || path.startsWith('/zpjevnicek/songs/')) {
     e.respondWith(staleWhileRevalidate(req));
     return;
   }
 
-  // HTML navigace → network-first s fallbackem na cache
-  const isHTMLNav = req.mode === 'navigate' || path.endsWith('.html') || path === '/' || path === '';
-  if (isHTMLNav) {
-    e.respondWith(networkFirst(req));
+  // HTML navigace → network-first s fallbackem na cache (index)
+  if (req.mode === 'navigate' || path.endsWith('.html')) {
+    e.respondWith(networkFirstHTML(req));
     return;
   }
 
@@ -61,28 +82,34 @@ async function cacheFirst(req) {
   const hit = await cache.match(req, { ignoreSearch: true });
   if (hit) return hit;
   const res = await fetch(req);
-  if (res.ok) cache.put(req, res.clone());
+  if (res && res.ok) cache.put(req, res.clone());
   return res;
 }
 
-async function networkFirst(req) {
+async function networkFirstHTML(req) {
   const cache = await caches.open(CACHE_STATIC);
   try {
     const res = await fetch(req, { cache: 'no-store' });
-    if (res.ok) cache.put(req, res.clone());
+    if (res && res.ok) cache.put('/zpjevnicek/index.html', res.clone());
     return res;
   } catch {
-    const hit = await cache.match(req, { ignoreSearch: true });
-    if (hit) return hit;
-    return cache.match('index.html');
+    // offline fallback
+    return (await cache.match(req, { ignoreSearch: true })) ||
+           (await cache.match('/zpjevnicek/index.html')) ||
+           Response.error();
   }
 }
 
 async function staleWhileRevalidate(req) {
   const cache = await caches.open(CACHE_DYNAMIC);
   const hit = await cache.match(req, { ignoreSearch: true });
-  const net = fetch(req, { cache: 'no-store' })
-    .then(res => { if (res.ok) cache.put(req, res.clone()); return res; })
+
+  const fetching = fetch(req, { cache: 'no-store' })
+    .then(res => {
+      if (res && res.ok) cache.put(req, res.clone());
+      return res;
+    })
     .catch(() => null);
-  return hit || net || new Response('', { status: 504 });
+
+  return hit || fetching || new Response('', { status: 504 });
 }
