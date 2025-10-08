@@ -251,18 +251,15 @@ function fixChordOverlaps(root){
       // kolik chybí do požadované mezery?
       const need = (prevRight + MIN_CHORD_GAP) - left;
 
-      if (need > 0) {
-        // posuň tenhle akord doprava – necháme ho klidně „přetéct“ do dalšího segmentu
-        // (posun děláme transformací, ať nepřepočítáváme layout)
-        const nextShift = need; 
-        const current = parseFloat(ch.dataset._shift || '0');
-        const nextShift = current + need;
-        ch.style.transform = `translateX(${nextShift}px)`;
-        ch.dataset._shift = String(nextShift);
-
-        // update nové pravé hrany po posunu
-        prevRight = right + need;
-      } else {
+    if (need > 0) {
+  const nextShift = need; // po resetu je vždy od nuly
+  ch.style.transform = `translateX(${nextShift}px)`;
+  ch.dataset._shift = String(nextShift);
+  prevRight = right + need;
+} else {
+  prevRight = right;
+}
+ else {
         prevRight = right;
       }
     });
