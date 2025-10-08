@@ -239,6 +239,7 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
   lines.forEach(line => {
     const chords = Array.from(line.querySelectorAll('.ch'));
+    chords.forEach(ch => { ch.style.transform = ''; ch.dataset._shift = '0'; });
     let prevRight = -Infinity;
 
     chords.forEach(ch => {
@@ -253,6 +254,7 @@ function fixChordOverlaps(root){
       if (need > 0) {
         // posuň tenhle akord doprava – necháme ho klidně „přetéct“ do dalšího segmentu
         // (posun děláme transformací, ať nepřepočítáváme layout)
+        const nextShift = need; 
         const current = parseFloat(ch.dataset._shift || '0');
         const nextShift = current + need;
         ch.style.transform = `translateX(${nextShift}px)`;
