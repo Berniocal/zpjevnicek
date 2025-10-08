@@ -3,24 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zpjěvníček</title>
- <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
-<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
-<meta name="theme-color" content="#0f1729" />
-<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
+  <title>Zpěvníček</title>
 
-
+  <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
+  <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
+  <meta name="theme-color" content="#0f1729" />
+  <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Zpěvníček" />
 </head>
 <body>
   <div class="container">
     <div class="header">
       <div class="brand">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/></svg>
-        <h1>Zpjěvníček</h1>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/>
+        </svg>
+        <h1>Zpěvníček</h1>
       </div>
-      <a href="admin.html">Přidat písně ↗</a>
+      <a href="/zpjevnicek/admin.html">Přidat písně ↗</a>
     </div>
 
     <div class="card">
@@ -34,7 +35,9 @@
       </div>
       <hr class="sep"/>
       <ul id="list"></ul>
-      <div id="empty" class="empty" style="display:none">Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.</div>
+      <div id="empty" class="empty" style="display:none">
+        Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.
+      </div>
     </div>
 
     <div class="footer">🎸 GitHub Pages · alphaTab</div>
@@ -49,7 +52,7 @@ let songs = [];
 
 async function load(){
   try{
-    const res = await fetch('data/songs.json', {cache:'no-store'});
+    const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
     songs = await res.json();
   }catch(e){ songs = []; }
   render();
@@ -71,7 +74,7 @@ function render(){
     <li class="item">
       <div class="meta">
         <span class="badge">${s.number ?? '–'}</span>
-        <a class="title" href="song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
+        <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
       </div>
       <div class="badge">${s.author || ''}</div>
     </li>`).join('');
@@ -82,18 +85,43 @@ sort.addEventListener('change', render);
 load();
 </script>
 
-<!-- registrace SW se scope jen pro /zpjevnicek/ -->
+<!-- Registrace SW + AUTO-UPDATE -->
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
-        .then(r => console.log('Zpjěvníček SW scope:', r.scope))
-        .catch(console.error);
-    });
-  }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' });
+
+      // 1) Už stažená nová verze? → přepnout hned
+      if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+      // 2) Nová verze se právě instaluje → po installed ji hned aktivuj
+      reg.addEventListener('updatefound', () => {
+        const sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener('statechange', () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            sw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+      // 3) Po přepnutí řídícího SW automaticky jednorázově reloadni
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+
+      // 4) Občasná kontrola aktualizací (např. každou hodinu)
+      setInterval(() => reg.update().catch(()=>{}), 60 * 60 * 1000);
+    } catch (e) {
+      console.error(e);
+    }
+  });
+}
 </script>
-
-
 
 </body>
 </html>
