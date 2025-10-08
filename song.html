@@ -268,6 +268,12 @@ function fixChordOverlaps(root){
     });
   });
 }
+function relayoutChords(){
+  const cp = document.getElementById('view')?.querySelector('.cp');
+  if (!cp) return;
+  requestAnimationFrame(() => fixChordOverlaps(cp));
+}
+
 
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
@@ -413,10 +419,15 @@ const render = () => {
     document.getElementById('capo').oninput = e=>{ capo=parseInt(e.target.value||0,10); render(); };
 
     // velikost textu
-    const setFs=px=> document.documentElement.style.setProperty('--cpfs', px+'px');
-    let fs=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cpfs'))||20;
-    document.getElementById('fontUp').onclick   = ()=>{ fs=Math.min(72,fs+2); setFs(fs); };
-    document.getElementById('fontDown').onclick = ()=>{ fs=Math.max(12,fs-2); setFs(fs); };
+ const setFs = px => {
+  document.documentElement.style.setProperty('--cpfs', px + 'px');
+  relayoutChords();                 // po změně velikosti přepočítej akordy
+};
+let fs = parseFloat(getComputedStyle(document.documentElement)
+           .getPropertyValue('--cpfs')) || 20;
+document.getElementById('fontUp').onclick   = ()=>{ fs=Math.min(72,fs+2); setFs(fs); };
+document.getElementById('fontDown').onclick = ()=>{ fs=Math.max(12,fs-2); setFs(fs); };
+
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
@@ -446,6 +457,9 @@ document.getElementById('toggleChords').onclick = ()=>{
 load();
 
 window.addEventListener('resize', updateChromeHeight);
+  window.addEventListener('resize', relayoutChords);
+window.addEventListener('orientationchange', relayoutChords);
+
 </script>
 <script>
   if ('serviceWorker' in navigator) {
