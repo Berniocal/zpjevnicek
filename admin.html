@@ -186,7 +186,9 @@ function detectRepo(){
   return {user, repo};
 }
 // --- detekce "chord" tokenu ---
-const CHORD_RE = /^(?:[A-G](?:#|b)?)(?:maj|min|dim|aug|sus[24]?|add\d+|m|maj7|m7|7|6|9|11|13)?(?:\/[A-G](?:#|b)?)?$/;
+// české kořeny včetně H a B
+const CHORD_RE =
+  /^(?:[A-H](?:#|b)?)(?:maj|min|dim|aug|sus[24]?|add\d+|m|maj7|m7|7|6|9|11|13)?(?:\/[A-H](?:#|b)?)?$/;
 
 // --- řádek je "akordová linka" (jen akordy, mezery, |, -, /, ( ) ) ---
 function isChordLine(line) {
