@@ -200,33 +200,34 @@ const ALT = {
 // POZN.: Máš už NOTES_CZ a ALT z minula (C, C#, …, A, B, H).
 function normRoot(r){ return ALT[r] || r; }
 
-function splitChordParts(ch){
-  // kořen + libovolná „kvalita“ + volitelný bas po lomítku (Hmi/A, Fmaj7/C…)
-  const m = ch.match(/^([A-H](?:#|b)?)(.*?)(?:\/([A-H](?:#|b)?))?$/);
-  if (!m) return { root: ch, qual: '', bass: null };  // neznámé: necháme beze změny
-  return {
-    root: normRoot(m[1]),
-    qual: m[2] || '',
-    bass: m[3] ? normRoot(m[3]) : null
-  };
-}
-
 function transposeNote(n, semi){
-  const i = NOTES_CZ.indexOf(n);
-  if (i < 0) return n;
+  // bereme velká písmena, normalizujeme (Hb → B, A# → B, atd.)
+  const up = n.toUpperCase();
+  const norm = normRoot(up);
+  const i = NOTES_CZ.indexOf(norm);
+  if (i < 0) return n; // není to platná nota → vrať beze změny (zachová původní zápis)
   return NOTES_CZ[(i + semi + 120) % 12];
 }
 
-function transposeChord(ch, semi){
-  const p = splitChordParts(ch);
-  // když to není standardní akord (regex nesedl), vrať beze změny
-  if (!NOTES_CZ.includes(p.root)) return ch;
+// Obecná transpozice tokenu z hranatých závorek:
+// - pokud ZAČÍNÁ notou → transponuj ji (C, D, …, B, H + #/b), zbytek nech
+// - pokud obsahuje "/<nota>" → transponuj i basovou notu za lomítkem
+// - jinak vrať token beze změny
+function transposeChord(token, semi){
+  //   1) root     2) qual (cokoliv)       3) /bass        4) tail za basem (kdyby tam něco bylo)
+  const m = token.match(/^([A-Ha-h](?:#|b)?)(.*?)(?:\/([A-Ha-h](?:#|b)?)(.*))?$/);
+  if (!m) return token; // nezačíná notou → necháme beze změny
 
-  const rootT = transposeNote(p.root, semi);
-  const bassT = p.bass ? transposeNote(p.bass, semi) : null;
-  return rootT + p.qual + (bassT ? '/' + bassT : '');
+  const rootRaw = m[1];
+  const qual    = m[2] || '';
+  const bassRaw = m[3] || null;
+  const tail    = m[4] || '';
+
+  const rootT = transposeNote(rootRaw, semi);
+  const bassT = bassRaw ? transposeNote(bassRaw, semi) : null;
+
+  return rootT + qual + (bassT ? '/' + bassT : '') + tail;
 }
-
 
 // parser ChordPro s odstraněním prázdných řádků kolem a sloučením vícenásobných mezer
 function parseChordPro(text){
