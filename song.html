@@ -197,19 +197,36 @@ const ALT = {
   'E#':'F','Fb':'E'
 };
 
+// POZN.: Máš už NOTES_CZ a ALT z minula (C, C#, …, A, B, H).
 function normRoot(r){ return ALT[r] || r; }
-function splitChord(ch){
-  const m = ch.match(/^([A-H](?:#|b)?)(.*)$/); // povol i H
-  return m ? { root: normRoot(m[1]), rest: m[2] } : { root: ch, rest: '' };
+
+function splitChordParts(ch){
+  // kořen + libovolná „kvalita“ + volitelný bas po lomítku (Hmi/A, Fmaj7/C…)
+  const m = ch.match(/^([A-H](?:#|b)?)(.*?)(?:\/([A-H](?:#|b)?))?$/);
+  if (!m) return { root: ch, qual: '', bass: null };  // neznámé: necháme beze změny
+  return {
+    root: normRoot(m[1]),
+    qual: m[2] || '',
+    bass: m[3] ? normRoot(m[3]) : null
+  };
 }
 
-function transposeChord(ch, s){
-  const sp = splitChord(ch);
-  const i  = NOTES_CZ.indexOf(sp.root);
-  if (i < 0) return ch; // neznámý kořen – vrať bez změny
-  const j = (i + s + 120) % 12;
-  return NOTES_CZ[j] + sp.rest;
+function transposeNote(n, semi){
+  const i = NOTES_CZ.indexOf(n);
+  if (i < 0) return n;
+  return NOTES_CZ[(i + semi + 120) % 12];
 }
+
+function transposeChord(ch, semi){
+  const p = splitChordParts(ch);
+  // když to není standardní akord (regex nesedl), vrať beze změny
+  if (!NOTES_CZ.includes(p.root)) return ch;
+
+  const rootT = transposeNote(p.root, semi);
+  const bassT = p.bass ? transposeNote(p.bass, semi) : null;
+  return rootT + p.qual + (bassT ? '/' + bassT : '');
+}
+
 
 // parser ChordPro s odstraněním prázdných řádků kolem a sloučením vícenásobných mezer
 function parseChordPro(text){
