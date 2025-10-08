@@ -46,5 +46,13 @@
     "author": "Kryštof",
     "file": "songs/006-cesta-krystof.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "007-vinari-chinaski",
+    "number": 7,
+    "title": "Vinaři",
+    "author": "Chinaski",
+    "file": "songs/007-vinari-chinaski.pro",
+    "type": "chordpro"
   }
 ]
