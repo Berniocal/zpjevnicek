@@ -181,12 +181,35 @@ let SONGS_LIST = [];
 let SONG_INDEX = -1;
 let justSwipedTs = 0;
 
-// akordové helpery
-const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
+// Česká/German stupnice: B = B♭ (A#), H = B
+const NOTES_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
+const ALT = {
+  // běžné křížky/měkká
+  'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#',
+  // B a H
+  'A#':'B',  // A# zapisujeme jako B
+  'Bb':'B',  // Bb zapisujeme jako B
+  'Hb':'B',  // H♭ = B
+  'Cb':'H',  // C♭ = H
+  'B#':'C',  // B# -> C (u nás by dávalo smysl i H#, ale standardně C)
+  'H#':'C',  // H# -> C
+  // ostatní enharmonie
+  'E#':'F','Fb':'E'
+};
+
 function normRoot(r){ return ALT[r] || r; }
-function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root:normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
-function transposeChord(ch, s){ const sp=splitChord(ch), i=NOTES_SHARP.indexOf(sp.root); if(i<0) return ch; return NOTES_SHARP[(i+s+120)%12]+sp.rest; }
+function splitChord(ch){
+  const m = ch.match(/^([A-H](?:#|b)?)(.*)$/); // povol i H
+  return m ? { root: normRoot(m[1]), rest: m[2] } : { root: ch, rest: '' };
+}
+
+function transposeChord(ch, s){
+  const sp = splitChord(ch);
+  const i  = NOTES_CZ.indexOf(sp.root);
+  if (i < 0) return ch; // neznámý kořen – vrať bez změny
+  const j = (i + s + 120) % 12;
+  return NOTES_CZ[j] + sp.rest;
+}
 
 // parser ChordPro s odstraněním prázdných řádků kolem a sloučením vícenásobných mezer
 function parseChordPro(text){
