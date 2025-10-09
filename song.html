@@ -280,27 +280,34 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
 
   lines.forEach(line => {
-    // 1) reset všech posunů
+    // 0) reset všech posunů
     line.querySelectorAll('.seg').forEach(seg => {
       seg.style.marginLeft = '';
     });
 
     let prevRight = -Infinity;
+    let lastTop   = null;
 
-    // 2) projdi akordy zleva doprava a podle potřeby posuň SEGMENT (akord + slovo)
+    // 1) projdi akordy zleva doprava a podle potřeby posuň CELÝ SEGMENT (akord + slabiku)
     const chords = Array.from(line.querySelectorAll('.ch'));
+
     chords.forEach(ch => {
       const seg = ch.parentElement;              // <span class="seg">
-      const segRect = seg.getBoundingClientRect();
-      const chRect  = ch.getBoundingClientRect();
+      const chRect = ch.getBoundingClientRect();
 
-      const needLeft = prevRight + MIN_CHORD_GAP;           // požadovaná min. levá hrana akordu
-      const need = needLeft - chRect.left;                   // kolik chybí
+      // pokud jsme se vizuálně zalomili na další řádek, začínáme "na zelené louce"
+      if (lastTop !== null && (chRect.top - lastTop) > 0.5) {
+        prevRight = -Infinity;
+      }
+      lastTop = chRect.top;
+
+      const needLeft = prevRight + MIN_CHORD_GAP;    // kam nejdřív může začít další akord
+      const need     = needLeft - chRect.left;       // kolik chybí
 
       if (need > 0) {
         const cur = parseFloat(seg.style.marginLeft || '0');
         seg.style.marginLeft = (cur + need) + 'px';
-        // po posunu sečti znovu
+        // po posunu přečteme novou pravou hranu akordu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
       } else {
@@ -308,21 +315,24 @@ function fixChordOverlaps(root){
       }
     });
 
-    // 3) NORMALIZACE: segmenty, které se zalomily na nový vizuální řádek,
-    // nesmí mít žádný margin-left (jinak dělají "odskočené" první slovo).
-    const lineRect = line.getBoundingClientRect();
+    // 2) NORMALIZACE: segmenty, které začínají NOVÝ vizuální řádek, nesmí mít margin-left
     const segs = Array.from(line.querySelectorAll('.seg'));
-    segs.forEach(seg => {
-      const r = seg.getBoundingClientRect();
-      const startsNewVisualLine =
-        (r.top - lineRect.top) > 0.5 &&                 // posunul se na další řádek
-        (r.left - lineRect.left) < 1.0;                 // a je u levého okraje řádku
-      if (startsNewVisualLine) {
-        seg.style.marginLeft = '0px';
-      }
-    });
+    if (segs.length) {
+      const rects = segs.map(s => s.getBoundingClientRect());
+      const firstLeft = Math.min(...rects.map(r => r.left));
+      const firstTop  = Math.min(...rects.map(r => r.top));
+      const LEFT_TOL = 16;  // tolerance pro padding/zaokrouhlení
+      const TOP_TOL  = 0.5;
+
+      segs.forEach((seg, i) => {
+        const r = rects[i];
+        const startsNewRow = (r.top - firstTop) > TOP_TOL && (r.left - firstLeft) < LEFT_TOL;
+        if (startsNewRow) seg.style.marginLeft = '0px';
+      });
+    }
   });
 }
+
 
 
 let relayoutScheduled = false;
