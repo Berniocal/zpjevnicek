@@ -278,37 +278,48 @@ const MIN_CHORD_GAP = 4;
 // aby se nepřekrývaly – případně posune ten další doprava.
 function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
+
   lines.forEach(line => {
     const chords = Array.from(line.querySelectorAll('.ch'));
+
+    // reset posunů
     chords.forEach(ch => { ch.style.transform = ''; ch.dataset._shift = '0'; });
+
     let prevRight = -Infinity;
 
     chords.forEach(ch => {
-      // aktuální „levá“/„pravá“ hrana akordu v layoutu
-      const rect = ch.getBoundingClientRect();
-      const left = rect.left;
-      const right = rect.right;
+      const seg = ch.parentElement;          // kotevní inline-block
+      if (!seg) return;
 
-      // kolik chybí do požadované mezery?
+      // skutečná kotva je .seg, ne .ch (ch je abs. left:0)
+      const left  = seg.offsetLeft;
+      const width = ch.offsetWidth;
+
       const need = (prevRight + MIN_CHORD_GAP) - left;
 
-if (need > 0) {
-  const nextShift = need; // po resetu je vždy od nuly
-  ch.style.transform = `translateX(${nextShift}px)`;
-  ch.dataset._shift = String(nextShift);
-  prevRight = right + need;
-} else {
-  prevRight = right;
-}
-
+      if (need > 0) {
+        ch.style.transform = `translateX(${need}px)`;
+        ch.dataset._shift = String(need);
+        prevRight = left + need + width;
+      } else {
+        prevRight = left + width;
+      }
     });
   });
 }
+
+let relayoutScheduled = false;
 function relayoutChords(){
-  const cp = document.getElementById('view')?.querySelector('.cp');
+  const cp = document.querySelector('#view .cp');
   if (!cp) return;
-  requestAnimationFrame(() => fixChordOverlaps(cp));
+  if (relayoutScheduled) return;
+  relayoutScheduled = true;
+  requestAnimationFrame(() => {
+    relayoutScheduled = false;
+    fixChordOverlaps(cp);
+  });
 }
+
 
 
 function updateChromeHeight(){
@@ -492,9 +503,22 @@ document.getElementById('toggleChords').onclick = ()=>{
 }
 load();
 
-window.addEventListener('resize', updateChromeHeight);
-  window.addEventListener('resize', relayoutChords);
-window.addEventListener('orientationchange', relayoutChords);
+// ---- šetrné přepočty při změně velikosti okna / orientace ----
+let _resizeTO;
+function onResizeReflow(){
+  updateChromeHeight();
+  relayoutChords();
+}
+
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTO);
+  _resizeTO = setTimeout(onResizeReflow, 120); // debounce
+});
+
+window.addEventListener('orientationchange', () => {
+  setTimeout(onResizeReflow, 150); // po otočení nech layout ustálit
+});
+
 
 </script>
 <script>
