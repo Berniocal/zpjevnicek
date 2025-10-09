@@ -280,41 +280,50 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
 
   lines.forEach(line => {
-    // 1) reset předchozích úprav
+    // 1) reset všech posunů
     line.querySelectorAll('.seg').forEach(seg => {
       seg.style.marginLeft = '';
     });
 
     let prevRight = -Infinity;
 
-    // 2) projdi akordy zleva doprava
+    // 2) projdi akordy zleva doprava a podle potřeby posuň SEGMENT (akord + slovo)
     const chords = Array.from(line.querySelectorAll('.ch'));
-
     chords.forEach(ch => {
-      const seg = ch.parentElement;              // <span class="seg"> (obsahuje akord i text)
+      const seg = ch.parentElement;              // <span class="seg">
       const segRect = seg.getBoundingClientRect();
       const chRect  = ch.getBoundingClientRect();
 
-      // kde musí začínat další akord, aby nenarážel
-      const needLeft = prevRight + MIN_CHORD_GAP;
-
-      // kolik chybí do požadované levé hrany?
-      const need = needLeft - chRect.left;
+      const needLeft = prevRight + MIN_CHORD_GAP;           // požadovaná min. levá hrana akordu
+      const need = needLeft - chRect.left;                   // kolik chybí
 
       if (need > 0) {
-        // Posuň celý segment (akord + text) doprava – zůstane zarovnaný nad svou slabikou.
         const cur = parseFloat(seg.style.marginLeft || '0');
         seg.style.marginLeft = (cur + need) + 'px';
-
-        // po posunu přečti novou pravou hranu akordu
+        // po posunu sečti znovu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
       } else {
         prevRight = chRect.right;
       }
     });
+
+    // 3) NORMALIZACE: segmenty, které se zalomily na nový vizuální řádek,
+    // nesmí mít žádný margin-left (jinak dělají "odskočené" první slovo).
+    const lineRect = line.getBoundingClientRect();
+    const segs = Array.from(line.querySelectorAll('.seg'));
+    segs.forEach(seg => {
+      const r = seg.getBoundingClientRect();
+      const startsNewVisualLine =
+        (r.top - lineRect.top) > 0.5 &&                 // posunul se na další řádek
+        (r.left - lineRect.left) < 1.0;                 // a je u levého okraje řádku
+      if (startsNewVisualLine) {
+        seg.style.marginLeft = '0px';
+      }
+    });
   });
 }
+
 
 let relayoutScheduled = false;
 function relayoutChords(){
