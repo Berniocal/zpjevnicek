@@ -280,29 +280,37 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
 
   lines.forEach(line => {
-    const chords = Array.from(line.querySelectorAll('.ch'));
-
-    // reset posunů
-    chords.forEach(ch => { ch.style.transform = ''; ch.dataset._shift = '0'; });
+    // 1) reset předchozích úprav
+    line.querySelectorAll('.seg').forEach(seg => {
+      seg.style.marginLeft = '';
+    });
 
     let prevRight = -Infinity;
 
+    // 2) projdi akordy zleva doprava
+    const chords = Array.from(line.querySelectorAll('.ch'));
+
     chords.forEach(ch => {
-      const seg = ch.parentElement;          // kotevní inline-block
-      if (!seg) return;
+      const seg = ch.parentElement;              // <span class="seg"> (obsahuje akord i text)
+      const segRect = seg.getBoundingClientRect();
+      const chRect  = ch.getBoundingClientRect();
 
-      // skutečná kotva je .seg, ne .ch (ch je abs. left:0)
-      const left  = seg.offsetLeft;
-      const width = ch.offsetWidth;
+      // kde musí začínat další akord, aby nenarážel
+      const needLeft = prevRight + MIN_CHORD_GAP;
 
-      const need = (prevRight + MIN_CHORD_GAP) - left;
+      // kolik chybí do požadované levé hrany?
+      const need = needLeft - chRect.left;
 
       if (need > 0) {
-        ch.style.transform = `translateX(${need}px)`;
-        ch.dataset._shift = String(need);
-        prevRight = left + need + width;
+        // Posuň celý segment (akord + text) doprava – zůstane zarovnaný nad svou slabikou.
+        const cur = parseFloat(seg.style.marginLeft || '0');
+        seg.style.marginLeft = (cur + need) + 'px';
+
+        // po posunu přečti novou pravou hranu akordu
+        const newRect = ch.getBoundingClientRect();
+        prevRight = newRect.right;
       } else {
-        prevRight = left + width;
+        prevRight = chRect.right;
       }
     });
   });
@@ -314,10 +322,7 @@ function relayoutChords(){
   if (!cp) return;
   if (relayoutScheduled) return;
   relayoutScheduled = true;
-  requestAnimationFrame(() => {
-    relayoutScheduled = false;
-    fixChordOverlaps(cp);
-  });
+requestAnimationFrame(relayoutChords);
 }
 
 
@@ -480,7 +485,9 @@ document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
   localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
   applyChordVisibility();
+  relayoutChords(); // ← přidej
 };
+
 
 
   } else {
