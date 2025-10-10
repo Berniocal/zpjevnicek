@@ -313,27 +313,6 @@ function fixChordOverlaps(root){
   });
 }
 
-
-
-    // 2) NORMALIZACE: segmenty, které začínají NOVÝ vizuální řádek, nesmí mít margin-left
-    const segs = Array.from(line.querySelectorAll('.seg'));
-    if (segs.length) {
-      const rects = segs.map(s => s.getBoundingClientRect());
-      const firstLeft = Math.min(...rects.map(r => r.left));
-      const firstTop  = Math.min(...rects.map(r => r.top));
-      const LEFT_TOL = 16;  // tolerance pro padding/zaokrouhlení
-      const TOP_TOL  = 0.5;
-
-      segs.forEach((seg, i) => {
-        const r = rects[i];
-        const startsNewRow = (r.top - firstTop) > TOP_TOL && (r.left - firstLeft) < LEFT_TOL;
-        if (startsNewRow) seg.style.marginLeft = '0px';
-      });
-    }
-  });
-}
-
-
 let relayoutScheduled = false;
 function relayoutChords(){
   const cp = document.querySelector('#view .cp');
