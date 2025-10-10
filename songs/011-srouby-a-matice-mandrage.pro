@@ -42,4 +42,4 @@ navěky [Hm]spojený
 Šrouby a [A]matice,
 šrouby a matice,
 šrouby a matice.
- 
+ -
