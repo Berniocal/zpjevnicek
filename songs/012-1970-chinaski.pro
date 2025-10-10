@@ -29,3 +29,4 @@ Jsem [F#m]silnej ročník [G]sedmdesát a [G]možná že jsem rád
 A tak i [D]Husákovy d[D]ěti dospěly [Hm]do Kristových [Hm]let
 Čas [G]pádí, čas [G]letí, a [A]je to zvláštní s[A]vět
 A tak i [D]Husákovy [D]děti dospěly [Hm]do Kristových [Hm]let :/
+ 
