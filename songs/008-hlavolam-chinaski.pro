@@ -42,4 +42,4 @@ Chci [C]cítit tvůj ledový [G]klid[Am]
 [C]Jen s tebou po uši v [G]hříchu, [Am]lásko.
 [C]Jen s tebou hodlám tu [G]žít.[Am][D]
 Chci líbat tě na tvoje [Em]ústa.[C][G][Em][C][G]
- 
+ -
