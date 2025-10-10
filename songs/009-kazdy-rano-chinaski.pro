@@ -54,3 +54,4 @@ já vůl [A]já blázen,
 [C]kdo postaví [G]mé nohy na zem,
 [D]kdo to [A]pro mě kromě [C]tebe udě[G]lá?
 [D]kdo to [A]pro mě kromě [C]tebe udě[G]lá?
+ 
