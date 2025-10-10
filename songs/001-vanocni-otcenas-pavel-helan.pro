@@ -42,3 +42,4 @@
 [C]králové se mu klaněli, ač se to nezdá
 [G]neměl ani ochranku a neplatil si hotely
 [C]dodnes nám svítí jeho mediální hvězda
+ 
