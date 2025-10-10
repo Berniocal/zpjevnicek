@@ -1,5 +1,5 @@
 {title: Buchet je spousta}
-{artist: Pavel Helan}
+{artist: Pohádková}
 {key: D}
 
 [D]Z pekárny světa [G]kraj za láskou [A]svou,
