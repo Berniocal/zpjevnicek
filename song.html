@@ -39,7 +39,7 @@
   overflow: visible;   /* ← přidej sem */
 }
 
-.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
+.cp .seg{ position:relative; display:inline; padding-top:var(--cp-pad) } /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
   font-weight:700;
@@ -281,9 +281,10 @@ function fixChordOverlaps(root){
 
   lines.forEach(line => {
     // 0) reset všech posunů
-    line.querySelectorAll('.seg').forEach(seg => {
-      seg.style.marginLeft = '';
-    });
+line.querySelectorAll('.seg').forEach(seg => {
+  seg.style.textIndent = '';
+});
+
 
     let prevRight = -Infinity;
     let lastTop   = null;
@@ -305,8 +306,9 @@ function fixChordOverlaps(root){
       const need     = needLeft - chRect.left;       // kolik chybí
 
       if (need > 0) {
-        const cur = parseFloat(seg.style.marginLeft || '0');
-        seg.style.marginLeft = (cur + need) + 'px';
+ const cur = parseFloat(seg.style.textIndent || '0');
+seg.style.textIndent = (cur + need) + 'px';
+
         // po posunu přečteme novou pravou hranu akordu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
