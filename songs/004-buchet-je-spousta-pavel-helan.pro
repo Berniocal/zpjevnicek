@@ -43,4 +43,5 @@
 [Em]lahodná [A]sousta,
 [D]ať naše láska je vždy [G]stejně čist[A]á,
 [G]a pevná jako [A]brány [D]trám.
-
+ 
+ 
