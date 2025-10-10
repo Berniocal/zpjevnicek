@@ -54,5 +54,13 @@
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "009-kazdy-rano-chinaski",
+    "number": 9,
+    "title": "Každý ráno",
+    "author": "Chinaski",
+    "file": "songs/009-kazdy-rano-chinaski.pro",
+    "type": "chordpro"
   }
 ]
