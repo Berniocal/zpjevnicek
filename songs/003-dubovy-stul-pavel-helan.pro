@@ -33,3 +33,4 @@ a já tvůj [G]marnotratný [D]syn,
 [Hmi] [Hmi/A] [E] [A2]                                   
 Jako [Hmi]dubový stůl nechci, [Hmi/A]aby ses hnul.
 Jako [E]úsměv dalajlámy [A2]chci, abys byl[D]
+-
