@@ -39,12 +39,7 @@
   overflow: visible;   /* ← přidej sem */
 }
 
-.cp .seg{
-  position:relative;
-  display:inline;           /* bylo inline-block → způsobovalo „skok“ celého kusu */
-  padding-top:var(--cp-pad);
-}
-
+.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
   font-weight:700;
@@ -285,44 +280,71 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
 
   lines.forEach(line => {
-    // reset
+    // 0) reset všech posunů
     line.querySelectorAll('.seg').forEach(seg => {
-      seg.style.textIndent = '';
+      seg.style.marginLeft = '';
     });
 
     let prevRight = -Infinity;
+    let lastTop   = null;
 
+    // 1) projdi akordy zleva doprava a podle potřeby posuň CELÝ SEGMENT (akord + slabiku)
     const chords = Array.from(line.querySelectorAll('.ch'));
+
     chords.forEach(ch => {
-      const seg    = ch.parentElement;                // <span class="seg">
+      const seg = ch.parentElement;              // <span class="seg">
       const chRect = ch.getBoundingClientRect();
 
-      const needLeft = prevRight + MIN_CHORD_GAP;
-      const need     = needLeft - chRect.left;
+      // pokud jsme se vizuálně zalomili na další řádek, začínáme "na zelené louce"
+      if (lastTop !== null && (chRect.top - lastTop) > 0.5) {
+        prevRight = -Infinity;
+      }
+      lastTop = chRect.top;
+
+      const needLeft = prevRight + MIN_CHORD_GAP;    // kam nejdřív může začít další akord
+      const need     = needLeft - chRect.left;       // kolik chybí
 
       if (need > 0) {
-        const cur = parseFloat(seg.style.textIndent || '0');
-        seg.style.textIndent = (cur + need) + 'px';
-
+        const cur = parseFloat(seg.style.marginLeft || '0');
+        seg.style.marginLeft = (cur + need) + 'px';
+        // po posunu přečteme novou pravou hranu akordu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
       } else {
         prevRight = chRect.right;
       }
     });
+
+    // 2) NORMALIZACE: segmenty, které začínají NOVÝ vizuální řádek, nesmí mít margin-left
+    const segs = Array.from(line.querySelectorAll('.seg'));
+    if (segs.length) {
+      const rects = segs.map(s => s.getBoundingClientRect());
+      const firstLeft = Math.min(...rects.map(r => r.left));
+      const firstTop  = Math.min(...rects.map(r => r.top));
+      const LEFT_TOL = 16;  // tolerance pro padding/zaokrouhlení
+      const TOP_TOL  = 0.5;
+
+      segs.forEach((seg, i) => {
+        const r = rects[i];
+        const startsNewRow = (r.top - firstTop) > TOP_TOL && (r.left - firstLeft) < LEFT_TOL;
+        if (startsNewRow) seg.style.marginLeft = '0px';
+      });
+    }
   });
 }
+
+
 
 let relayoutScheduled = false;
 function relayoutChords(){
   const cp = document.querySelector('#view .cp');
-  if (!cp || relayoutScheduled) return;
+  if (!cp) return;
+  if (relayoutScheduled) return;
   relayoutScheduled = true;
-  requestAnimationFrame(() => {
-    relayoutScheduled = false;
-    fixChordOverlaps(cp);
-  });
+requestAnimationFrame(relayoutChords);
 }
+
+
 
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
