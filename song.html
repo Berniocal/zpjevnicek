@@ -285,31 +285,25 @@ function fixChordOverlaps(root){
   const lines = root.querySelectorAll('.line');
 
   lines.forEach(line => {
-    // 1) reset předchozích úprav
+    // reset
     line.querySelectorAll('.seg').forEach(seg => {
-      seg.style.textIndent = '';        // ← místo marginLeft
+      seg.style.textIndent = '';
     });
 
     let prevRight = -Infinity;
 
-    // 2) projdi akordy zleva doprava
     const chords = Array.from(line.querySelectorAll('.ch'));
-
     chords.forEach(ch => {
-      const seg = ch.parentElement;              // <span class="seg">
-      const segRect = seg.getBoundingClientRect();
-      const chRect  = ch.getBoundingClientRect();
+      const seg    = ch.parentElement;                // <span class="seg">
+      const chRect = ch.getBoundingClientRect();
 
       const needLeft = prevRight + MIN_CHORD_GAP;
-      const need = needLeft - chRect.left;
+      const need     = needLeft - chRect.left;
 
       if (need > 0) {
-        // Posuň pouze začátek segmentu na tomto řádku,
-        // aby akord nepřekrýval předchozí – text se může dál normálně lámat.
         const cur = parseFloat(seg.style.textIndent || '0');
         seg.style.textIndent = (cur + need) + 'px';
 
-        // po posunu přečti novou pravou hranu akordu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
       } else {
@@ -318,6 +312,7 @@ function fixChordOverlaps(root){
     });
   });
 }
+
 
 
     // 2) NORMALIZACE: segmenty, které začínají NOVÝ vizuální řádek, nesmí mít margin-left
@@ -339,17 +334,16 @@ function fixChordOverlaps(root){
 }
 
 
-
 let relayoutScheduled = false;
 function relayoutChords(){
   const cp = document.querySelector('#view .cp');
-  if (!cp) return;
-  if (relayoutScheduled) return;
+  if (!cp || relayoutScheduled) return;
   relayoutScheduled = true;
-requestAnimationFrame(relayoutChords);
+  requestAnimationFrame(() => {
+    relayoutScheduled = false;
+    fixChordOverlaps(cp);
+  });
 }
-
-
 
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
