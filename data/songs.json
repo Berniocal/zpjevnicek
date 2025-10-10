@@ -94,5 +94,13 @@
     "author": "Chinaski",
     "file": "songs/012-1970-chinaski.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "013-magdalena-jelen",
+    "number": 13,
+    "title": "Magdaléna",
+    "author": "Jelen",
+    "file": "songs/013-magdalena-jelen.pro",
+    "type": "chordpro"
   }
 ]
