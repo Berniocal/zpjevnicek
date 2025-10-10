@@ -56,11 +56,11 @@
     "type": "chordpro"
   },
   {
-    "id": "009-kazdy-rano-chinaski",
-    "number": 9,
-    "title": "Každý ráno",
+    "id": "008-hlavolam-chinaski",
+    "number": 8,
+    "title": "Hlavolam",
     "author": "Chinaski",
-    "file": "songs/009-kazdy-rano-chinaski.pro",
+    "file": "songs/008-hlavolam-chinaski.pro",
     "type": "chordpro"
   }
 ]
