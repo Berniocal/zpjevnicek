@@ -33,19 +33,13 @@
   font-size:var(--cpfs);
   line-height:var(--cp-line);  /* ← používáme proměnnou */
 }
-    .cp { --padPx: 0px; }
 .cp .line{
   position:relative;
   white-space:pre-wrap;
   overflow: visible;   /* ← přidej sem */
 }
 
-.cp .seg{
-  position:relative;
-  display:inline-block;
-  /* vezmi větší z pevné hodnoty a změřené výšky akordu */
-  padding-top: max(var(--cp-pad), var(--padPx));
-}
+.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
   font-weight:700;
@@ -287,10 +281,9 @@ function fixChordOverlaps(root){
 
   lines.forEach(line => {
     // 0) reset všech posunů
-line.querySelectorAll('.seg').forEach(seg => {
-  seg.style.textIndent = '';
-});
-
+    line.querySelectorAll('.seg').forEach(seg => {
+      seg.style.marginLeft = '';
+    });
 
     let prevRight = -Infinity;
     let lastTop   = null;
@@ -312,9 +305,8 @@ line.querySelectorAll('.seg').forEach(seg => {
       const need     = needLeft - chRect.left;       // kolik chybí
 
       if (need > 0) {
- const cur = parseFloat(seg.style.textIndent || '0');
-seg.style.textIndent = (cur + need) + 'px';
-
+        const cur = parseFloat(seg.style.marginLeft || '0');
+        seg.style.marginLeft = (cur + need) + 'px';
         // po posunu přečteme novou pravou hranu akordu
         const newRect = ch.getBoundingClientRect();
         prevRight = newRect.right;
@@ -335,7 +327,7 @@ seg.style.textIndent = (cur + need) + 'px';
       segs.forEach((seg, i) => {
         const r = rects[i];
         const startsNewRow = (r.top - firstTop) > TOP_TOL && (r.left - firstLeft) < LEFT_TOL;
-       if (startsNewRow) seg.style.textIndent = '0px';
+        if (startsNewRow) seg.style.marginLeft = '0px';
       });
     }
   });
@@ -346,13 +338,10 @@ seg.style.textIndent = (cur + need) + 'px';
 let relayoutScheduled = false;
 function relayoutChords(){
   const cp = document.querySelector('#view .cp');
-  if (!cp || relayoutScheduled) return;
+  if (!cp) return;
+  if (relayoutScheduled) return;
   relayoutScheduled = true;
-  requestAnimationFrame(() => {
-    relayoutScheduled = false;
-    ensureVerticalSpace(cp);   // spočítá potřebnou svislou rezervu
-    fixChordOverlaps(cp);      // pak dorovná vodorovné přesahy
-  });
+requestAnimationFrame(relayoutChords);
 }
 
 
@@ -367,14 +356,6 @@ function setChromeHidden(hidden){
   document.body.classList.toggle('chrome-hidden', hidden);
   // už nic neupravujeme – obsah má padding-top přes CSS, takže scroll zůstane
   updateChromeHeight(); // pro jistotu, kdyby se lišta výškou změnila (wrap řádků apod.)
-}
-function ensureVerticalSpace(root){
-  const chords = root.querySelectorAll('.ch');
-  if (!chords.length) return;
-  let maxH = 0;
-  chords.forEach(ch => { maxH = Math.max(maxH, ch.getBoundingClientRect().height); });
-  // +2 px jako bezpečnostní mezera
-  root.style.setProperty('--padPx', (Math.ceil(maxH) + 2) + 'px');
 }
 
 
@@ -492,10 +473,6 @@ const render = () => {
   // vlož do DOM
   view.innerHTML = '';
   view.appendChild(el);
-// nejdřív spočítej výšku akordu, ať se text neposouvá do akordů
-ensureVerticalSpace(el);
-
-// a teprve pak řeš vodorovné kolize
 
   // po vložení nech prohlížeč spočítat layout a teprve pak oprav přesahy
   requestAnimationFrame(() => {
@@ -512,13 +489,11 @@ ensureVerticalSpace(el);
     document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
     document.getElementById('capo').oninput = e=>{ capo=parseInt(e.target.value||0,10); render(); };
 
-const setFs = px => {
+    // velikost textu
+ const setFs = px => {
   document.documentElement.style.setProperty('--cpfs', px + 'px');
-  const cp = document.querySelector('#view .cp');
-  if (cp) ensureVerticalSpace(cp);
-  relayoutChords();
+  relayoutChords();                 // po změně velikosti přepočítej akordy
 };
-
 let fs = parseFloat(getComputedStyle(document.documentElement)
            .getPropertyValue('--cpfs')) || 20;
 document.getElementById('fontUp').onclick   = ()=>{ fs=Math.min(72,fs+2); setFs(fs); };
@@ -529,9 +504,7 @@ document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
   localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
   applyChordVisibility();
-  const cp = document.querySelector('#view .cp');
-  if (cp) ensureVerticalSpace(cp);
-  relayoutChords();
+  relayoutChords(); // ← přidej
 };
 
 
