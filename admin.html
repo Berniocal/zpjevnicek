@@ -49,6 +49,7 @@
       z-index:2;
       pointer-events:none;
       overflow:hidden; /* ořez i pro vnitřní marky */
+      padding: var(--ed-pad);     /* ← NOVÉ: stejné odsazení jako textarea/mirror */
     }
     .mirror{
       position:absolute; inset:0;
@@ -227,22 +228,21 @@
       if (visible.length > ROW_LIMIT) overIdx.add(i);
     });
 
-    marksEl.innerHTML = '';
-    const mirrorBox = mirrorEl.getBoundingClientRect();
-    const padTop = parseFloat(getComputedStyle(mirrorEl).paddingTop) || 0;
-    const spans = mirrorEl.querySelectorAll('.line');
+marksEl.innerHTML = '';
 
-    spans.forEach((span, i)=>{
-      if (!overIdx.has(i)) return;
-      const rects = span.getClientRects();
-      if (!rects.length) return;
-      const last = rects[rects.length-1];
-      const top  = last.bottom - mirrorBox.top + padTop - 2;
-      const mark = document.createElement('div');
-      mark.className = 'mark';
-      mark.style.top = top + 'px';
-      marksEl.appendChild(mark);
-    });
+const spans = mirrorEl.querySelectorAll('.line');
+spans.forEach((span, i)=>{
+  if (!overIdx.has(i)) return;
+
+  // obsahové souřadnice – stabilní i při scrollu
+  const top = span.offsetTop + span.offsetHeight - 2;  // 2px podtržení
+
+  const mark = document.createElement('div');
+  mark.className = 'mark';
+  mark.style.top = top + 'px';
+  marksEl.appendChild(mark);
+});
+
   }
 
   bodyEl.addEventListener('scroll', ()=>{
