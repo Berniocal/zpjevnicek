@@ -3,11 +3,13 @@
 
 [Gm]Chladná [C]rána jsou [Gm]tomu kdo [C]strádá
 [Gm]láskou [C]bolestnou, [Gm]neopětova[C]nou. 
-Pokud [Gm]víš, tak [C]rád tě mám [Gm]a ty mě máš [C]ráda.
+Pokud [Gm]víš, tak [C]rád tě mám 
+[Gm]a ty mě máš [C]ráda.
 [Gm]Chuť a[C] vůni tvou [Gm]nejde zapome[C]nout.
 
 Chystá [Dmi7]se prej konec [C]světa, tramta[Gm]dá!
-[Dmi7]Mě jen jedna [C]věta napa[B7]dá...(Pojď s tim ven!)
+[Dmi7]Mě jen jedna [C]věta napa[B7]dá...
+(Pojď s tim ven!)
 [F]Chci ti říct, že [C7]mám tě [C]rád,
 že [Gmi]miluju tě [Gm7]jako blázen,
 [F]chci si nechat [C7]teto[C]vat
@@ -19,11 +21,13 @@ c[Gmi]hci ti říct, že [Gm7]rád tě mám [B7]víc.
 
 [Gm7]Dýcháš na [C]mou tvá[Gm7]ř, já na tvou [C]dýchám.
 [Gm7]Chvěješ se [C]myšlenkou, [Gm7]že se roze[C]dní,
-[Gm7]Děláš, jako že [C]nespěcháš, [Gm7]já že nepospí[C]chám.
+[Gm7]Děláš, jako že [C]nespěcháš, 
+[Gm7]já že nepospí[C]chám.
 [Gm7]Nechce se [C]z obje[Gm7]tí, když je posle[C]dní.
 
 Chystá [Dmi7]se prej konec [C]světa, tramta[Gm]dá!
-[Dmi7]Mě jen jedna [C]věta napa[B7]dá...(Pojď s tim ven!)
+[Dmi7]Mě jen jedna [C]věta napa[B7]dá...
+(Pojď s tim ven!)
 [F]Chci ti říct, že [C7]mám tě [C]rád,
 že [Gmi]miluju tě [Gm7]jako blázen,
 [F]chci si nechat [C7]teto[C]vat
