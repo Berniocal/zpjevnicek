@@ -14,13 +14,35 @@
     .grid{display:grid;gap:10px}
     .two{grid-template-columns:1fr 1fr}
     .full{grid-column:1 / -1;}           /* položka přes celou šířku gridu */
-    textarea{
-      width:100%;                        /* roztáhne na celou šířku */
-      min-height:520px;                  /* bylo ~320px → +~50 % */
-      resize:vertical;                   /* povolit ruční zvětšení výšky */
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; /* ať sedí akordy */
+
+    /* --- editor s podkladem pro zvýraznění dlouhých řádků --- */
+    .editor{ position:relative; }
+    .editor textarea{
+      width:100%;
+      min-height:520px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       line-height:1.6;
+      background:transparent;           /* ať prosvítá podklad */
+      position:relative;
+      z-index:1;
+      white-space:pre-wrap;             /* stejné zalamování jako podklad */
+      overflow-wrap:break-word;
     }
+    .marks{
+      position:absolute; inset:0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      line-height:1.6;
+      white-space:pre-wrap;
+      overflow-wrap:break-word;
+      color:transparent;                /* text neukazujeme, jen pozadí řádků */
+      pointer-events:none;              /* aby šel editovat textarea */
+      z-index:0;
+      /* sjednotíme padding s textarea (pokud máš v /assets/style.css jiné, slaď tam i tady) */
+      padding: 8px;
+    }
+    .marks .row{ display:block; }
+    .marks .over{ background: rgba(220, 38, 38, .16); } /* jemná červená */
   </style>
 </head>
 <body>
@@ -72,10 +94,15 @@
           </select>
         </label>
       </div>
+
       <label class="full">Text (ChordPro)
-        <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+        <!-- ▼ OBALEM TEXTAREA A PODKLAD PRO HIGHLIGHT ▼ -->
+        <div class="editor">
+          <pre id="marks" class="marks" aria-hidden="true"></pre>
+          <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+        </div>
       </label>
-      <!-- tlačítko náhledu odstraněno -->
+
       <div class="grid two">
         <label>Název souboru (automaticky)
           <input id="filename" readonly />
@@ -98,8 +125,6 @@
     </div>
   </div>
 
-  <!-- overlay náhled kompletně odstraněn -->
-
   <script>
   const qs = s=>document.querySelector(s);
   const statusEl = qs('#status');
@@ -109,6 +134,9 @@
   const keyEl = qs('#key');
   const bodyEl = qs('#body');
   const filenameEl = qs('#filename');
+  const marksEl = qs('#marks');
+
+  const ROW_LIMIT = 30; // limit znaků na řádku bez akordů [..]
 
   function slug(s){ return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
   function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
@@ -141,12 +169,46 @@
     const user = host.includes('github.io') ? host.split('.')[0] : '';
     return {user, repo};
   }
+
+  // ---------- Highlight řádků delších než ROW_LIMIT (bez akordů) ----------
+  const CHORD_BRACKETS_RE = /\[[^\]]*]/g; // [cokoli do nejbližšího ]
+  function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+  function rebuildMarks(){
+    const text = bodyEl.value.replace(/\r/g,'');
+    const lines = text.split('\n');
+
+    // Sestavíme <pre> obsah po řádcích
+    const html = lines.map(line=>{
+      const visible = line.replace(CHORD_BRACKETS_RE, ''); // bez akordů
+      const over = visible.length > ROW_LIMIT;
+      const content = line.length ? escapeHtml(line) : '&nbsp;'; // drží výšku i pro prázdné
+      return `<span class="row${over ? ' over':''}">${content}</span>`;
+    }).join('\n');
+
+    marksEl.innerHTML = html;
+    // sladíme rozměry a padding s textarea (kdyby se lišily)
+    const cs = getComputedStyle(bodyEl);
+    marksEl.style.padding = cs.padding;
+    marksEl.style.fontSize = cs.fontSize;
+    marksEl.style.lineHeight = cs.lineHeight;
+  }
+
+  // Sync scroll (textarea → podklad)
+  bodyEl.addEventListener('scroll', ()=>{
+    marksEl.scrollTop = bodyEl.scrollTop;
+    marksEl.scrollLeft = bodyEl.scrollLeft;
+  });
+
+  // Rebuild při psaní, vkládání, změně
+  ['input','change','keyup'].forEach(ev => bodyEl.addEventListener(ev, rebuildMarks));
+  // Po načtení
+  rebuildMarks();
+
   // --- detekce "chord" tokenu ---
-  // české kořeny včetně H a B + UG tolerantní varianta
   const CHORD_RE =
     /^(?:[A-H](?:#|b)?)(?:(?:maj|min|dim|aug|sus[24]?|add\d+|m|mi|moll|dur)(?:\d+)?)?(?:\d+)?(?:\/[A-H](?:#|b)?)?$/i;
 
-  // --- osamocený „chord-like“ token (akord, jedno písmeno A–H, samotné číslo, N.C., x) ---
   function isChordishToken(tok) {
     if (!tok) return false;
     if (CHORD_RE.test(tok)) return true;
@@ -155,49 +217,40 @@
     if (/^(N\.C\.|NC|x)$/i.test(tok)) return true;
     return false;
   }
-
-  // --- TAB/tablatura? (e|---, A|---, dlouhé běhy '-') ---
   function looksLikeTab(line) {
     const t = line.trim();
     if (/^[eBGDAE]\|[-x\ds\s|]+$/.test(t)) return true;
     if (/-{3,}/.test(t)) return true;
     return false;
   }
-
-  // --- řádek je "akordová linka" (UG i klasické) ---
   function isChordLine(line) {
     if (!line || !line.trim()) return false;
     if (looksLikeTab(line)) return false;
 
-    const hasLongSpaces = / {2,}/.test(line);          // „hodně mezer za sebou“
+    const hasLongSpaces = / {2,}/.test(line);
     const rawParts = line.trim().split(/\s+/);
 
     let chordy = 0, ostatni = 0, totalLen = 0;
     for (const p of rawParts) {
-      // odstraň dekorace, ale nech '/' kvůli slash-akordům
       const clean = p.replace(/[|()·•.\u00B7]+/g, '').replace(/^-+|-+$/g, '');
       if (!clean) continue;
       totalLen += clean.length;
       if (isChordishToken(clean)) chordy++;
       else ostatni++;
     }
-
     if (chordy === 0) return false;
 
-    // „převážně akordy“ + buď dlouhé mezery, nebo krátké tokeny (typicky akordy)
     const ratioOK = (ostatni === 0) || (chordy / (chordy + ostatni) >= 0.8);
     const avgLen = totalLen / Math.max(1, (chordy + ostatni));
 
     return ratioOK && (hasLongSpaces || avgLen <= 3);
   }
 
-  // --- zarovnání akordové linky nad text → vloží [Akord] do textu kolem sloupečků ---
+  // --- UG → ChordPro převod (beze změn) ---
   function mergeChordAndLyrics(chordsLine, lyricLine){
-    // najdi sloupcové pozice akordů
     const pos = [];
     let i = 0;
     while (i < chordsLine.length){
-      // přeskoč mezery
       while (i < chordsLine.length && chordsLine[i] === ' ') i++;
       if (i >= chordsLine.length) break;
       const start = i;
@@ -207,46 +260,32 @@
     }
     if (!pos.length) return lyricLine;
 
-    // vlož akordy do textu podle sloupců (nejbližší vhodný index)
     let out = lyricLine;
-    // vkládáme odzadu, aby se indexy neposouvaly
     pos.sort((a,b)=>b.col-a.col).forEach(p=>{
       const idx = Math.min(Math.max(p.col, 0), out.length);
       out = out.slice(0, idx) + `[${p.chord}]` + out.slice(idx);
     });
     return out;
   }
-
-  // --- konverze UG → ChordPro ---
-  // 1) [ch]Am[/ch] → [Am]
-  // 2) akordové řádky + následující text sloučíme do jedné řádky s [Akord]
-  // 3) [Verse]/[Chorus]/(Verse) → {comment: Verse}
   function ugToChordPro(text){
     let t = text.replace(/\r/g,'');
-    // [ch]C[/ch] → [C]
     t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
 
     const lines = t.split('\n');
     const out = [];
     for (let i = 0; i < lines.length; i++){
       const L = lines[i];
-
-      // sekční hlavičky
       const sec = L.match(/^\s*(?:\[(verse|chorus|bridge|intro|outro|solo)\]|\((verse|chorus|bridge|intro|outro|solo)\))\s*$/i);
       if (sec) { out.push(`{comment: ${ (sec[1]||sec[2]).toLowerCase() }}`); continue; }
 
-      // akordová + textová linka
       if (isChordLine(L) && i+1 < lines.length){
         out.push( mergeChordAndLyrics(L, lines[i+1] || '') );
-        i++; // přeskoč lyric line, už jsme ji sloučili
+        i++;
         continue;
       }
-
-      // jinak ponech řádek (už může obsahovat [C]… díky [ch] náhradě)
       out.push(L);
     }
 
-    // zjemni vícenásobné prázdné řádky
     const compact = [];
     let prevEmpty = false;
     for (const r of out){
@@ -267,25 +306,21 @@
       if (!token) return status('Vlož prosím PAT token.', false);
       if (!titleEl.value.trim()) return status('Doplň název písně.', false);
 
-      // ---- 2.3: ZÍSKAT TEXT A PŘÍPADNĚ PŘEVÉST UG -> CHORDPRO ----
+      // 2.3: případný převod UG -> ChordPro
       let body = bodyEl.value.replace(/\r/g, '');
       const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
-
-      // autodetekce UG: [ch]…[/ch] nebo samostatné "akordové řádky"
       const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
-
       if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) {
         body = ugToChordPro(body);
       }
-      // ---- konec 2.3 ----
 
-      // ChordPro obsah s metadaty
+      // ChordPro + metadata
       const lines = [];
       lines.push(`{title: ${titleEl.value.trim()}}`);
       if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
       if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
       lines.push('');
-      lines.push(body);                              // ← tady už je případně převedený text
+      lines.push(body);
       const content = lines.join('\n');
 
       const filename = filenameEl.value || 'pisen.pro';
