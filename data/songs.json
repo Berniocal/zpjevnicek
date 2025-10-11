@@ -110,5 +110,13 @@
     "author": "MIG 21",
     "file": "songs/014-chci-ti-rict-mig-21.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "015-kridla-z-mydla-krystof",
+    "number": 15,
+    "title": "Křídla z mýdla",
+    "author": "Kryštof",
+    "file": "songs/015-kridla-z-mydla-krystof.pro",
+    "type": "chordpro"
   }
 ]
