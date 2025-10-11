@@ -19,7 +19,7 @@
 [A]Křídla mít [F#m]z mýdla a [D]tát, [D]když se [A]vsází
 Že další [F#m]fází je [D]pád.[D]
 
-[:Do[Hm]lůůůů[Hm]ůůůůů[A]ů [A]  Do[F#m]lůůůů[F#m]ůůůůů[D]ů:[D]]
+/:Do[Hm]lůůůů[Hm]ůůůůů[A]ů [A]  Do[F#m]lůůůů[F#m]ůůůůů[D]ů:[D]/
 
 [A]Na všechno bylo času. [F#m]Než přišlo ticho hlasu
 [D]Než přišly první kroky, [D]naší poslední sloky
