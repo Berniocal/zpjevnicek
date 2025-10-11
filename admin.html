@@ -49,13 +49,13 @@
       z-index:2;
       pointer-events:none;
       overflow:hidden; /* ořez i pro vnitřní marky */
-      padding: var(--ed-pad);     /* ← NOVÉ: stejné odsazení jako textarea/mirror */
+      padding: var(--ed-pad);
     }
     .marks-content{
-  position:relative;                 /* rodič pro absolutní .mark */
-  min-height:100%;                   /* bude přepsáno na přesnou výšku v JS */
-  will-change: transform;            /* plynulejší posun */
-}
+      position:relative;                 /* rodič pro absolutní .mark */
+      min-height:100%;                   /* přepsáno na skutečnou výšku v JS */
+      will-change: transform;
+    }
     .mirror{
       position:absolute; inset:0;
       padding: var(--ed-pad);
@@ -71,11 +71,10 @@
       border-radius:1px;
     }
 
-    /* Tlačítko pro zap/vyp upozornění */
-    #toggleMarks{
-      align-self:end; justify-self:end;
-      padding:6px 10px; font-size:14px;
-    }
+    /* Ovládací prvky vedle sebe hezky drží */
+    #toggleMarks{ align-self:end; justify-self:end; padding:6px 10px; font-size:14px; }
+    .limitCtl{ display:flex; gap:6px; align-items:center; justify-content:flex-end; }
+    #limitVal{ width:84px; }
   </style>
 </head>
 <body>
@@ -126,7 +125,12 @@
             <option value="ug">Ultimate Guitar</option>
           </select>
         </label>
-        <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
+
+        <div class="limitCtl">
+          <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
+          <input id="limitVal" type="number" min="10" max="200" step="1" />
+          <button id="applyLimit" title="Nastavit hranici znaků">Nastavit limit</button>
+        </div>
       </div>
 
       <label class="full">Text (ChordPro)
@@ -173,8 +177,13 @@
   const marksContentEl = document.getElementById('marksContent'); 
   const mirrorEl = document.getElementById('mirror');
   const toggleMarksBtn = document.getElementById('toggleMarks');
+  const limitInput = document.getElementById('limitVal');
+  const applyLimitBtn = document.getElementById('applyLimit');
 
-  const ROW_LIMIT = 30;
+  // ⬇ limit znaků – načte se z localStorage, jinak 30
+  let rowLimit = Number(localStorage.getItem('row_limit') || '30');
+  limitInput.value = rowLimit;
+
   const CHORD_BRACKETS_RE = /\[[^\]]*]/g;
   let marksEnabled = true;
 
@@ -214,11 +223,18 @@
   function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
   function rebuildMarks(){
-    if (!marksEnabled) { marksEl.innerHTML=''; return; }
+    if (!marksEnabled) {
+      marksContentEl.innerHTML = '';
+      marksContentEl.style.height = '0px';
+      marksEl.style.display = 'none';
+      return;
+    }
+    marksEl.style.display = '';
 
     const text = bodyEl.value.replace(/\r/g,'');
     const lines = text.split('\n');
 
+    // mirror na měření
     mirrorEl.innerHTML = '';
     for (let i=0;i<lines.length;i++){
       const span = document.createElement('span');
@@ -228,36 +244,32 @@
       if (i < lines.length-1) mirrorEl.appendChild(document.createElement('br'));
     }
 
+    // které zdrojové řádky překračují limit (bez akordů)?
     const overIdx = new Set();
     lines.forEach((L, i)=>{
       const visible = L.replace(CHORD_BRACKETS_RE, '');
-      if (visible.length > ROW_LIMIT) overIdx.add(i);
+      if (visible.length > rowLimit) overIdx.add(i);
     });
 
-// ... po naplnění mirrorEl a výpočtu overIdx ...
+    // vytvoř marky pro celý obsah
+    marksContentEl.innerHTML = '';
+    marksContentEl.style.height = mirrorEl.scrollHeight + 'px';
 
-// Nastav výšku obsahu a vykresli značky do marksContentEl
-marksContentEl.innerHTML = '';
-marksContentEl.style.height = mirrorEl.scrollHeight + 'px';
-
-const spans = mirrorEl.querySelectorAll('.line');
-spans.forEach((span, i)=>{
-  if (!overIdx.has(i)) return;
-
-  // top v "obsahových" souřadnicích (nezávislé na scrollu)
-  const top = span.offsetTop + span.offsetHeight - 2; // 2px podtržení
-
-  const mark = document.createElement('div');
-  mark.className = 'mark';
-  mark.style.top = top + 'px';
-  marksContentEl.appendChild(mark);
-});
-
-
+    const spans = mirrorEl.querySelectorAll('.line');
+    spans.forEach((span, i)=>{
+      if (!overIdx.has(i)) return;
+      const top = span.offsetTop + span.offsetHeight - 2; // 2px podtržení
+      const mark = document.createElement('div');
+      mark.className = 'mark';
+      mark.style.top = top + 'px';
+      marksContentEl.appendChild(mark);
+    });
   }
 
   bodyEl.addEventListener('scroll', ()=>{
+    // posuň vnitřek s čárami; vnější .marks je ořezová maska
     marksContentEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
+    // mirror držíme ve stejném scrollu kvůli offsetům
     mirrorEl.scrollTop = bodyEl.scrollTop;
     mirrorEl.scrollLeft = bodyEl.scrollLeft;
   });
@@ -269,6 +281,15 @@ spans.forEach((span, i)=>{
   toggleMarksBtn.addEventListener('click', ()=>{
     marksEnabled = !marksEnabled;
     toggleMarksBtn.textContent = marksEnabled ? '⚙ Upozornění: zapnuto' : '⚙ Upozornění: vypnuto';
+    rebuildMarks();
+  });
+
+  // nastavení limitu
+  applyLimitBtn.addEventListener('click', ()=>{
+    const v = Number(limitInput.value);
+    if (!Number.isFinite(v) || v < 1) return;
+    rowLimit = v;
+    localStorage.setItem('row_limit', String(rowLimit));
     rebuildMarks();
   });
 
