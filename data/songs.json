@@ -126,5 +126,13 @@
     "author": "Jelen",
     "file": "songs/016-tancime-spolu-jelen.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "017-malovani-divokej-bill",
+    "number": 17,
+    "title": "Malování",
+    "author": "Divokej Bill",
+    "file": "songs/017-malovani-divokej-bill.pro",
+    "type": "chordpro"
   }
 ]
