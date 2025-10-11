@@ -8,16 +8,21 @@ na to se [Em]nezapomíná,ve [C]sklenici vína
 jsem [G]právě [D]utopila [C]žal,
 [Em]hmm[D][C]
 
-[Em]V paměti a ve [C]vzpomínkách, mi s[G]cházíš [D]čím dál [C]víc,
-[Em]v paměti a ve [C]vzpomínkách ti [G]pořád [D]mám co [C]říct
+[Em]V paměti a ve [C]vzpomínkách, 
+mi s[G]cházíš [D]čím dál [C]víc,
+[Em]v paměti a ve [C]vzpomínkách 
+ti [G]pořád [D]mám co [C]říct
 
 [G] [C]  [G]  [D]  [C]  [Em] [C] [G]  [D]  [C]         
-[Em]Blíží se ráno [C]a venku svítá, [G]je [D]načase [C]jít,
-[Em]blíží se ráno a [C]dnes ani zítra, [G]už [D]nemůžu [C]snít,
-[Em]hmm[D][C]
+[Em]Blíží se ráno [C]a venku svítá, 
+[G]je [D]načase [C]jít,
+[Em]blíží se ráno a [C]dnes ani zítra, 
+[G]už [D]nemůžu [C]snít, [Em]hmm[D][C]
 
-[Em]V paměti a ve [C]vzpomínkách, mi s[G]cházíš [D]čím dál [C]víc,
-[Em]v paměti a ve [C]vzpomínkách ti [G]pořád [D]mám co [C]říct
+[Em]V paměti a ve [C]vzpomínkách, 
+mi s[G]cházíš [D]čím dál [C]víc,
+[Em]v paměti a ve [C]vzpomínkách 
+ti [G]pořád [D]mám co [C]říct
 
 [G] [C]  [G]  [D]  [C] [Em]   [C]  [G]  [D]  [C] 
 [G]Tančíme [D]spolu píseň [C]je nám tak [G]blízká,
