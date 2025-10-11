@@ -56,3 +56,4 @@ R: [D]My máme rádi [A]víno,
 [D]a ochutnat ti[A]dáme
 [C]Slunce a [G]nekonečný vinohrad
 - 
+-
