@@ -23,3 +23,4 @@ panny čer[A]noo[D]ké
 Kéž [D]bych byl [G]nikdy [A]nepo[D]znal 
 panny čer[A]noo[D]ké 
 -
+-
