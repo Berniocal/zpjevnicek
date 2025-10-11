@@ -17,31 +17,33 @@
 
     /* --- editor s podkladem pro zvýraznění dlouhých řádků --- */
     .editor{ position:relative; }
-    .editor textarea{
-      width:100%;
-      min-height:520px;
-      resize:vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      line-height:1.6;
-      background:transparent;           /* ať prosvítá podklad */
-      color:#fff;
-      position:relative;
-      z-index:1;
-      white-space:pre-wrap;             /* stejné zalamování jako podklad */
-      overflow-wrap:break-word;
-    }
-    .marks{
-      position:absolute; inset:0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      line-height:1.6;
-      white-space:pre-wrap;
-      overflow-wrap:break-word;
-      color:transparent;                /* text neukazujeme, jen pozadí řádků */
-      pointer-events:none;              /* aby šel editovat textarea */
-      z-index:0;
-      /* sjednotíme padding s textarea (pokud máš v /assets/style.css jiné, slaď tam i tady) */
-      padding: 8px;
-    }
+.editor textarea{
+  width:100%;
+  min-height:520px;
+  resize:vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:16px;             /* přidej pevnou velikost */
+  line-height:24px;           /* a pevné řádkování, ne relativní 1.6 */
+  background:transparent;
+  color:#fff;
+  position:relative;
+  z-index:1;
+  white-space:pre-wrap;
+  overflow-wrap:break-word;
+}
+
+.marks{
+  position:absolute; inset:0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:16px;             /* stejná velikost písma */
+  line-height:24px;           /* stejné řádkování */
+  white-space:pre-wrap;
+  overflow-wrap:break-word;
+  color:transparent;
+  pointer-events:none;
+  z-index:0;
+  padding:8px;
+}
     .marks .row{ display:block; }
     .marks .over{ background: rgba(220, 38, 38, .16); } /* jemná červená */
   </style>
