@@ -48,3 +48,4 @@ máš [A]těžký srdce a mokrý řasy.
 tak [E]sama tomu nevěříš. 
 [A]     [D]Nenech se.    [A]   [D]   [A]   [D]Nenech se.
  -
+-
