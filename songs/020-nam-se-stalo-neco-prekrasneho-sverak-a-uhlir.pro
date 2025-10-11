@@ -54,3 +54,4 @@ je z toho [G]najednou
 (našla dívka kluka nešťastného)
 [Am]láska [F]nesku[G]teč[C]ná.
 (zamilovala se do něho)
+-
