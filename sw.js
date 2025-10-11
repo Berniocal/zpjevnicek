@@ -4,7 +4,7 @@
    - stale-while-revalidate pro data/songs.json a /songs/*
    - auto-update: skipWaiting + message handler
 */
-const VERSION = '2025-10-08-33';
+const VERSION = '2025-10-08-34';
 const CACHE_STATIC  = `zpj-static-${VERSION}`;
 const CACHE_DYNAMIC = `zpj-dyn-${VERSION}`;
 
