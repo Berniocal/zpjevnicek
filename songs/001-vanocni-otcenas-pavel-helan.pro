@@ -43,4 +43,4 @@ ale zbav nás od zlého.[D]Amen!
 [G]neměl ani ochranku a neplatil si hotely
 [C]dodnes nám svítí jeho mediální hvězda
  
-[_]
+konec
