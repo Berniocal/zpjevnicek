@@ -36,3 +36,4 @@ když [G7]neví[C]m, kudy [Fmaj]kam,
 a[G7]ť nec[C]hodím [Fmaj]ve tmě
 [Dmi]a dojdu tam, kam [Fmaj]mám...
  -
+ -
