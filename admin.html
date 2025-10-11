@@ -13,45 +13,59 @@
   <style>
     .grid{display:grid;gap:10px}
     .two{grid-template-columns:1fr 1fr}
-    .full{grid-column:1 / -1;}           /* položka přes celou šířku gridu */
+    .full{grid-column:1 / -1;} /* položka přes celou šířku gridu */
 
-    /* --- editor s podkladem pro zvýraznění dlouhých řádků --- */
+    /* ---------- Editor s podtržením dlouhých řádků (mirror-based) ---------- */
+    .editor,
+    .editor textarea,
+    .editor .marks,
+    .editor .mirror{
+      --ed-font: ui-monospace, SFMono-Regular, Menlo, monospace;
+      --ed-size: 16px;
+      --ed-line: 24px;     /* pevné px → stejné řádkování všude */
+      --ed-pad: 8px;
+      font-family: var(--ed-font);
+      font-size: var(--ed-size);
+      line-height: var(--ed-line);
+      box-sizing: border-box;
+      tab-size: 4;
+    }
     .editor{ position:relative; }
 
     .editor textarea{
       width:100%;
       min-height:520px;
       resize:vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size:16px;             /* pevná velikost kvůli shodnému řádkování */
-      line-height:24px;           /* pevné řádkování */
-      background:transparent;     /* ať je vidět overlay nad ním */
-      color:#fff;                 /* běžná barva textu */
+      background:transparent;  /* nech průhledné – je vidět zvýraznění */
+      color:#fff;               /* bílý text v editoru */
       position:relative;
       z-index:1;
-      white-space:pre-wrap;
-      overflow-wrap:break-word;
-      padding:8px;
-      box-sizing:border-box;
+      padding: var(--ed-pad);
     }
 
+    /* vrstva pro vykreslení podtržení (absolutně umístěné proužky .mark) */
     .marks{
       position:absolute; inset:0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size:16px;
-      line-height:24px;
-      white-space:pre-wrap;
-      overflow-wrap:break-word;
-      color:transparent;          /* běžné řádky neviditelné */
-      pointer-events:none;        /* aby šel editovat textarea */
-      z-index:2;                  /* NAD textareou (kvůli obarvení textu) */
-      padding:8px;
-      box-sizing:border-box;
+      z-index:2;                 /* nad textareou */
+      pointer-events:none;
     }
-    .marks .row{ display:block; }
-    .marks .over{
-      color:#f87171;              /* 🔴 barva písma pro dlouhé řádky */
-      background:transparent;     /* žádné podbarvení */
+
+    /* skryté zrcadlo – kopíruje zalamování stejně jako by ho viděl prohlížeč */
+    .mirror{
+      position:absolute; inset:0;
+      padding: var(--ed-pad);
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+      visibility:hidden;         /* neukazujeme, jen měříme */
+      z-index:-1;
+    }
+
+    /* vzhled podtržení problémového řádku */
+    .mark{
+      position:absolute; left:0; right:0;
+      height:2px;
+      background:#ef4444;        /* barva podtržení */
+      border-radius:1px;
     }
   </style>
 </head>
@@ -107,8 +121,9 @@
 
       <label class="full">Text (ChordPro)
         <div class="editor">
-          <pre id="marks" class="marks" aria-hidden="true"></pre>
+          <div id="marks" class="marks"></div>
           <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+          <div id="mirror" class="mirror" aria-hidden="true"></div>
         </div>
       </label>
 
@@ -143,7 +158,9 @@
   const keyEl = qs('#key');
   const bodyEl = qs('#body');
   const filenameEl = qs('#filename');
-  const marksEl = qs('#marks');
+
+  const marksEl  = document.getElementById('marks');
+  const mirrorEl = document.getElementById('mirror');
 
   const ROW_LIMIT = 30; // limit znaků na řádku bez akordů [..]
 
@@ -179,47 +196,74 @@
     return {user, repo};
   }
 
-  // ---------- Highlight řádků delších než ROW_LIMIT (bez akordů) ----------
-  const CHORD_BRACKETS_RE = /\[[^\]]*]/g; // [cokoli do nejbližšího ]
-  function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+  /* ---------- Zvýraznění: podtrhni řádky delší než ROW_LIMIT (bez akordů) ---------- */
+  const CHORD_BRACKETS_RE = /\[[^\]]*]/g; // [ ... ]
+
+  function escapeHtml(s){
+    return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  }
 
   function rebuildMarks(){
     const text = bodyEl.value.replace(/\r/g,'');
     const lines = text.split('\n');
 
-    const html = lines.map(line=>{
-      const visible = line.replace(CHORD_BRACKETS_RE, ''); // bez akordů
-      const over = visible.length > ROW_LIMIT;
-      const content = line.length ? escapeHtml(line) : '&nbsp;';
-      return `<span class="row${over ? ' over':''}">${content}</span>`;
-    }).join('\n');
+    // 1) Naplň mirror přesnou kopií obsahu (každý zdrojový řádek ve <span>, oddělený <br>)
+    mirrorEl.innerHTML = '';
+    for (let i=0;i<lines.length;i++){
+      const span = document.createElement('span');
+      span.className = 'line';
+      span.innerHTML = lines[i].length ? escapeHtml(lines[i]) : ' ';
+      mirrorEl.appendChild(span);
+      if (i < lines.length-1) mirrorEl.appendChild(document.createElement('br'));
+    }
 
-    marksEl.innerHTML = html;
-    // sladění metrik (ponecháno, ať to sedí i když globální CSS něco změní)
-    const cs = getComputedStyle(bodyEl);
-    marksEl.style.padding = cs.padding;
-    marksEl.style.fontSize = cs.fontSize;
-    marksEl.style.lineHeight = cs.lineHeight;
+    // 2) Které zdrojové řádky překračují limit?
+    const overIdx = new Set();
+    lines.forEach((L, i)=>{
+      const visible = L.replace(CHORD_BRACKETS_RE, '');
+      if (visible.length > ROW_LIMIT) overIdx.add(i);
+    });
+
+    // 3) Z mirroru odečteme pixelové pozice a nakreslíme podtržení
+    marksEl.innerHTML = '';
+    const mirrorBox = mirrorEl.getBoundingClientRect();
+    const padTop = parseFloat(getComputedStyle(mirrorEl).paddingTop) || 0;
+
+    const spans = mirrorEl.querySelectorAll('.line');
+    spans.forEach((span, i)=>{
+      if (!overIdx.has(i)) return;
+      const rects = span.getClientRects();
+      if (!rects.length) return;
+      const last = rects[rects.length-1];
+      const top  = last.bottom - mirrorBox.top + padTop - 2; // 2px vysoké podtržení
+      const mark = document.createElement('div');
+      mark.className = 'mark';
+      mark.style.top = top + 'px';
+      marksEl.appendChild(mark);
+    });
   }
 
-  // Sync scroll (textarea → overlay)
+  // Scroll sync (posouváme overlay opačným překladem)
   bodyEl.addEventListener('scroll', ()=>{
-    marksEl.scrollTop = bodyEl.scrollTop;
-    marksEl.scrollLeft = bodyEl.scrollLeft;
+    marksEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
+    // mirror musí mít stejný scroll, aby getClientRects seděl
+    mirrorEl.scrollTop = bodyEl.scrollTop;
+    mirrorEl.scrollLeft = bodyEl.scrollLeft;
   });
 
   ['input','change','keyup'].forEach(ev => bodyEl.addEventListener(ev, rebuildMarks));
+  window.addEventListener('resize', rebuildMarks);
   rebuildMarks();
 
-  // --- detekce "chord" tokenu ---
+  /* ---------- Detekce akordových linek + UG → ChordPro (beze změn) ---------- */
   const CHORD_RE =
     /^(?:[A-H](?:#|b)?)(?:(?:maj|min|dim|aug|sus[24]?|add\d+|m|mi|moll|dur)(?:\d+)?)?(?:\d+)?(?:\/[A-H](?:#|b)?)?$/i;
 
   function isChordishToken(tok) {
     if (!tok) return false;
     if (CHORD_RE.test(tok)) return true;
-    if (/^[A-H]$/i.test(tok)) return true;
-    if (/^\d{1,2}$/.test(tok)) return true;
+    if (/^[A-H]$/i.test(tok)) return true;        // osamocené písmeno
+    if (/^\d{1,2}$/.test(tok)) return true;       // samotné číslo (počítání dob)
     if (/^(N\.C\.|NC|x)$/i.test(tok)) return true;
     return false;
   }
@@ -248,11 +292,9 @@
 
     const ratioOK = (ostatni === 0) || (chordy / (chordy + ostatni) >= 0.8);
     const avgLen = totalLen / Math.max(1, (chordy + ostatni));
-
     return ratioOK && (hasLongSpaces || avgLen <= 3);
   }
 
-  // --- UG → ChordPro převod (beze změn) ---
   function mergeChordAndLyrics(chordsLine, lyricLine){
     const pos = [];
     let i = 0;
@@ -273,6 +315,7 @@
     });
     return out;
   }
+
   function ugToChordPro(text){
     let t = text.replace(/\r/g,'');
     t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
@@ -286,12 +329,13 @@
 
       if (isChordLine(L) && i+1 < lines.length){
         out.push( mergeChordAndLyrics(L, lines[i+1] || '') );
-        i++;
+        i++; // přeskoč lyric line
         continue;
       }
       out.push(L);
     }
 
+    // zjemni vícenásobné prázdné řádky
     const compact = [];
     let prevEmpty = false;
     for (const r of out){
@@ -303,16 +347,17 @@
     return compact.join('\n');
   }
 
+  // Uložit do GitHubu
   qs('#saveBtn').onclick = async () => {
     try {
       const { user, repo } = detectRepo();
       if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
 
-      const token = tokenEl.value.trim();
+      const token = (qs('#token').value || '').trim();
       if (!token) return status('Vlož prosím PAT token.', false);
       if (!titleEl.value.trim()) return status('Doplň název písně.', false);
 
-      // 2.3: případný převod UG -> ChordPro
+      // případný převod UG -> ChordPro
       let body = bodyEl.value.replace(/\r/g, '');
       const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
       const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
@@ -358,7 +403,6 @@
   };
   </script>
 
-  <!-- Service Worker registrace ponechána -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
