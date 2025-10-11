@@ -200,6 +200,14 @@ let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
 let SONGS_LIST = [];
 let SONG_INDEX = -1;
 let justSwipedTs = 0;
+// Stav skrytí horní lišty (globální)
+let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
+
+// Aplikuj naposledy uložený stav lišty hned po načtení skriptu,
+// aby byla lišta schovaná i po přechodu swipem/po restartu PWA.
+if (CHROME_HIDDEN) {
+  document.body.classList.add('chrome-hidden');
+}
 // Autoposuv – stav + funkce
 let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0'; // výchozí: viditelné
 let autoMode = 0;        // 0 = vyp, 1 = pomalu, 2 = rychle
@@ -427,12 +435,12 @@ function updateChromeHeight(){
 }
 
 function setChromeHidden(hidden){
-  document.body.classList.toggle('chrome-hidden', hidden);
-  // už nic neupravujeme – obsah má padding-top přes CSS, takže scroll zůstane
-  updateChromeHeight(); // pro jistotu, kdyby se lišta výškou změnila (wrap řádků apod.)
+  CHROME_HIDDEN = !!hidden;
+  document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN);
+  localStorage.setItem('chromeHidden', CHROME_HIDDEN ? '1' : '0');
+  // obsah má padding-top přes CSS; jen pro jistotu zaktualizuj výšku
+  updateChromeHeight();
 }
-
-
 /* ---- Dvoj-klik / dvoj-tap bez blikání ---- */
 function wireDoubleToggle(){
   const view = document.getElementById('view');
