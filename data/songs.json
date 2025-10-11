@@ -142,5 +142,13 @@
     "author": "Uhlíř a Svěrák",
     "file": "songs/018-ta-nase-hospoda-uhlir-a-sverak.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "019-saro-traband",
+    "number": 19,
+    "title": "Sáro",
+    "author": "Traband",
+    "file": "songs/019-saro-traband.pro",
+    "type": "chordpro"
   }
 ]
