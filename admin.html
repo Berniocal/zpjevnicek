@@ -51,6 +51,11 @@
       overflow:hidden; /* ořez i pro vnitřní marky */
       padding: var(--ed-pad);     /* ← NOVÉ: stejné odsazení jako textarea/mirror */
     }
+    .marks-content{
+  position:relative;                 /* rodič pro absolutní .mark */
+  min-height:100%;                   /* bude přepsáno na přesnou výšku v JS */
+  will-change: transform;            /* plynulejší posun */
+}
     .mirror{
       position:absolute; inset:0;
       padding: var(--ed-pad);
@@ -126,7 +131,7 @@
 
       <label class="full">Text (ChordPro)
         <div class="editor">
-          <div id="marks" class="marks"></div>
+          <div id="marks" class="marks"><div id="marksContent" class="marks-content"></div></div>
           <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
           <div id="mirror" class="mirror" aria-hidden="true"></div>
         </div>
@@ -165,6 +170,7 @@
   const filenameEl = qs('#filename');
 
   const marksEl  = document.getElementById('marks');
+  const marksContentEl = document.getElementById('marksContent'); 
   const mirrorEl = document.getElementById('mirror');
   const toggleMarksBtn = document.getElementById('toggleMarks');
 
@@ -228,25 +234,30 @@
       if (visible.length > ROW_LIMIT) overIdx.add(i);
     });
 
-marksEl.innerHTML = '';
+// ... po naplnění mirrorEl a výpočtu overIdx ...
+
+// Nastav výšku obsahu a vykresli značky do marksContentEl
+marksContentEl.innerHTML = '';
+marksContentEl.style.height = mirrorEl.scrollHeight + 'px';
 
 const spans = mirrorEl.querySelectorAll('.line');
 spans.forEach((span, i)=>{
   if (!overIdx.has(i)) return;
 
-  // obsahové souřadnice – stabilní i při scrollu
-  const top = span.offsetTop + span.offsetHeight - 2;  // 2px podtržení
+  // top v "obsahových" souřadnicích (nezávislé na scrollu)
+  const top = span.offsetTop + span.offsetHeight - 2; // 2px podtržení
 
   const mark = document.createElement('div');
   mark.className = 'mark';
   mark.style.top = top + 'px';
-  marksEl.appendChild(mark);
+  marksContentEl.appendChild(mark);
 });
+
 
   }
 
   bodyEl.addEventListener('scroll', ()=>{
-    marksEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
+    marksContentEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
     mirrorEl.scrollTop = bodyEl.scrollTop;
     mirrorEl.scrollLeft = bodyEl.scrollLeft;
   });
