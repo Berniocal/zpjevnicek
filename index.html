@@ -123,5 +123,20 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+<!-- ⬇⬇⬇ JEDINÁ NOVÁ ČÁST: globální aplikace uložené velikosti textu -->
+<script>
+  // Globální klíč (stejný na všech stránkách aplikace)
+  const ZPJ_FONT_KEY = 'zpj-fontScale';
+
+  // Při každém načtení jakékoli stránky PWA nastavíme --song-scale na :root
+  (function applyGlobalSongScale(){
+    const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
+    if (!isNaN(val) && val > 0) {
+      document.documentElement.style.setProperty('--song-scale', String(val));
+    }
+  })();
+</script>
+<!-- ⬆⬆⬆ KONEC NOVÉ ČÁSTI -->
+
 </body>
 </html>
