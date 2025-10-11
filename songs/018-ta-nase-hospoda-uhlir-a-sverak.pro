@@ -1,5 +1,5 @@
 {title: Ta naše hospoda}
-{artist: Uhlíř a Svěrák}
+{artist: Svěrák a Uhlíř}
 
 /: [C]Ta naše hospoda o[F]d zhora od spoda,
 [C]to je pěkné zaříze[G]ní. 
