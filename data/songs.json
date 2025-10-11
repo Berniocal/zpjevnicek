@@ -150,5 +150,13 @@
     "author": "Traband",
     "file": "songs/019-saro-traband.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir",
+    "number": 20,
+    "title": "Nám se stalo něco překrásného",
+    "author": "Svěrák a Uhlíř",
+    "file": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
+    "type": "chordpro"
   }
 ]
