@@ -3,8 +3,7 @@
 
 [Dm]Nesnaž se, znáš se. 
 [B]Řekni mi [C]co je jiný,
-[Dm]jak v kleci máš [B]se 
-[C]pro nevinný
+[Dm]jak v kleci máš [B]se [C]pro nevinný
 [Dm]noci dlouhý [B]jsou plný 
 [C]touhy a [Dm]lásky nás dvo[B]u. 
 [C]Všechno hezký [Dm]za sebou mám. 
@@ -18,7 +17,7 @@
 [Dm]Malování po [B]zdech holejma 
 [C]rukama tě [Dmi]nezachrání, 
 už [B]máš na ka[C]hánku,
-[Dmi]Nezachrání, už jsi [B]na zá[C]dech
+[Dmi]nezachrání, už jsi [B]na zá[C]dech
 Je to [Dm]za náma, 
 ty čteš [B]poslední [C]stránku,
 [Dm]za náma, [B]na [C]zádech,
@@ -41,5 +40,6 @@ ty čteš [B]poslední [C]stránku,
 [Dmi]Znáš se, [B]řekni mi [C]co je jiný.
 [Dmi]Jak v kleci máš [B]se [C]pro nevinný
 [Dmi]noci dlouhý [B]jsou plný [C]touhy
-a [Dm]lásky nás tří
+a [Dm]lásky nás tří...
+-
 -
