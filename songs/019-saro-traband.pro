@@ -6,15 +6,17 @@
 [Am]Sáro, [Em]Sáro, jak [F]moc a nebo [C]málo,
 mi [F]chybí abych [C]tvojí duši [F]mohl rozu[G]mět?
 
-Sbor [Am]kajícných [Em]mnichů jde [F]krajinou [C]v tichu,
+Sbor [Am]kajícných [Em]mnichů 
+jde [F]krajinou [C]v tichu,
 a pro [F]všechnu lidskou [C]pýchu
 má jen [F]přezíravý [G]smích.
-A z p[Am]rohraných [Em]válek se [F]vojska domů [C]vrací,
+A z p[Am]rohraných [Em]válek 
+se [F]vojska domů [C]vrací,
 však [F]zbraně stále [C]burácí,
 a [F]bitva zuří [G]v nich.
 
 [Am]Sáro, [Em]Sáro, [F]v noci se mi [C]zdálo, 
-že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d.
+že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d
 [Am]Sáro, [Em]Sáro, jak [F]moc a nebo [C]málo,
 mi [F]chybí abych [C]tvojí duši [F]mohl rozu[G]mět?
 
@@ -26,7 +28,7 @@ Tak [F]snadno pohřbít [C]může,
 sto [F]urozených [G]hlav.
 
 [Am]Sáro, [Em]Sáro, [F]v noci se mi [C]zdálo, 
-že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d.
+že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d
 [Am]Sáro, [Em]Sáro, jak [F]moc a nebo [C]málo,
 mi [F]chybí abych [C]tvojí duši [F]mohl rozu[G]mět?
 
@@ -38,22 +40,25 @@ už [F]objevili [C]jistě,
 proti [F]povinnosti [G]lék.
 
 [Am]Sáro, [Em]Sáro, [F]v noci se mi [C]zdálo, 
-že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d.
+že [F]tři andělé [C]Boží k nám [F]přišli na obě[G]d
 [Am]Sáro, [Em]Sáro, jak [F]moc a nebo [C]málo,
 Ti [F]chybí abys [C]mojí duši [F]mohla rozu[G]mět?
 
 [Am]Páv pod tvým [Em]oknem [F]zpívá sotva [C]procit,
 [F]o tajemstvích [C]noci,
 [F]ve tvých zahra[G]dách.
-[Am]A já - potulný [Em]kejklíř, [F]co svázali mu [C]ruce,
+[Am]A já - potulný [Em]kejklíř, 
+[F]co svázali mu [C]ruce,
 teď h[F]raju o tvé s[C]rdce,
 a chci [F]mít Tě nado[G]sah.
 
 [Am]Sáro, [Em]Sáro, [F]pomalu a [C]líně,
-s [F]hlavou na Tvém [C]klíně [F]chci se probou[G]zet.
+s [F]hlavou na Tvém [C]klíně 
+[F]chci se probou[G]zet.
 [Am]Sáro, Sáro, [Em]Sáro, Sáro, [F]rosa padá [C]ráno,
 a [F]v poledne už [C]možná [F]bude jiný [G]svět.
 
 [Am]Sáro, [Em]Sáro, [F]vstávej, milá [C]Sáro!
 [F]Andělé k nám [C]přišli na [G]oběd.
+-
 -
