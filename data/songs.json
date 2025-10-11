@@ -160,6 +160,14 @@
     "type": "chordpro"
   },
   {
+    "id": "021-hruska-cechomor",
+    "number": 21,
+    "title": "Hruška",
+    "author": "Čechomor",
+    "file": "songs/021-hruska-cechomor.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "022-zamilovany-princ-tomas-klus",
     "number": 22,
     "title": "Zamilovaný princ",
