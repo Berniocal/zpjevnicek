@@ -55,3 +55,4 @@ je z toho [G]najednou
 [Am]láska [F]nesku[G]teč[C]ná.
 (zamilovala se do něho)
 -
+-
