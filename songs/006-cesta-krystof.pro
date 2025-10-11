@@ -36,4 +36,4 @@ kam [Am]zvou svodidla, co po tmě mi [F]lžou,[G]
 zda [C]couvám zpátky a [G]plýtvám řádky,
 co ř[Am]vou, že už mi doma neotev[F]řou.[G]
  -
-
+-
