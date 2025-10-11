@@ -1,8 +1,7 @@
 {title: Sáro}
 {artist: Traband}
 
-Ami   Em    F            C
-Sáro, Sáro, v noci se mi zdálo, 
+[Am]Sáro, [Em]Sáro, [F]v noci se mi [C]zdálo,
 že [F]tři andělé [C]k nám [F]přišli na obě[G]d.
 [Am]Sáro, [Em]Sáro, jak [F]moc a nebo [C]málo,
 mi [F]chybí abych [C]tvojí duši [F]mohl rozu[G]mět?
@@ -57,3 +56,4 @@ a [F]v poledne už [C]možná [F]bude jiný [G]svět.
 
 [Am]Sáro, [Em]Sáro, [F]vstávej, milá [C]Sáro!
 [F]Andělé k nám [C]přišli na [G]oběd.
+-
