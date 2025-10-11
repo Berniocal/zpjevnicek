@@ -6,8 +6,7 @@
 [C]černý 4[Fmaj]s,
 [C]posílám [Fmaj]zprávy vám, 
 [Dmi]sdílím fotky z [Fmaj]cest,
-[C]doma mám i[Fmaj]Mac, iPad, 
-[C]aj nad, aj [Fmaj]pod,
+[C]doma mám i[Fmaj]Mac, iPad, [C]aj nad, aj [Fmaj]pod,
 [C]a ještě jedna [Fmaj]aplikace, 
 [Dmi]by mi přišla vho[Fmaj]d.
 
@@ -24,8 +23,7 @@ a[G7]ť nec[C]hodím [Fmaj]ve tmě
 [C]funguje to [Fmaj]prima,
 [C]designed in [Fmaj]California, 
 [Dmi]made in Ch[Fmaj]ina,
-[C]koupil jsem si [Fmaj]iPhone, 
-[C]černý 4[Fmaj]s
+[C]koupil jsem si [Fmaj]iPhone, [C]černý 4[Fmaj]s
 [C]a toto [Fmaj]skromné přání 
 [Dmi]odesílám do [Fmaj]nebes...
 
