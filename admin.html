@@ -5,49 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Správa písní</title>
   <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
-<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
-<meta name="theme-color" content="#0f1729" />
-<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
-
-
+  <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
+  <meta name="theme-color" content="#0f1729" />
+  <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
   <style>
     .grid{display:grid;gap:10px}
-.two{grid-template-columns:1fr 1fr}
-.full{grid-column:1 / -1;}           /* položka přes celou šířku gridu */
-textarea{
-  width:100%;                        /* roztáhne na celou šířku */
-  min-height:520px;                  /* bylo ~320px → +~50 % */
-  resize:vertical;                   /* povolit ruční zvětšení výšky */
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; /* ať sedí akordy */
-  line-height:1.6;
-}
-    /* overlay pro fullscreen náhled */
-.overlay{
-  position:fixed; inset:0; z-index:9999;
-  background:rgba(0,0,0,.8);
-  backdrop-filter: blur(2px);
-  display:none;
-}
-.overlay.open{ display:block; }
-.stage{ position:absolute; inset:0; display:flex; flex-direction:column; }
-.toolbar{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; padding:10px 14px;
-  background:#0f1729; border-bottom:1px solid #24324a; color:#eaf1ff;
-}
-.viewer{ flex:1; overflow:auto; padding:18px; }
-
-/* ChordPro render uvnitř náhledu */
-.overlay .cp{ font-size: var(--fs, 22px); line-height:1.9; color:#eaf1ff; }
-.overlay .cp .line{ position:relative; white-space:pre-wrap; }
-.overlay .cp .seg{ position:relative; display:inline-block; padding-top:1.1em; }
-.overlay .cp .ch{ position:absolute; left:0; top:0; font-weight:700;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.9em }
-.overlay .cp .ly{ visibility:visible }
+    .two{grid-template-columns:1fr 1fr}
+    .full{grid-column:1 / -1;}           /* položka přes celou šířku gridu */
+    textarea{
+      width:100%;                        /* roztáhne na celou šířku */
+      min-height:520px;                  /* bylo ~320px → +~50 % */
+      resize:vertical;                   /* povolit ruční zvětšení výšky */
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; /* ať sedí akordy */
+      line-height:1.6;
+    }
   </style>
-
 </head>
 <body>
   <div class="container">
@@ -91,20 +65,17 @@ textarea{
           <input id="key" placeholder="Am" />
         </label>
         <label>Formát vstupu
-  <select id="fmt">
-    <option value="auto" selected>Auto</option>
-    <option value="chordpro">ChordPro</option>
-    <option value="ug">Ultimate Guitar</option>
-  </select>
-</label>
-
+          <select id="fmt">
+            <option value="auto" selected>Auto</option>
+            <option value="chordpro">ChordPro</option>
+            <option value="ug">Ultimate Guitar</option>
+          </select>
+        </label>
       </div>
       <label class="full">Text (ChordPro)
-  <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
-</label>
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px">
-  <button id="previewBtn">👁 Náhled / Celá obrazovka</button>
-</div>
+        <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+      </label>
+      <!-- tlačítko náhledu odstraněno -->
       <div class="grid two">
         <label>Název souboru (automaticky)
           <input id="filename" readonly />
@@ -126,312 +97,235 @@ textarea{
       </ol>
     </div>
   </div>
-<div id="overlay" class="overlay" aria-hidden="true">
-  <div class="stage">
-    <div class="toolbar">
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-        <strong>Náhled písně</strong>
-        <button id="fsToggle">Na celou obrazovku</button>
-        <span>Velikost: 
-          <button id="fsDown" title="Zmenšit">−</button>
-          <span id="fsVal" style="min-width:3ch; display:inline-block; text-align:center">22</span>
-          <button id="fsUp" title="Zvětšit">+</button>
-        </span>
-      </div>
-      <button id="closeOverlay" title="Zavřít">✕</button>
-    </div>
-    <div id="overlayView" class="viewer"></div>
-  </div>
-</div>
 
-<script>
-const qs = s=>document.querySelector(s);
-const statusEl = qs('#status');
-const titleEl = qs('#title');
-const artistEl = qs('#artist');
-const numberEl = qs('#number');
-const keyEl = qs('#key');
-const bodyEl = qs('#body');
-const filenameEl = qs('#filename');
+  <!-- overlay náhled kompletně odstraněn -->
 
-function slug(s){ return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
-function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
-function status(msg, ok=false){ statusEl.textContent = msg; statusEl.className = 'note' + (ok?' ok':''); }
-
-function computeFilename(){
-  const n = numberEl.value ? String(numberEl.value).padStart(3,'0')+'-' : '';
-  const t = slug(titleEl.value||'pisen');
-  const a = slug(artistEl.value||'');
-  filenameEl.value = `${n}${t}${a?'-'+a:''}.pro`;
-}
-['input','change'].forEach(ev=>{
-  titleEl.addEventListener(ev, computeFilename);
-  artistEl.addEventListener(ev, computeFilename);
-  numberEl.addEventListener(ev, computeFilename);
-});
-computeFilename();
-
-// token storage
-const tokenEl = qs('#token');
-const saved = localStorage.getItem('gh_pat');
-if(saved) tokenEl.value = saved;
-qs('#saveToken').onclick = ()=>{ localStorage.setItem('gh_pat', tokenEl.value.trim()); status('Token uložen.', true); };
-qs('#clearToken').onclick = ()=>{ localStorage.removeItem('gh_pat'); tokenEl.value=''; status('Token smazán.', true); };
-
-function detectRepo(){
-  const host = location.host;                 // user.github.io
-  const parts = location.pathname.split('/').filter(Boolean);
-  const repo = parts.length? parts[0] : '';
-  const user = host.includes('github.io') ? host.split('.')[0] : '';
-  return {user, repo};
-}
-// --- detekce "chord" tokenu ---
-// české kořeny včetně H a B
-const CHORD_RE =
-  /^(?:[A-H](?:#|b)?)(?:maj|min|dim|aug|sus[24]?|add\d+|m|maj7|m7|7|6|9|11|13)?(?:\/[A-H](?:#|b)?)?$/;
-
-// --- řádek je "akordová linka" (jen akordy, mezery, |, -, /, ( ) ) ---
-function isChordLine(line) {
-  const t = line.trim();
-  if (!t) return false;
-  // pokud má moc dlouhá slova, není to akordová linka
-  const parts = t.split(/\s+/);
-  let chordy = 0, ostatni = 0;
-  for (const p of parts) {
-    if (!p) continue;
-    const clean = p.replace(/[|()\-·•.]+/g, '');
-    if (!clean) continue;
-    if (CHORD_RE.test(clean)) chordy++;
-    else ostatni++;
-  }
-  return chordy > 0 && ostatni === 0;
-}
-
-// --- zarovnání akordové linky nad text → vloží [Akord] do textu kolem sloupečků ---
-function mergeChordAndLyrics(chordsLine, lyricLine){
-  // najdi sloupcové pozice akordů
-  const pos = [];
-  let i = 0;
-  while (i < chordsLine.length){
-    // přeskoč mezery
-    while (i < chordsLine.length && chordsLine[i] === ' ') i++;
-    if (i >= chordsLine.length) break;
-    const start = i;
-    while (i < chordsLine.length && chordsLine[i] !== ' ') i++;
-    const token = chordsLine.slice(start, i).replace(/[|()\-·•.]+/g, '');
-    if (CHORD_RE.test(token)) pos.push({col:start, chord:token});
-  }
-  if (!pos.length) return lyricLine;
-
-  // vlož akordy do textu podle sloupců (nejbližší vhodný index)
-  let out = lyricLine;
-  // vkládáme odzadu, aby se indexy neposouvaly
-  pos.sort((a,b)=>b.col-a.col).forEach(p=>{
-    const idx = Math.min(Math.max(p.col, 0), out.length);
-    out = out.slice(0, idx) + `[${p.chord}]` + out.slice(idx);
-  });
-  return out;
-}
-
-// --- konverze UG → ChordPro ---
-// 1) [ch]Am[/ch] → [Am]
-// 2) akordové řádky + následující text sloučíme do jedné řádky s [Akord]
-// 3) [Verse]/[Chorus]/(Verse) → {comment: Verse}
-function ugToChordPro(text){
-  let t = text.replace(/\r/g,'');
-  // [ch]C[/ch] → [C]
-  t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
-
-  const lines = t.split('\n');
-  const out = [];
-  for (let i = 0; i < lines.length; i++){
-    const L = lines[i];
-
-    // sekční hlavičky
-    const sec = L.match(/^\s*(?:\[(verse|chorus|bridge|intro|outro|solo)\]|\((verse|chorus|bridge|intro|outro|solo)\))\s*$/i);
-    if (sec) { out.push(`{comment: ${ (sec[1]||sec[2]).toLowerCase() }}`); continue; }
-
-    // akordová + textová linka
-    if (isChordLine(L) && i+1 < lines.length){
-      out.push( mergeChordAndLyrics(L, lines[i+1] || '') );
-      i++; // přeskoč lyric line, už jsme ji sloučili
-      continue;
-    }
-
-    // jinak ponech řádek (už může obsahovat [C]… díky [ch] náhradě)
-    out.push(L);
-  }
-
-  // zjemni vícenásobné prázdné řádky
-  const compact = [];
-  let prevEmpty = false;
-  for (const r of out){
-    const empty = !r.trim();
-    if (empty && prevEmpty) continue;
-    compact.push(r);
-    prevEmpty = empty;
-  }
-  return compact.join('\n');
-}
-
-qs('#saveBtn').onclick = async () => {
-  try {
-    const { user, repo } = detectRepo();
-    if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
-
-    const token = tokenEl.value.trim();
-    if (!token) return status('Vlož prosím PAT token.', false);
-    if (!titleEl.value.trim()) return status('Doplň název písně.', false);
-
-    // ---- 2.3: ZÍSKAT TEXT A PŘÍPADNĚ PŘEVÉST UG -> CHORDPRO ----
-    let body = bodyEl.value.replace(/\r/g, '');
-    const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
-
-    // autodetekce UG: [ch]…[/ch] nebo samostatné "akordové řádky"
-    const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
-
-    if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) {
-      body = ugToChordPro(body);
-    }
-    // ---- konec 2.3 ----
-
-    // ChordPro obsah s metadaty
-    const lines = [];
-    lines.push(`{title: ${titleEl.value.trim()}}`);
-    if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
-    if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
-    lines.push('');
-    lines.push(body);                              // ← tady už je případně převedený text
-    const content = lines.join('\n');
-
-    const filename = filenameEl.value || 'pisen.pro';
-    const path = `songs/${filename}`;
-
-    status('Ukládám…');
-    const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json'
-      },
-      body: JSON.stringify({
-        message: `feat(song): add ${titleEl.value.trim()}`,
-        content: b64utf8(content),
-        branch: 'main'
-      })
-    });
-
-    if (!res.ok) {
-      const t = await res.text();
-      throw new Error(`GitHub API ${res.status}: ${t}`);
-    }
-    status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
-  } catch (e) {
-    console.error(e);
-    status('Chyba: ' + e.message);
-  }
-};
-
-</script>
   <script>
-/* ---------- ChordPro render (stejný jako v song.html) ---------- */
-const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const ALT = {'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
-function normRoot(r){ return ALT[r] || r; }
-function splitChord(ch){ const m = ch.match(/^([A-G](?:#|b)?)(.*)$/); return m ? {root: normRoot(m[1]), rest:m[2]} : {root:ch, rest:''}; }
-function transposeChord(ch, semi){
-  const s = splitChord(ch); const i = NOTES_SHARP.indexOf(s.root); if(i===-1) return ch;
-  const j = (i + semi + 120) % 12; return NOTES_SHARP[j] + s.rest;
-}
-function parseChordPro(text){
-  const meta = {}; const lines = text.replace(/\r/g,'').split('\n'); const blocks = [];
-  for (const line of lines){
-    const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-    if (m) { meta[m[1].toLowerCase()] = m[2]; continue; }
-    blocks.push(line);
+  const qs = s=>document.querySelector(s);
+  const statusEl = qs('#status');
+  const titleEl = qs('#title');
+  const artistEl = qs('#artist');
+  const numberEl = qs('#number');
+  const keyEl = qs('#key');
+  const bodyEl = qs('#body');
+  const filenameEl = qs('#filename');
+
+  function slug(s){ return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function status(msg, ok=false){ statusEl.textContent = msg; statusEl.className = 'note' + (ok?' ok':''); }
+
+  function computeFilename(){
+    const n = numberEl.value ? String(numberEl.value).padStart(3,'0')+'-' : '';
+    const t = slug(titleEl.value||'pisen');
+    const a = slug(artistEl.value||'');
+    filenameEl.value = `${n}${t}${a?'-'+a:''}.pro`;
   }
-  return { meta, lines: blocks };
-}
-function renderChordPro(text, transposeSemi=0, capo=0){
-  const { meta, lines } = parseChordPro(text);
-  const rootTrans = transposeSemi - (capo|0);
-  const cont = document.createElement('div'); cont.className = 'cp';
-  for (const raw of lines){
-    if (!raw.trim()) { cont.appendChild(document.createElement('br')); continue; }
-    const line = document.createElement('div'); line.className = 'line';
-    let i = 0, curChord = '';
-    while (i < raw.length){
-      if (raw[i] === '['){
-        const j = raw.indexOf(']', i+1);
-        if (j !== -1){ curChord = raw.slice(i+1, j); i = j+1; continue; }
-      }
-      let j = i; while (j < raw.length && raw[j] !== '[') j++;
-      const lyr = raw.slice(i, j) || ' ';
-      const seg = document.createElement('span'); seg.className='seg';
-      const ch = document.createElement('span'); ch.className='ch';
-      ch.textContent = curChord ? transposeChord(curChord, rootTrans) : '';
-      const ly = document.createElement('span'); ly.className='ly'; ly.textContent = lyr;
-      seg.appendChild(ch); seg.appendChild(ly);
-      line.appendChild(seg); i = j;
+  ['input','change'].forEach(ev=>{
+    titleEl.addEventListener(ev, computeFilename);
+    artistEl.addEventListener(ev, computeFilename);
+    numberEl.addEventListener(ev, computeFilename);
+  });
+  computeFilename();
+
+  // token storage
+  const tokenEl = qs('#token');
+  const saved = localStorage.getItem('gh_pat');
+  if(saved) tokenEl.value = saved;
+  qs('#saveToken').onclick = ()=>{ localStorage.setItem('gh_pat', tokenEl.value.trim()); status('Token uložen.', true); };
+  qs('#clearToken').onclick = ()=>{ localStorage.removeItem('gh_pat'); tokenEl.value=''; status('Token smazán.', true); };
+
+  function detectRepo(){
+    const host = location.host;                 // user.github.io
+    const parts = location.pathname.split('/').filter(Boolean);
+    const repo = parts.length? parts[0] : '';
+    const user = host.includes('github.io') ? host.split('.')[0] : '';
+    return {user, repo};
+  }
+  // --- detekce "chord" tokenu ---
+  // české kořeny včetně H a B + UG tolerantní varianta
+  const CHORD_RE =
+    /^(?:[A-H](?:#|b)?)(?:(?:maj|min|dim|aug|sus[24]?|add\d+|m|mi|moll|dur)(?:\d+)?)?(?:\d+)?(?:\/[A-H](?:#|b)?)?$/i;
+
+  // --- osamocený „chord-like“ token (akord, jedno písmeno A–H, samotné číslo, N.C., x) ---
+  function isChordishToken(tok) {
+    if (!tok) return false;
+    if (CHORD_RE.test(tok)) return true;
+    if (/^[A-H]$/i.test(tok)) return true;        // osamocené písmeno
+    if (/^\d{1,2}$/.test(tok)) return true;       // samotné číslo (počítání dob)
+    if (/^(N\.C\.|NC|x)$/i.test(tok)) return true;
+    return false;
+  }
+
+  // --- TAB/tablatura? (e|---, A|---, dlouhé běhy '-') ---
+  function looksLikeTab(line) {
+    const t = line.trim();
+    if (/^[eBGDAE]\|[-x\ds\s|]+$/.test(t)) return true;
+    if (/-{3,}/.test(t)) return true;
+    return false;
+  }
+
+  // --- řádek je "akordová linka" (UG i klasické) ---
+  function isChordLine(line) {
+    if (!line || !line.trim()) return false;
+    if (looksLikeTab(line)) return false;
+
+    const hasLongSpaces = / {2,}/.test(line);          // „hodně mezer za sebou“
+    const rawParts = line.trim().split(/\s+/);
+
+    let chordy = 0, ostatni = 0, totalLen = 0;
+    for (const p of rawParts) {
+      // odstraň dekorace, ale nech '/' kvůli slash-akordům
+      const clean = p.replace(/[|()·•.\u00B7]+/g, '').replace(/^-+|-+$/g, '');
+      if (!clean) continue;
+      totalLen += clean.length;
+      if (isChordishToken(clean)) chordy++;
+      else ostatni++;
     }
-    cont.appendChild(line);
+
+    if (chordy === 0) return false;
+
+    // „převážně akordy“ + buď dlouhé mezery, nebo krátké tokeny (typicky akordy)
+    const ratioOK = (ostatni === 0) || (chordy / (chordy + ostatni) >= 0.8);
+    const avgLen = totalLen / Math.max(1, (chordy + ostatni));
+
+    return ratioOK && (hasLongSpaces || avgLen <= 3);
   }
-  return cont;
-}
 
-/* ---------- Fullscreen náhled ---------- */
-const overlay = document.getElementById('overlay');
-const overlayView = document.getElementById('overlayView');
-const fsVal = document.getElementById('fsVal');
-let fontSize = Number(localStorage.getItem('cp_fs') || 22); // počáteční bod písma v px
+  // --- zarovnání akordové linky nad text → vloží [Akord] do textu kolem sloupečků ---
+  function mergeChordAndLyrics(chordsLine, lyricLine){
+    // najdi sloupcové pozice akordů
+    const pos = [];
+    let i = 0;
+    while (i < chordsLine.length){
+      // přeskoč mezery
+      while (i < chordsLine.length && chordsLine[i] === ' ') i++;
+      if (i >= chordsLine.length) break;
+      const start = i;
+      while (i < chordsLine.length && chordsLine[i] !== ' ') i++;
+      const token = chordsLine.slice(start, i).replace(/[|()\-·•.]+/g, '');
+      if (CHORD_RE.test(token)) pos.push({col:start, chord:token});
+    }
+    if (!pos.length) return lyricLine;
 
-function applyFontSize(){
-  overlay.style.setProperty('--fs', fontSize + 'px');
-  fsVal.textContent = fontSize;
-  localStorage.setItem('cp_fs', String(fontSize));
-}
-
-document.getElementById('previewBtn').onclick = ()=>{
-  // vyrenderuj z textarea
-  overlayView.innerHTML = '';
-  overlayView.appendChild(renderChordPro(document.getElementById('body').value || ''));
-  overlay.classList.add('open');
-  applyFontSize();
-  // nepovinné: rovnou požádat o fullscreen? necháme na tlačítku
-};
-
-document.getElementById('closeOverlay').onclick = ()=>{
-  overlay.classList.remove('open');
-  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-};
-
-document.getElementById('fsToggle').onclick = async ()=>{
-  if (!document.fullscreenElement) {
-    try { await overlay.requestFullscreen(); } catch(e){}
-  } else {
-    try { await document.exitFullscreen(); } catch(e){}
-  }
-};
-
-document.getElementById('fsUp').onclick = ()=>{ fontSize = Math.min(72, fontSize+2); applyFontSize(); };
-document.getElementById('fsDown').onclick = ()=>{ fontSize = Math.max(12, fontSize-2); applyFontSize(); };
-
-// ESC zavře
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape' && overlay.classList.contains('open')){
-    document.getElementById('closeOverlay').click();
-  }
-});
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
-        .then(r => console.log('Zpjěvníček SW scope:', r.scope))
-        .catch(console.error);
+    // vlož akordy do textu podle sloupců (nejbližší vhodný index)
+    let out = lyricLine;
+    // vkládáme odzadu, aby se indexy neposouvaly
+    pos.sort((a,b)=>b.col-a.col).forEach(p=>{
+      const idx = Math.min(Math.max(p.col, 0), out.length);
+      out = out.slice(0, idx) + `[${p.chord}]` + out.slice(idx);
     });
+    return out;
   }
-</script>
 
+  // --- konverze UG → ChordPro ---
+  // 1) [ch]Am[/ch] → [Am]
+  // 2) akordové řádky + následující text sloučíme do jedné řádky s [Akord]
+  // 3) [Verse]/[Chorus]/(Verse) → {comment: Verse}
+  function ugToChordPro(text){
+    let t = text.replace(/\r/g,'');
+    // [ch]C[/ch] → [C]
+    t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
 
+    const lines = t.split('\n');
+    const out = [];
+    for (let i = 0; i < lines.length; i++){
+      const L = lines[i];
+
+      // sekční hlavičky
+      const sec = L.match(/^\s*(?:\[(verse|chorus|bridge|intro|outro|solo)\]|\((verse|chorus|bridge|intro|outro|solo)\))\s*$/i);
+      if (sec) { out.push(`{comment: ${ (sec[1]||sec[2]).toLowerCase() }}`); continue; }
+
+      // akordová + textová linka
+      if (isChordLine(L) && i+1 < lines.length){
+        out.push( mergeChordAndLyrics(L, lines[i+1] || '') );
+        i++; // přeskoč lyric line, už jsme ji sloučili
+        continue;
+      }
+
+      // jinak ponech řádek (už může obsahovat [C]… díky [ch] náhradě)
+      out.push(L);
+    }
+
+    // zjemni vícenásobné prázdné řádky
+    const compact = [];
+    let prevEmpty = false;
+    for (const r of out){
+      const empty = !r.trim();
+      if (empty && prevEmpty) continue;
+      compact.push(r);
+      prevEmpty = empty;
+    }
+    return compact.join('\n');
+  }
+
+  qs('#saveBtn').onclick = async () => {
+    try {
+      const { user, repo } = detectRepo();
+      if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
+
+      const token = tokenEl.value.trim();
+      if (!token) return status('Vlož prosím PAT token.', false);
+      if (!titleEl.value.trim()) return status('Doplň název písně.', false);
+
+      // ---- 2.3: ZÍSKAT TEXT A PŘÍPADNĚ PŘEVÉST UG -> CHORDPRO ----
+      let body = bodyEl.value.replace(/\r/g, '');
+      const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
+
+      // autodetekce UG: [ch]…[/ch] nebo samostatné "akordové řádky"
+      const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
+
+      if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) {
+        body = ugToChordPro(body);
+      }
+      // ---- konec 2.3 ----
+
+      // ChordPro obsah s metadaty
+      const lines = [];
+      lines.push(`{title: ${titleEl.value.trim()}}`);
+      if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
+      if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
+      lines.push('');
+      lines.push(body);                              // ← tady už je případně převedený text
+      const content = lines.join('\n');
+
+      const filename = filenameEl.value || 'pisen.pro';
+      const path = `songs/${filename}`;
+
+      status('Ukládám…');
+      const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json'
+        },
+        body: JSON.stringify({
+          message: `feat(song): add ${titleEl.value.trim()}`,
+          content: b64utf8(content),
+          branch: 'main'
+        })
+      });
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`GitHub API ${res.status}: ${t}`);
+      }
+      status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
+    } catch (e) {
+      console.error(e);
+      status('Chyba: ' + e.message);
+    }
+  };
+  </script>
+
+  <!-- Service Worker registrace ponechána -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
+          .then(r => console.log('Zpjěvníček SW scope:', r.scope))
+          .catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>
