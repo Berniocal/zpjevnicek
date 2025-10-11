@@ -17,35 +17,42 @@
 
     /* --- editor s podkladem pro zvýraznění dlouhých řádků --- */
     .editor{ position:relative; }
-.editor textarea{
-  width:100%;
-  min-height:520px;
-  resize:vertical;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size:16px;             /* přidej pevnou velikost */
-  line-height:24px;           /* a pevné řádkování, ne relativní 1.6 */
-  background:transparent;
-  color:#fff;
-  position:relative;
-  z-index:1;
-  white-space:pre-wrap;
-  overflow-wrap:break-word;
-}
 
-.marks{
-  position:absolute; inset:0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size:16px;             /* stejná velikost písma */
-  line-height:24px;           /* stejné řádkování */
-  white-space:pre-wrap;
-  overflow-wrap:break-word;
-  color:transparent;
-  pointer-events:none;
-  z-index:0;
-  padding:8px;
-}
+    .editor textarea{
+      width:100%;
+      min-height:520px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size:16px;             /* pevná velikost kvůli shodnému řádkování */
+      line-height:24px;           /* pevné řádkování */
+      background:transparent;     /* ať je vidět overlay nad ním */
+      color:#fff;                 /* běžná barva textu */
+      position:relative;
+      z-index:1;
+      white-space:pre-wrap;
+      overflow-wrap:break-word;
+      padding:8px;
+      box-sizing:border-box;
+    }
+
+    .marks{
+      position:absolute; inset:0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size:16px;
+      line-height:24px;
+      white-space:pre-wrap;
+      overflow-wrap:break-word;
+      color:transparent;          /* běžné řádky neviditelné */
+      pointer-events:none;        /* aby šel editovat textarea */
+      z-index:2;                  /* NAD textareou (kvůli obarvení textu) */
+      padding:8px;
+      box-sizing:border-box;
+    }
     .marks .row{ display:block; }
-    .marks .over{ background: rgba(220, 38, 38, .16); } /* jemná červená */
+    .marks .over{
+      color:#f87171;              /* 🔴 barva písma pro dlouhé řádky */
+      background:transparent;     /* žádné podbarvení */
+    }
   </style>
 </head>
 <body>
@@ -99,7 +106,6 @@
       </div>
 
       <label class="full">Text (ChordPro)
-        <!-- ▼ OBALEM TEXTAREA A PODKLAD PRO HIGHLIGHT ▼ -->
         <div class="editor">
           <pre id="marks" class="marks" aria-hidden="true"></pre>
           <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
@@ -181,31 +187,28 @@
     const text = bodyEl.value.replace(/\r/g,'');
     const lines = text.split('\n');
 
-    // Sestavíme <pre> obsah po řádcích
     const html = lines.map(line=>{
       const visible = line.replace(CHORD_BRACKETS_RE, ''); // bez akordů
       const over = visible.length > ROW_LIMIT;
-      const content = line.length ? escapeHtml(line) : '&nbsp;'; // drží výšku i pro prázdné
+      const content = line.length ? escapeHtml(line) : '&nbsp;';
       return `<span class="row${over ? ' over':''}">${content}</span>`;
     }).join('\n');
 
     marksEl.innerHTML = html;
-    // sladíme rozměry a padding s textarea (kdyby se lišily)
+    // sladění metrik (ponecháno, ať to sedí i když globální CSS něco změní)
     const cs = getComputedStyle(bodyEl);
     marksEl.style.padding = cs.padding;
     marksEl.style.fontSize = cs.fontSize;
     marksEl.style.lineHeight = cs.lineHeight;
   }
 
-  // Sync scroll (textarea → podklad)
+  // Sync scroll (textarea → overlay)
   bodyEl.addEventListener('scroll', ()=>{
     marksEl.scrollTop = bodyEl.scrollTop;
     marksEl.scrollLeft = bodyEl.scrollLeft;
   });
 
-  // Rebuild při psaní, vkládání, změně
   ['input','change','keyup'].forEach(ev => bodyEl.addEventListener(ev, rebuildMarks));
-  // Po načtení
   rebuildMarks();
 
   // --- detekce "chord" tokenu ---
@@ -215,8 +218,8 @@
   function isChordishToken(tok) {
     if (!tok) return false;
     if (CHORD_RE.test(tok)) return true;
-    if (/^[A-H]$/i.test(tok)) return true;        // osamocené písmeno
-    if (/^\d{1,2}$/.test(tok)) return true;       // samotné číslo (počítání dob)
+    if (/^[A-H]$/i.test(tok)) return true;
+    if (/^\d{1,2}$/.test(tok)) return true;
     if (/^(N\.C\.|NC|x)$/i.test(tok)) return true;
     return false;
   }
