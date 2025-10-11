@@ -206,6 +206,16 @@ let autoMode = 0;        // 0 = vyp, 1 = pomalu, 2 = rychle
 let _autoRaf = 0;
 let _lastTs = 0;
 
+/* === GLOBAL FONT SIZE PERSISTENCE (jediná nová logika) === */
+const FONT_KEY = 'zpj-fontPx';
+(function applySavedFontSize() {
+  const saved = parseFloat(localStorage.getItem(FONT_KEY));
+  if (!isNaN(saved) && saved >= 12 && saved <= 72) {
+    document.documentElement.style.setProperty('--cpfs', saved + 'px');
+  }
+})();
+/* === konec nové logiky === */
+
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
   const floater = document.getElementById('autoScroll');
@@ -506,7 +516,7 @@ function wireSwipeNavigation(){
 function goNextSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const next = (SONG_INDEX + 1) % SONGS_LIST.length;
-  location.href = `song.html?id=${encodeURIComponent(SONGS_LIST[next].id)}`;
+  location.href = `song.html?id=${encodeURIComponent(SONG_SLIST[next].id)}`;
 }
 function goPrevSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
@@ -556,6 +566,7 @@ const render = () => {
     // velikost textu
  const setFs = px => {
   document.documentElement.style.setProperty('--cpfs', px + 'px');
+  localStorage.setItem(FONT_KEY, String(px));   // ⬅ uložit globálně
   relayoutChords();                 // po změně velikosti přepočítej akordy
 };
 let fs = parseFloat(getComputedStyle(document.documentElement)
