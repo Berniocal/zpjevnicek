@@ -45,3 +45,4 @@ ale zbav nás od zlého.[D]Amen!
 
  
 konec
+konec
