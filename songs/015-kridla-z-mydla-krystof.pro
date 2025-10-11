@@ -28,3 +28,4 @@
 Že další [F#m]fází je [D]pád.[D]
 [A]Křídla mít [F#m]z mýdla a [D]tát, [D]když se [A]vsází
 Že další [F#m]fází je [D]pád.[D]
+-
