@@ -38,5 +38,5 @@ jak tě to [G]vomámí a [D]nepustí zpět
 
 /:Jaký si to [F]uděláš [B]takový to [Dmi]máš:/
  -
-
+-
  
