@@ -54,3 +54,4 @@ jen [Gmi]jméno tvé, chci [Gm7]vypít bazén
 [Gmi]zasadit si [Gm7]tvoje vlasy,
 [F]rozfoukat je [C7]do u[C]lic, 
 c[Gmi]hci ti říct, že [Gm7]rád tě mám [B7]víc.
+-
