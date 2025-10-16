@@ -1,10 +1,10 @@
-/* Zpěvníček – Service Worker v1.5 (offline .pro songs precache)
+/* Zpěvníček – Service Worker v1.6 (fix: songs -> DYNAMIC cache + broader lookup)
    - cache-first pro statiku (shell)
    - network-first pro HTML navigaci (s offline fallbackem)
    - stale-while-revalidate pro data a /songs/*
-   - instalace: precache core + robustní precache všech .pro souborů ze /data/songs.json
+   - instalace: precache core do STATIC + všechny .pro ze /data/songs.json do DYNAMIC
 */
-const VERSION = '2025-10-16-05';
+const VERSION = '2025-10-16-07';
 const CACHE_STATIC  = `zpj-static-${VERSION}`;
 const CACHE_DYNAMIC = `zpj-dyn-${VERSION}`;
 const BASE = '/zpjevnicek';
@@ -24,12 +24,13 @@ const CORE_ASSETS = [
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
-    const c = await caches.open(CACHE_STATIC);
+    const cStatic = await caches.open(CACHE_STATIC);
+    const cDyn    = await caches.open(CACHE_DYNAMIC);
 
-    // 1) precache jádra – offline shell
-    await c.addAll(CORE_ASSETS.map(u => new Request(u, { cache: 'reload' })));
+    // 1) precache jádra – offline shell (STATIC)
+    await cStatic.addAll(CORE_ASSETS.map(u => new Request(u, { cache: 'reload' })));
 
-    // 2) pokus o stažení všech písní podle "file" z /data/songs.json
+    // 2) stáhni všechny písně podle "file" z /data/songs.json (ukládej do DYNAMIC)
     try {
       const res = await fetch(`${BASE}/data/songs.json`, { cache: 'reload' });
       if (res.ok) {
@@ -42,15 +43,13 @@ self.addEventListener('install', (e) => {
               try {
                 const r = new Request(abs, { cache: 'reload' });
                 const songRes = await fetch(r);
-                if (songRes.ok) await c.put(r, songRes.clone());
+                if (songRes.ok) await cDyn.put(r, songRes.clone()); // <<< DYNAMIC
               } catch { /* jedna chyba nevadí */ }
             }
           }
         }
       }
-    } catch {
-      // songs.json chybí nebo nelze načíst – nevadí, SWR se postará při běhu
-    }
+    } catch { /* songs.json chybí / chyba – nevadí */ }
 
     self.skipWaiting();
   })());
@@ -122,33 +121,42 @@ async function networkFirstHTML(req) {
 }
 
 async function staleWhileRevalidate(req) {
-  const cache = await caches.open(CACHE_DYNAMIC);
-  const hit = await cache.match(req, { ignoreSearch: true });
+  // Hledej napřed napříč VŠEMI cache (STATIC i DYNAMIC)
+  const anyHit = await caches.match(req, { ignoreSearch: true });
+  if (anyHit) {
+    // paralelně se zkus aktualizovat
+    fetch(req, { cache: 'no-store' })
+      .then(async res => {
+        if (res && res.ok) {
+          const dyn = await caches.open(CACHE_DYNAMIC);
+          dyn.put(req, res.clone());
+        }
+      })
+      .catch(() => {});
+    return anyHit;
+  }
 
-  const fetching = fetch(req, { cache: 'no-store' })
-    .then(res => {
-      if (res && res.ok) cache.put(req, res.clone());
-      return res;
-    })
-    .catch(() => null);
-
-  return hit || fetching || new Response('', { status: 504 });
+  // jinak network → ulož do DYNAMIC
+  try {
+    const res = await fetch(req, { cache: 'no-store' });
+    if (res && res.ok) {
+      const dyn = await caches.open(CACHE_DYNAMIC);
+      dyn.put(req, res.clone());
+    }
+    return res;
+  } catch {
+    return new Response('', { status: 504 });
+  }
 }
 
-// Pomocník: vytvoří absolutní cestu pro song.file (podporuje relativní i absolutní zápisy)
+// Pomocník: absolutní cesta pro song.file
 function toAbsoluteSongPath(u) {
   if (typeof u !== 'string') return null;
   let s = u.trim();
   if (!s) return null;
 
-  // pokud už je absolutní cesta pod /zpjevnicek/
-  if (s.startsWith(`${BASE}/`)) return s;
-
-  // pokud začíná "/songs/" → doplň prefix
+  if (s.startsWith(`${BASE}/`)) return s;         // už absolutní
   if (s.startsWith('/songs/')) return `${BASE}${s}`;
-
-  // pokud začíná "songs/" → doplň prefix
-  if (s.startsWith('songs/')) return `${BASE}/${s}`;
-
+  if (s.startsWith('songs/'))  return `${BASE}/${s}`;
   return null;
 }
