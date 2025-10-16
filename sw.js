@@ -1,56 +1,58 @@
-/* Zpěvníček – Service Worker v1.3 (auto-update + offline songs)
+/* Zpěvníček – Service Worker v1.5 (offline .pro songs precache)
    - cache-first pro statiku (shell)
    - network-first pro HTML navigaci (s offline fallbackem)
    - stale-while-revalidate pro data a /songs/*
-   - instalace: precache core + (volitelně) všechny /songs z /data/songs.json
+   - instalace: precache core + robustní precache všech .pro souborů ze /data/songs.json
 */
-const VERSION = '2025-10-16-02';
+const VERSION = '2025-10-16-05';
 const CACHE_STATIC  = `zpj-static-${VERSION}`;
 const CACHE_DYNAMIC = `zpj-dyn-${VERSION}`;
+const BASE = '/zpjevnicek';
 
-// VŠECHNY cesty ABSOLUTNĚ pod /zpjevnicek/
 const CORE_ASSETS = [
-  '/zpjevnicek/',
-  '/zpjevnicek/index.html',
-  '/zpjevnicek/song.html',
-  '/zpjevnicek/admin.html',
-  '/zpjevnicek/assets/style.css',
-  '/zpjevnicek/manifest.webmanifest',
-  '/zpjevnicek/assets/icons/icon-192.png',
-  '/zpjevnicek/assets/icons/icon-512.png',
-  '/zpjevnicek/assets/icons/maskable-512.png',
-  // pokusíme se přivést i seznam písní (pokud existuje)
-  '/zpjevnicek/data/songs.json'
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/song.html`,
+  `${BASE}/admin.html`,
+  `${BASE}/assets/style.css`,
+  `${BASE}/manifest.webmanifest`,
+  `${BASE}/assets/icons/icon-192.png`,
+  `${BASE}/assets/icons/icon-512.png`,
+  `${BASE}/assets/icons/maskable-512.png`,
+  `${BASE}/data/songs.json`
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE_STATIC);
 
-    // ÚPRAVA #1: pevné precache – stáhne vše potřebné pro offline shell
+    // 1) precache jádra – offline shell
     await c.addAll(CORE_ASSETS.map(u => new Request(u, { cache: 'reload' })));
 
-    // === EXTRA: Precache všech písní podle manifestu /data/songs.json (pokud existuje) ===
+    // 2) pokus o stažení všech písní podle "file" z /data/songs.json
     try {
-      const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'reload' });
+      const res = await fetch(`${BASE}/data/songs.json`, { cache: 'reload' });
       if (res.ok) {
-        const list = await res.json(); // očekává se pole absolutních cest
-        if (Array.isArray(list) && list.length) {
-          // jen HTML ze /songs/
-          const songRequests = list
-            .filter(u => typeof u === 'string' && u.startsWith('/zpjevnicek/songs/') && u.endsWith('.html'))
-            .map(u => new Request(u, { cache: 'reload' }));
-          if (songRequests.length) {
-            await c.addAll(songRequests);
+        const list = await res.json();
+        if (Array.isArray(list)) {
+          for (const song of list) {
+            if (song?.file && typeof song.file === 'string') {
+              const abs = toAbsoluteSongPath(song.file);
+              if (!abs) continue;
+              try {
+                const r = new Request(abs, { cache: 'reload' });
+                const songRes = await fetch(r);
+                if (songRes.ok) await c.put(r, songRes.clone());
+              } catch { /* jedna chyba nevadí */ }
+            }
           }
         }
       }
-    } catch (err) {
-      // pokud seznam není/selže, appka bude mít písně po prvním otevření (SWR níže)
-      // záměrně ticho
+    } catch {
+      // songs.json chybí nebo nelze načíst – nevadí, SWR se postará při běhu
     }
 
-    self.skipWaiting(); // auto-update
+    self.skipWaiting();
   })());
 });
 
@@ -58,13 +60,13 @@ self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter(k => ![CACHE_STATIC, CACHE_DYNAMIC].includes(k)).map(k => caches.delete(k))
+      keys.filter(k => ![CACHE_STATIC, CACHE_DYNAMIC].includes(k))
+          .map(k => caches.delete(k))
     );
     await self.clients.claim();
   })());
 });
 
-// UI může přepnout na novou verzi okamžitě
 self.addEventListener('message', (e) => {
   if (e?.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -74,25 +76,23 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-
-  // Obsluhujeme jen vlastní origin a jen cestu /zpjevnicek/**
-  if (url.origin !== location.origin || !url.pathname.startsWith('/zpjevnicek/')) return;
+  if (url.origin !== location.origin || !url.pathname.startsWith(`${BASE}/`)) return;
 
   const path = url.pathname;
 
-  // Data a písně → stale-while-revalidate
-  if (path === '/zpjevnicek/data/songs.json' || path.startsWith('/zpjevnicek/songs/')) {
+  // Data a písně (.pro) → stale-while-revalidate
+  if (path === `${BASE}/data/songs.json` || path.startsWith(`${BASE}/songs/`)) {
     e.respondWith(staleWhileRevalidate(req));
     return;
   }
 
-  // HTML navigace → network-first s fallbackem na cache (index)
+  // HTML navigace → network-first
   if (req.mode === 'navigate' || path.endsWith('.html')) {
     e.respondWith(networkFirstHTML(req));
     return;
   }
 
-  // Ostatní statika → cache-first
+  // Ostatní → cache-first
   e.respondWith(cacheFirst(req));
 });
 
@@ -109,18 +109,14 @@ async function networkFirstHTML(req) {
   const cache = await caches.open(CACHE_STATIC);
   try {
     const res = await fetch(req, { cache: 'no-store' });
-
     if (res && res.ok) {
-      // ÚPRAVA #2: ulož jak shell, tak i konkrétní HTML odpověď
-      cache.put('/zpjevnicek/index.html', res.clone());
+      cache.put(`${BASE}/index.html`, res.clone());
       cache.put(req, res.clone());
     }
-
     return res;
   } catch {
-    // offline fallback
     return (await cache.match(req, { ignoreSearch: true })) ||
-           (await cache.match('/zpjevnicek/index.html')) ||
+           (await cache.match(`${BASE}/index.html`)) ||
            Response.error();
   }
 }
@@ -137,4 +133,22 @@ async function staleWhileRevalidate(req) {
     .catch(() => null);
 
   return hit || fetching || new Response('', { status: 504 });
+}
+
+// Pomocník: vytvoří absolutní cestu pro song.file (podporuje relativní i absolutní zápisy)
+function toAbsoluteSongPath(u) {
+  if (typeof u !== 'string') return null;
+  let s = u.trim();
+  if (!s) return null;
+
+  // pokud už je absolutní cesta pod /zpjevnicek/
+  if (s.startsWith(`${BASE}/`)) return s;
+
+  // pokud začíná "/songs/" → doplň prefix
+  if (s.startsWith('/songs/')) return `${BASE}${s}`;
+
+  // pokud začíná "songs/" → doplň prefix
+  if (s.startsWith('songs/')) return `${BASE}/${s}`;
+
+  return null;
 }
