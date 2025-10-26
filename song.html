@@ -15,7 +15,7 @@
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
   <style>
 :root{
-  --cpfs:20px;
+    --cpfs: calc(20px * var(--song-scale, 1));
   --chromeH:0px;
   --chordColor:#22c55e;
   --chordScale:1.05;
@@ -571,17 +571,26 @@ const render = () => {
     document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
     document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
   
-    // velikost textu
- const setFs = px => {
-  document.documentElement.style.setProperty('--cpfs', px + 'px');
-  localStorage.setItem(FONT_KEY, String(px));   // ⬅ uložit globálně
-  relayoutChords();                 // po změně velikosti přepočítej akordy
-};
-let fs = parseFloat(getComputedStyle(document.documentElement)
-           .getPropertyValue('--cpfs')) || 20;
-document.getElementById('fontUp').onclick   = ()=>{ fs=Math.min(72,fs+2); setFs(fs); };
-document.getElementById('fontDown').onclick = ()=>{ fs=Math.max(12,fs-2); setFs(fs); };
+// --- jednotná velikost napříč PWA přes 'zpj-fontScale' ---
+const ZPJ_FONT_KEY = 'zpj-fontScale';
 
+// získej aktuální scale (výchozí 1)
+function getScale(){
+  const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale')) || 1;
+  return s > 0 ? s : 1;
+}
+function setScale(s){
+  const clamped = Math.min(3, Math.max(0.5, s)); // povolíme 0.5× až 3×
+  document.documentElement.style.setProperty('--song-scale', String(clamped));
+  localStorage.setItem(ZPJ_FONT_KEY, String(clamped));
+  relayoutChords(); // po změně přepočti akordy
+}
+
+// inicializace (kdyby už scale běží z IIFE, jen ho načteme)
+let scale = getScale();
+
+document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); };
+document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); };
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
@@ -661,6 +670,15 @@ window.addEventListener('orientationchange', () => {
 </script>
 
 <button id="autoScroll" class="auto-scroll" title="Auto posuv">∨</button>
+<script>
+  (function applyGlobalSongScale(){
+    const ZPJ_FONT_KEY = 'zpj-fontScale';
+    const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
+    if (!isNaN(val) && val > 0) {
+      document.documentElement.style.setProperty('--song-scale', String(val));
+    }
+  })();
+</script>
 
 </body>
 </html>
