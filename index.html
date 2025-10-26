@@ -14,15 +14,22 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="brand">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/>
-        </svg>
-        <h1>Zpěvníček</h1>
-      </div>
-      <a href="/zpjevnicek/admin.html">Přidat písně ↗</a>
-    </div>
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/>
+    </svg>
+    <h1>Zpěvníček</h1>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:12px">
+    <label class="kbd" style="white-space:nowrap">
+      <input id="autoOffline" type="checkbox"> offline
+    </label>
+    <a href="/zpjevnicek/admin.html">Přidat písně ↗</a>
+  </div>
+</div>
+
 
     <div class="card">
       <div class="controls">
@@ -121,6 +128,39 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+</script>
+<!-- ✅ Přepínač auto-offline + automatické stahování -->
+<script>
+  const AUTO_OFFLINE_KEY = 'zpj-autoOffline';
+  const cb = document.getElementById('autoOffline');
+  cb.checked = localStorage.getItem(AUTO_OFFLINE_KEY) === '1';
+  cb.onchange = () => localStorage.setItem(AUTO_OFFLINE_KEY, cb.checked ? '1' : '0');
+
+  function goodConnection(){
+    const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+    if (!c) return true;
+    if (c.saveData) return false;
+    const okTypes = ['wifi','ethernet','unknown'];
+    return okTypes.includes(c.type) || (c.effectiveType || '').includes('4g');
+  }
+
+  async function prefetchAllIfAllowed(){
+    try{
+      const allow = localStorage.getItem(AUTO_OFFLINE_KEY) === '1';
+      if (!allow) return;
+      if (!navigator.onLine) return;
+      if (!goodConnection()) return;
+
+      const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
+      if (reg && reg.active) {
+        reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: true });
+      }
+    }catch(e){ console.warn(e); }
+  }
+
+  // spustit po loadu + občas zopakovat (každých 30 min)
+  window.addEventListener('load', prefetchAllIfAllowed);
+  setInterval(prefetchAllIfAllowed, 30*60*1000);
 </script>
 
 <!-- ⬇⬇⬇ JEDINÁ NOVÁ ČÁST: globální aplikace uložené velikosti textu -->
