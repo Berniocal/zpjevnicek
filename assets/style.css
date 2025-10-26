@@ -6,10 +6,36 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:16px/1.6 system-ui, Segoe UI, Roboto, Arial}
 .container{max-width:960px;margin:auto;padding:28px 20px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.brand{display:flex;gap:10px;align-items:center}
-.brand svg{width:24px;height:24px}
-.brand h1{font-size:24px;font-weight:700}
+
+/* ── HLAVIČKA ─────────────────────────────────────────── */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;   /* akce začínají nahoře */
+  gap:16px;
+  margin-bottom:24px;       /* větší mezera pod hlavičkou */
+}
+.header .brand{ display:flex; align-items:center; gap:10px; }
+.header .brand h1{ margin:0; font-size:24px; font-weight:700; letter-spacing:.2px; }
+.header-actions{
+  margin-left:auto;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+}
+
+/* tlačítka */
+.btn{
+  background:#0e1a30; color:#9ec3ff;
+  border:1px solid #2a3b64; border-radius:10px;
+  padding:8px 12px; cursor:pointer;
+}
+.btn:hover{ background:#14223d; }
+.btn-ghost{
+  background:transparent; color:#c9d9f7;
+  border:1px dashed #2a3b64;
+}
+#offlineWrap input{ transform:translateY(1px); margin-right:6px; }
+
+/* ── OSTATNÍ ──────────────────────────────────────────── */
 .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 hr.sep{border:none;border-top:1px solid var(--line);margin:14px 0}
 .controls{display:flex;gap:10px;flex-wrap:wrap}
@@ -27,3 +53,9 @@ ul{list-style:none}
 #alphaTab canvas,#alphaTab svg{max-width:none}
 .footer{color:var(--muted);font-size:13px;margin-top:16px}
 a{color:var(--accent);text-decoration:none}
+
+/* ── RESPONSIVE ───────────────────────────────────────── */
+@media (max-width:520px){
+  .header{ align-items:stretch; }
+  .header-actions{ align-items:flex-start; }
+}
