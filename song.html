@@ -419,14 +419,14 @@ function fixChordOverlaps(root){
 
 let relayoutScheduled = false;
 function relayoutChords(){
-  const cp = document.querySelector('#view .cp');
-  if (!cp) return;
   if (relayoutScheduled) return;
   relayoutScheduled = true;
-requestAnimationFrame(relayoutChords);
+  requestAnimationFrame(() => {
+    relayoutScheduled = false;
+    const cp = document.querySelector('#view .cp');
+    if (cp) fixChordOverlaps(cp);
+  });
 }
-
-
 
 function updateChromeHeight(){
   const ch = document.getElementById('chrome');
