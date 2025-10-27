@@ -11,7 +11,7 @@ a ty mus[G]íš [C]bý[G]ti [C]má,
 [Dmi]lebo mi tě [E]Pán Bůh [Am]dá.
 
 [Am]A já sa udělám [G]malú veve[C]ričkú
-a ti uskočím tobě [E]z dubu na jed[Am]ličku,
+a uskočím tobě [E]z dubu na jed[Am]ličku,
 přece tvoj[G]a [C]ne[G]bu[C]du, [Dmi]ani jednu [E]hodi[Am]nu.
 
 [Am]A já chovám doma [G]takú seké[C]rečku,
