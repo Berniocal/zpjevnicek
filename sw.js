@@ -6,7 +6,7 @@
    - /songs/*: cache-first (offline-ready)
    - Volitelně: hromadné stažení všech písní přes postMessage {type:'CACHE_ALL_SONGS'}
 */
-const VERSION = '2025-10-26-09';
+const VERSION = '2025-10-26-10';
 const CACHE_STATIC  = `zpj-static-${VERSION}`; // mění se při deployi
 const CACHE_DYNAMIC = `zpj-dyn-v1`;            // STÁLÉ, NEMĚNIT KVŮLI UDRŽENÍ OFFLINE OBSAHU
 const BASE = '/zpjevnicek';
@@ -153,6 +153,32 @@ async function staleWhileRevalidate(req) {
     return new Response('', { status: 504 });
   }
 }
+
+async function networkFirstJSON(req) {
+  const dyn = await caches.open(CACHE_DYNAMIC);
+  try {
+    // 🟢 Nejprve zkus síť (žádná cache)
+    const res = await fetch(req, { cache: 'no-store' });
+    if (res && res.ok) {
+      dyn.put(req, res.clone());
+      console.log('[SW] songs.json aktualizován z internetu');
+    }
+    return res;
+  } catch (err) {
+    // 🔴 Když nejsme online → použij poslední uloženou verzi
+    const cached = await dyn.match(req, { ignoreSearch: true });
+    if (cached) {
+      console.log('[SW] songs.json načten z cache');
+      return cached;
+    }
+    // 🟠 Žádná cache → vrať prázdné pole
+    return new Response('[]', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
 
 // ---------- pomocné ----------
 async function cacheAllSongs(chunkSize = 8, reportProgress = false) {
