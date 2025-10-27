@@ -246,5 +246,13 @@
     "author": "Tomáš Klus",
     "file": "songs/031-a-pak-tomas-klus.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "032-promeny-cechomor",
+    "number": 32,
+    "title": "Proměny",
+    "author": "Čechomor",
+    "file": "songs/032-promeny-cechomor.pro",
+    "type": "chordpro"
   }
 ]
