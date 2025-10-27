@@ -21,6 +21,26 @@ body{background:var(--bg);color:var(--ink);font:16px/1.6 system-ui, Segoe UI, Ro
   margin-left:auto;
   display:flex; flex-direction:column; align-items:flex-end; gap:8px;
 }
+/* ── LOGO "Zpjěvníček" ───────────────────────────── */
+.logo {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  display: inline-block;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.logo .w { color: #fff; }        /* bílé písmo */
+.logo .gray { color: #9fa8b8; }  /* šedé písmo */
+.logo .háček {
+  position: relative;
+  left: -0.25em;
+}
+.logo .e {
+  position: relative;
+  display: inline-block;
+}
+
 
 /* tlačítka */
 .btn{
