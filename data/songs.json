@@ -190,5 +190,13 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/024-kdyz-si-te-divko-predstavim-sverak-a-uhlir.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "025-svaz-ceskejch-bohemu-wohnout",
+    "number": 25,
+    "title": "Svaz českejch bohémů",
+    "author": "Wohnout",
+    "file": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
+    "type": "chordpro"
   }
 ]
