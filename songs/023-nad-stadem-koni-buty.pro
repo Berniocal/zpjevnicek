@@ -37,3 +37,5 @@ hej ha jo hej ha jo
 do bílé [D]vody, [A]vo[G]dy.
 Vyhasnul [D]kotel, [A]a náhoda [Em]je,
 štěstí od podko[G]vy:/ x 3
+-
+-
