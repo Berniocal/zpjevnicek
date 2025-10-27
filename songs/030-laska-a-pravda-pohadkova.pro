@@ -26,3 +26,5 @@ jen se [B]nevzdávej, jen se [A]nevzdávej.
 i když [Dmi]na světě je jí [Am]málo.
 [F]Lásku a pravdu [C]lidem přej,
 jen se [B]nevzdávej, jen se [A]nevzdávej.
+-
+-
