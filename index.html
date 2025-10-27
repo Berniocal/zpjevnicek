@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zpěvníček</title>
+  <title>Zpjěvníček</title>
 
   <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
   <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
@@ -19,7 +19,7 @@
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/>
     </svg>
-    <h1>Zpěvníček</h1>
+    <h1>Zpjěvníček</h1>
   </div>
 </div>
 
@@ -139,7 +139,7 @@ if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
       if (reg && reg.active) {
         reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
-        console.log('[Zpěvníček] Automatické stahování písní spuštěno.');
+        console.log('[Zpjěvníček] Automatické stahování písní spuštěno.');
       }
     }catch(e){ console.warn(e); }
   }
