@@ -222,5 +222,13 @@
     "author": "Peha",
     "file": "songs/028-spomal-peha.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "029-jdevozem-tomas-klus",
+    "number": 29,
+    "title": "JdeVoZem",
+    "author": "Tomáš Klus",
+    "file": "songs/029-jdevozem-tomas-klus.pro",
+    "type": "chordpro"
   }
 ]
