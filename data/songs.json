@@ -174,5 +174,13 @@
     "author": "Tomáš Klus",
     "file": "songs/022-zamilovany-princ-tomas-klus.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "023-nad-stadem-koni-buty",
+    "number": 23,
+    "title": "Nad stádem koní",
+    "author": "Buty",
+    "file": "songs/023-nad-stadem-koni-buty.pro",
+    "type": "chordpro"
   }
 ]
