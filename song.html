@@ -214,14 +214,6 @@ let autoMode = 0;        // 0 = vyp, 1 = pomalu, 2 = rychle
 let _autoRaf = 0;
 let _lastTs = 0;
 
-/* === GLOBAL FONT SIZE PERSISTENCE (jediná nová logika) === */
-const FONT_KEY = 'zpj-fontPx';
-(function applySavedFontSize() {
-  const saved = parseFloat(localStorage.getItem(FONT_KEY));
-  if (!isNaN(saved) && saved >= 12 && saved <= 72) {
-    document.documentElement.style.setProperty('--cpfs', saved + 'px');
-  }
-})();
 /* === konec nové logiky === */
 
 function updateAutoBtnVisibility(){
