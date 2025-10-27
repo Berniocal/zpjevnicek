@@ -19,13 +19,10 @@
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M3 21c4-1 7-6 9-9l2 2c-3 2-8 5-11 7zM14 3l7 7-2 2-7-7 2-2z" stroke="#7bb0ff" stroke-width="1.5"/>
     </svg>
-    <h1>Zpjěvníček</h1>
+    <h1>Zpěvníček</h1>
   </div>
-
-  <label class="btn btn-ghost" id="offlineWrap" title="Stáhnout všechny písně pro offline použití">
-    <input id="autoOffline" type="checkbox"> offline
-  </label>
 </div>
+
 
     <div class="card">
       <div class="controls">
@@ -125,6 +122,33 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+  <!-- ✅ Automatické stahování všech písní při Wi-Fi / 4G -->
+<script>
+  function goodConnection(){
+    const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+    if (!c) return true;
+    if (c.saveData) return false;
+    const okTypes = ['wifi','ethernet','unknown'];
+    return okTypes.includes(c.type) || (c.effectiveType || '').includes('4g');
+  }
+
+  async function prefetchAllSongs(){
+    if (!navigator.onLine) return;
+    if (!goodConnection()) return;
+    try{
+      const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
+      if (reg && reg.active) {
+        reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
+        console.log('[Zpěvníček] Automatické stahování písní spuštěno.');
+      }
+    }catch(e){ console.warn(e); }
+  }
+
+  // spusť po načtení stránky a zkus to znovu každých 30 minut
+  window.addEventListener('load', prefetchAllSongs);
+  setInterval(prefetchAllSongs, 30*60*1000);
+</script>
+
 <!-- ✅ Přepínač auto-offline + automatické stahování -->
 <script>
   const AUTO_OFFLINE_KEY = 'zpj-autoOffline';
