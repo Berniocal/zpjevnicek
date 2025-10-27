@@ -48,3 +48,5 @@ Samé "[G]kdyby", samé "jed[D]nou"
 a pak [Em]po nás potop[C]a.
 Což tak[G]hle se jednou zved[D]nout
 a to [Em]klubko rozmotat[C]?
+-
+-
