@@ -230,5 +230,13 @@
     "author": "Tomáš Klus",
     "file": "songs/029-jdevozem-tomas-klus.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "030-laska-a-pravda-pohadkova",
+    "number": 30,
+    "title": "Láska a pravda",
+    "author": "Pohádková",
+    "file": "songs/030-laska-a-pravda-pohadkova.pro",
+    "type": "chordpro"
   }
 ]
