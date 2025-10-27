@@ -238,5 +238,13 @@
     "author": "Pohádková",
     "file": "songs/030-laska-a-pravda-pohadkova.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "031-a-pak-tomas-klus",
+    "number": 31,
+    "title": "A pak",
+    "author": "Tomáš Klus",
+    "file": "songs/031-a-pak-tomas-klus.pro",
+    "type": "chordpro"
   }
 ]
