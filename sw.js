@@ -6,7 +6,7 @@
    - /songs/*: cache-first (offline-ready)
    - Volitelně: hromadné stažení všech písní přes postMessage {type:'CACHE_ALL_SONGS'}
 */
-const VERSION = '2025-10-26-08';
+const VERSION = '2025-10-26-09';
 const CACHE_STATIC  = `zpj-static-${VERSION}`; // mění se při deployi
 const CACHE_DYNAMIC = `zpj-dyn-v1`;            // STÁLÉ, NEMĚNIT KVŮLI UDRŽENÍ OFFLINE OBSAHU
 const BASE = '/zpjevnicek';
@@ -21,7 +21,6 @@ const CORE_ASSETS = [
   `${BASE}/assets/icons/icon-192.png`,
   `${BASE}/assets/icons/icon-512.png`,
   `${BASE}/assets/icons/maskable-512.png`,
-  `${BASE}/data/songs.json`
 ];
 
 self.addEventListener('install', (e) => {
@@ -35,7 +34,6 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
-    // Čisti jen staré STATIC cache; DYNAMIC ponech vždy být.
     const keys = await caches.keys();
     await Promise.all(
       keys.map(k => {
@@ -45,13 +43,18 @@ self.addEventListener('activate', (e) => {
         return Promise.resolve(false);
       })
     );
-    // (volitelně) zapni navigation preload
+    // 🧹 zruš případnou statickou kopii seznamu
+    try {
+      const cStatic = await caches.open(CACHE_STATIC);
+      await cStatic.delete(`${BASE}/data/songs.json`, { ignoreSearch: true });
+    } catch {}
     if ('navigationPreload' in self.registration) {
       try { await self.registration.navigationPreload.enable(); } catch {}
     }
     await self.clients.claim();
   })());
 });
+
 
 self.addEventListener('message', (e) => {
   const msg = e?.data;
@@ -74,7 +77,7 @@ self.addEventListener('fetch', (e) => {
 
   // data & přehled
   if (path === `${BASE}/data/songs.json`) {
-    e.respondWith(staleWhileRevalidate(req));
+    e.respondWith(networkFirstJSON(req));
     return;
   }
 
