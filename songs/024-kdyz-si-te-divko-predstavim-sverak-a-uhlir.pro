@@ -35,3 +35,5 @@
 [D]Člověka to [Am]neomrzí, 
 [G]když je láskou [D]zasažen.:/
 [Em]zasažen
+-
+-
