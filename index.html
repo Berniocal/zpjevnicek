@@ -149,40 +149,6 @@ if ('serviceWorker' in navigator) {
   setInterval(prefetchAllSongs, 30*60*1000);
 </script>
 
-<!-- ✅ Přepínač auto-offline + automatické stahování -->
-<script>
-  const AUTO_OFFLINE_KEY = 'zpj-autoOffline';
-  const cb = document.getElementById('autoOffline');
-  cb.checked = localStorage.getItem(AUTO_OFFLINE_KEY) === '1';
-  cb.onchange = () => localStorage.setItem(AUTO_OFFLINE_KEY, cb.checked ? '1' : '0');
-
-  function goodConnection(){
-    const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
-    if (!c) return true;
-    if (c.saveData) return false;
-    const okTypes = ['wifi','ethernet','unknown'];
-    return okTypes.includes(c.type) || (c.effectiveType || '').includes('4g');
-  }
-
-  async function prefetchAllIfAllowed(){
-    try{
-      const allow = localStorage.getItem(AUTO_OFFLINE_KEY) === '1';
-      if (!allow) return;
-      if (!navigator.onLine) return;
-      if (!goodConnection()) return;
-
-      const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
-      if (reg && reg.active) {
-        reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: true });
-      }
-    }catch(e){ console.warn(e); }
-  }
-
-  // spustit po loadu + občas zopakovat (každých 30 min)
-  window.addEventListener('load', prefetchAllIfAllowed);
-  setInterval(prefetchAllIfAllowed, 30*60*1000);
-</script>
-
 <!-- ⬇⬇⬇ JEDINÁ NOVÁ ČÁST: globální aplikace uložené velikosti textu -->
 <script>
   // Globální klíč (stejný na všech stránkách aplikace)
