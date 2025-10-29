@@ -32,3 +32,5 @@ Kdybych já ho [Em]viděl[C]
 [G]Měl bych jednu malou [D]otázku:
 "Jaký je můj [Em]úděl?[C]"
 [G]A proč život visí [D]na vlásku?
+-
+-
