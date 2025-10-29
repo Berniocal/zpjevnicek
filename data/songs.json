@@ -294,5 +294,13 @@
     "author": "Support Lesbiens",
     "file": "songs/037-zivotni-support-lesbiens.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "038-andel-mirai",
+    "number": 38,
+    "title": "Anděl",
+    "author": "Mirai",
+    "file": "songs/038-andel-mirai.pro",
+    "type": "chordpro"
   }
 ]
