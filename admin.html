@@ -75,130 +75,160 @@
     #toggleMarks{ align-self:end; justify-self:end; padding:6px 10px; font-size:14px; }
     .limitCtl{ display:flex; gap:6px; align-items:center; justify-content:flex-end; }
     #limitVal{ width:84px; }
+
+    /* ---------- Collapsibles ---------- */
+    details.accordion{
+      border:1px solid #1f2b46; border-radius:10px; padding:0; margin-top:14px; background:var(--card);
+    }
+    details.accordion > summary{
+      list-style:none; cursor:pointer; padding:12px 14px; font-weight:600;
+      display:flex; align-items:center; gap:8px; user-select:none;
+    }
+    details.accordion > summary::before{
+      content: '▸'; transition: transform .15s ease; display:inline-block;
+    }
+    details.accordion[open] > summary::before{ transform: rotate(90deg); }
+    details.accordion .accordion-body{ padding: 0 14px 14px; }
+    details.accordion .accordion-body > .card{ margin-top:12px; }
+    /* první card hned po summary bez extra mezery */
+    details.accordion .accordion-body > .card:first-child{ margin-top:0; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header"><h1 style="margin:0">Přidat píseň (ChordPro)</h1><a href="index.html">← Zpět</a></div>
+    <div class="header"><h1 style="margin:0">Správa písní</h1><a href="index.html">← Zpět</a></div>
 
-     <div class="card" style="margin-top:12px">
-      <div class="grid two">
-        <label>Token (PAT)
-          <input id="token" placeholder="ghp_… nebo github_pat_…" />
-          <div class="note">Scopes: <code>Repository contents → Read and write</code> pro vybraný repozitář.</div>
-        </label>
-        <div>
-          <button id="saveToken">Uložit token do prohlížeče</button>
-          <button id="clearToken">Smazat token</button>
+    <!-- ========== SEKCE 1: VLOŽIT NOVOU PÍSEŇ (COLLAPSIBLE) ========== -->
+    <details class="accordion">
+      <summary>Vložit novou píseň</summary>
+      <div class="accordion-body">
+
+               <div class="card">
+          <div class="grid two">
+            <label>Token (PAT)
+              <input id="token" placeholder="ghp_… nebo github_pat_…" />
+              <div class="note">Scopes: <code>Repository contents → Read and write</code> pro vybraný repozitář.</div>
+            </label>
+            <div>
+              <button id="saveToken">Uložit token do prohlížeče</button>
+              <button id="clearToken">Smazat token</button>
+            </div>
+          </div>
+          <hr class="sep"/>
+          <div class="grid two">
+            <label>Název písně
+              <input id="title" placeholder="Greensleeves" />
+            </label>
+            <label>Autor
+              <input id="artist" placeholder="Traditional" />
+            </label>
+          </div>
+          <div class="grid two">
+            <label>Číslo (volitelné pro řazení)
+              <input id="number" type="number" min="1" step="1" placeholder="1" />
+            </label>
+            <label>Tonina (volitelně – meta)
+              <input id="key" placeholder="Am" />
+            </label>
+            <label>Formát vstupu
+              <select id="fmt">
+                <option value="auto" selected>Auto</option>
+                <option value="chordpro">ChordPro</option>
+                <option value="ug">Ultimate Guitar</option>
+              </select>
+            </label>
+
+            <div class="limitCtl">
+              <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
+              <input id="limitVal" type="number" min="10" max="200" step="1" />
+              <button id="applyLimit" title="Nastavit hranici znaků">Nastavit limit</button>
+            </div>
+          </div>
+
+          <label class="full">Text (ChordPro)
+            <div class="editor">
+              <div id="marks" class="marks"><div id="marksContent" class="marks-content"></div></div>
+              <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+              <div id="mirror" class="mirror" aria-hidden="true"></div>
+            </div>
+          </label>
+
+          <div class="grid two">
+            <label>Název souboru (automaticky)
+              <input id="filename" readonly />
+              <div class="note">Uloží se do <code>/songs</code> jako <code>NNN-nazev-autor.pro</code>.</div>
+            </label>
+            <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+              <button id="saveBtn">💾 Uložit do GitHubu</button>
+            </div>
+          </div>
+          <div id="status" class="note" style="margin-top:8px"></div>
         </div>
-      </div>
-      <hr class="sep"/>
-      <div class="grid two">
-        <label>Název písně
-          <input id="title" placeholder="Greensleeves" />
-        </label>
-        <label>Autor
-          <input id="artist" placeholder="Traditional" />
-        </label>
-      </div>
-      <div class="grid two">
-        <label>Číslo (volitelné pro řazení)
-          <input id="number" type="number" min="1" step="1" placeholder="1" />
-        </label>
-        <label>Tonina (volitelně – meta)
-          <input id="key" placeholder="Am" />
-        </label>
-        <label>Formát vstupu
-          <select id="fmt">
-            <option value="auto" selected>Auto</option>
-            <option value="chordpro">ChordPro</option>
-            <option value="ug">Ultimate Guitar</option>
-          </select>
-        </label>
 
-        <div class="limitCtl">
-          <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
-          <input id="limitVal" type="number" min="10" max="200" step="1" />
-          <button id="applyLimit" title="Nastavit hranici znaků">Nastavit limit</button>
+          </div>
+    </details>
+
+    <!-- ========== SEKCE 2: UPRAVIT / SMAZAT PÍSEŇ (COLLAPSIBLE) ========== -->
+    <details class="accordion">
+      <summary>Upravit existující píseň</summary>
+      <div class="accordion-body">
+
+        <div class="card">
+          <h2 style="margin:0 0 8px">Upravit existující píseň</h2>
+          <div class="grid two">
+            <label>Vyhledat (název nebo číslo)
+              <input id="editSearch" placeholder="např. 'Greensleeves' nebo 12" />
+            </label>
+            <div style="align-self:end;justify-self:end">
+              <button id="reloadIndex">↻ Načíst seznam písní</button>
+            </div>
+          </div>
+
+          <div id="editResults" class="list" style="margin-top:8px"></div>
+
+          <hr class="sep"/>
+
+          <div class="grid two">
+            <label>Název písně
+              <input id="eTitle" />
+            </label>
+            <label>Autor
+              <input id="eArtist" />
+            </label>
+          </div>
+          <div class="grid two">
+            <label>Číslo (volitelné)
+              <input id="eNumber" type="number" min="1" step="1" />
+            </label>
+            <label>Tonina (meta)
+              <input id="eKey" placeholder="Am" />
+            </label>
+          </div>
+
+          <label class="full">Text (ChordPro)
+            <div class="editor">
+              <div id="editMarks" class="marks"><div id="editMarksContent" class="marks-content"></div></div>
+              <textarea id="editBody" placeholder="[Am]Alas my love…"></textarea>
+              <div id="editMirror" class="mirror" aria-hidden="true"></div>
+            </div>
+          </label>
+
+          <div class="grid two">
+            <label>Cesta v repozitáři
+              <input id="editPath" readonly />
+              <div class="note">Soubor se nepřejmenovává (zůstává původní). Pro přejmenování ulož novou píseň a starou případně smaž.</div>
+            </label>
+            <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+              <button id="saveEditBtn">💾 Uložit změny</button>
+              <button id="deleteEditBtn" class="danger">🗑 Smazat píseň</button>
+            </div>
+          </div>
+
+          <div id="editStatus" class="note" style="margin-top:8px"></div>
         </div>
+
       </div>
-
-      <label class="full">Text (ChordPro)
-        <div class="editor">
-          <div id="marks" class="marks"><div id="marksContent" class="marks-content"></div></div>
-          <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
-          <div id="mirror" class="mirror" aria-hidden="true"></div>
-        </div>
-      </label>
-
-      <div class="grid two">
-        <label>Název souboru (automaticky)
-          <input id="filename" readonly />
-          <div class="note">Uloží se do <code>/songs</code> jako <code>NNN-nazev-autor.pro</code>.</div>
-        </label>
-        <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
-          <button id="saveBtn">💾 Uložit do GitHubu</button>
-        </div>
-      </div>
-      <div id="status" class="note" style="margin-top:8px"></div>
-    </div>
-
-    <!-- ⬇⬇⬇ NOVÁ SEKCE: UPRAVIT / SMAZAT PÍSEŇ -->
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:0 0 8px">Upravit existující píseň</h2>
-      <div class="grid two">
-        <label>Vyhledat (název nebo číslo)
-          <input id="editSearch" placeholder="např. 'Greensleeves' nebo 12" />
-        </label>
-        <div style="align-self:end;justify-self:end">
-          <button id="reloadIndex">↻ Načíst seznam písní</button>
-        </div>
-      </div>
-
-      <div id="editResults" class="list" style="margin-top:8px"></div>
-
-      <hr class="sep"/>
-
-      <div class="grid two">
-        <label>Název písně
-          <input id="eTitle" />
-        </label>
-        <label>Autor
-          <input id="eArtist" />
-        </label>
-      </div>
-      <div class="grid two">
-        <label>Číslo (volitelné)
-          <input id="eNumber" type="number" min="1" step="1" />
-        </label>
-        <label>Tonina (meta)
-          <input id="eKey" placeholder="Am" />
-        </label>
-      </div>
-
-      <label class="full">Text (ChordPro)
-        <div class="editor">
-          <div id="editMarks" class="marks"><div id="editMarksContent" class="marks-content"></div></div>
-          <textarea id="editBody" placeholder="[Am]Alas my love…"></textarea>
-          <div id="editMirror" class="mirror" aria-hidden="true"></div>
-        </div>
-      </label>
-
-      <div class="grid two">
-        <label>Cesta v repozitáři
-          <input id="editPath" readonly />
-          <div class="note">Soubor se nepřejmenovává (zůstává původní). Pro přejmenování ulož novou píseň a starou případně smaž.</div>
-        </label>
-        <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
-          <button id="saveEditBtn">💾 Uložit změny</button>
-          <button id="deleteEditBtn" class="danger">🗑 Smazat píseň</button>
-        </div>
-      </div>
-
-      <div id="editStatus" class="note" style="margin-top:8px"></div>
-    </div>
-    <!-- ⬆⬆⬆ KONEC NOVÉ SEKCE -->
-   
+    </details>
   </div>
 
   <script>
@@ -403,27 +433,18 @@
     for (const r of out){ const empty=!r.trim(); if (empty && prevEmpty) continue; compact.push(r); prevEmpty=empty; }
     return compact.join('\n');
   }
-// zajistí, že text končí dvěma řádky s jednou pomlčkou: "-", "-"
-function ensureDashEnding(text){
-  // normalizace konců řádků
-  text = text.replace(/\r/g, '');
-  const lines = text.split('\n');
+  // zajistí, že text končí dvěma řádky s jednou pomlčkou: "-", "-"
+  function ensureDashEnding(text){
+    text = text.replace(/\r/g, '');
+    const lines = text.split('\n');
+    while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+    let cnt = 0;
+    for (let i = lines.length - 1; i >= 0 && lines[i].trim() === '-'; i--) cnt++;
+    while (cnt < 2) { lines.push('-'); cnt++; }
+    return lines.join('\n') + '\n';
+  }
 
-  // odstraň prázdné řádky na konci
-  while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
-
-  // spočítej, kolik "-" už je na konci
-  let cnt = 0;
-  for (let i = lines.length - 1; i >= 0 && lines[i].trim() === '-'; i--) cnt++;
-
-  // doplň, aby byly aspoň dvě
-  while (cnt < 2) { lines.push('-'); cnt++; }
-
-  // přidej závěrečný newline pro hezký konec souboru
-  return lines.join('\n') + '\n';
-}
-
-  // Uložit do GitHubu
+  // Uložit novou píseň do GitHubu
   qs('#saveBtn').onclick = async () => {
     try {
       const { user, repo } = detectRepo();
@@ -437,8 +458,8 @@ function ensureDashEnding(text){
       const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
       const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
       if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
-      // ⬇⬇⬇ DOPLNĚNO: pojistka na koncové dva řádky s "-"
       body = ensureDashEnding(body);
+
       const lines = [];
       lines.push(`{title: ${titleEl.value.trim()}}`);
       if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
@@ -692,7 +713,6 @@ function ensureDashEnding(text){
         throw new Error(`GitHub API (delete) ${delRes.status}: ${t}`);
       }
 
-      // vyčisti formulář
       EDIT_SELECTED = null;
       eTitleEl.value=''; eArtistEl.value=''; eNumberEl.value=''; eKeyEl.value='';
       editBodyEl.value=''; editPathEl.value='';
@@ -700,7 +720,6 @@ function ensureDashEnding(text){
 
       estatus('Soubor byl smazán.', true);
 
-      // po smazání obnov seznam a výsledky vyhledávání
       await loadSongsIndex();
       const q = editSearchEl.value;
       renderEditResults(searchSongs(q));
@@ -780,7 +799,6 @@ function ensureDashEnding(text){
 
   // inicializačně načti index
   loadSongsIndex();
-
   </script>
 
   <script>
