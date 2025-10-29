@@ -24,6 +24,12 @@
   --cp-line:1.25;        /* bylo 1.9 – celkové řádkování textu */
   --cp-pad:1.05em;       /* bylo 1.15em – výška pro akord nad textem */
   --cp-pad-nochords:0.20em;
+    /* vlastní okraje „plátna“ písně + šířka posuvníku */
+  --song-pad-top: 12px;
+  --song-pad-bottom: 24px;
+  --song-pad-x: 8px;     /* ← tady budeš měnit levý/pravý „vnitřní“ okraj textu */
+  --scrollbarW: 3px;     /* ~1/6 běžné šířky (cca 18px → 3px) */
+
 }
 
 /* ChordPro render */
@@ -103,12 +109,28 @@ body:not(.chrome-hidden) #view{
 
 /* obsah: plná výška viewportu; lištu řešíme jen paddingem */
 #view{
-  height: 100vh;             /* dřív bylo calc(100vh - var(--chromeH)) */
+  height: 100vh;
   max-height: 100vh;
   overflow:auto;
   background:transparent;
   border:0; border-radius:0; box-shadow:none;
-  padding:12px 4px 24px;     /* základní padding */
+  /* pravý vnitřní okraj 0 → scrollbar na úplný kraj obrazovky */
+  padding: var(--song-pad-top) 0 var(--song-pad-bottom) var(--song-pad-x);
+  /* tenký scrollbar (Firefox) */
+  scrollbar-width: thin;
+  scrollbar-color: #2c3b60 transparent;
+}
+
+/* WebKit scrollbar: tenký a úplně u pravého okraje */
+#view::-webkit-scrollbar{
+  width: var(--scrollbarW);
+}
+#view::-webkit-scrollbar-track{
+  background: transparent;
+}
+#view::-webkit-scrollbar-thumb{
+  background: #2c3b60;
+  border-radius: 2px;
 }
 
 /* když je lišta vidět, přičti její výšku navrch – nic neodečítáme z height */
@@ -133,6 +155,8 @@ body:not(.chrome-hidden) #view{
 .auto-scroll:hover{ opacity:1 }
 .auto-scroll:active{ transform:scale(.98) }
 .auto-scroll.hidden{ display:none }
+/* Jen pro song.html: žádné odsazení kontejneru vpravo */
+.container{ padding-right: 0 !important; }
 
   </style>
 </head>
