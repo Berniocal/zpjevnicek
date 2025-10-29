@@ -278,5 +278,13 @@
     "author": "Čechomor",
     "file": "songs/035-mezi-horami-cechomor.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "036-gorale-cechomor",
+    "number": 36,
+    "title": "Gorale",
+    "author": "Čechomor",
+    "file": "songs/036-gorale-cechomor.pro",
+    "type": "chordpro"
   }
 ]
