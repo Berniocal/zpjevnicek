@@ -302,5 +302,13 @@
     "author": "Mirai",
     "file": "songs/038-andel-mirai.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "039-pulnocni-vaclav-neckar",
+    "number": 39,
+    "title": "Půlnoční",
+    "author": "Václav Neckář",
+    "file": "songs/039-pulnocni-vaclav-neckar.pro",
+    "type": "chordpro"
   }
 ]
