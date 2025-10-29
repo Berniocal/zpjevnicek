@@ -71,3 +71,5 @@ Ale to víš, že se to hodí,
 pořádně za to zatáhněte a už to pojede!
 Tak tedy dobře, tak ve jménu božím..
 No pořádně za to vemte! Tři, dva bum..
+-
+-
