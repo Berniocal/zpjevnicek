@@ -326,5 +326,13 @@
     "author": "Nightwork",
     "file": "songs/041-cekam-na-signal-nightwork.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "042-pod-dubem-za-dubem-sverak-a-uhlir",
+    "number": 42,
+    "title": "Pod dubem za dubem",
+    "author": "Svěrák a Uhlíř",
+    "file": "songs/042-pod-dubem-za-dubem-sverak-a-uhlir.pro",
+    "type": "chordpro"
   }
 ]
