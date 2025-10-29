@@ -13,7 +13,7 @@ to bych si vlastně hrozně [G]přál
 
 Ó, [D]Evo [F#]nebudu ti [Hm]lhát[G]
 můžeš se mi [D]smát o-o-o-[F#]oú
-asi tě mám [H]rád[A][A][Dmaj]
+asi tě mám [H]rád[A][A][Dmaj] 
 
 A hned [D]na všechno najdem odpo[A]věď
 co bude zítra za pár [Hm]let
@@ -27,6 +27,6 @@ to bych si vlastně hrozně [G]přál
 
 Ó, [D]Evo [F#]nebudu ti [Hm]lhát[G]
 můžeš se mi [D]smát o-o-o-[F#]oú
-asi tě mám [H]rád[A]
+asi tě mám [H]rád[A] 
 -
 -
