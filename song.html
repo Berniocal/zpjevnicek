@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
   <title>Píseň</title>
  <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
 <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
@@ -143,10 +143,20 @@ body.chrome-hidden #view {
   border-radius: 2px;
 }
 
-/* když je lišta vidět, přičti její výšku navrch – nic neodečítáme z height */
+/* když je lišta vidět, zůstává stávající chování */
 body:not(.chrome-hidden) #view{
-  padding-top: calc(var(--chromeH) + 12px);
+  padding-top: var(--chromeH);
 }
+
+/* když je lišta schovaná, využij úplně horní okraj
+   (ponech jen případný bezpečný okraj u výřezu) */
+body.chrome-hidden #view{
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* pro jistotu – kdyby se inline margin-top někde vrátil */
+body.chrome-hidden .sheet{ margin-top: 0 !important; }
+
 
     @media (max-width:640px){ #view{ padding-left:2px; padding-right:2px } }
 
@@ -172,7 +182,7 @@ body:not(.chrome-hidden) #view{
 </head>
 <body>
   <div class="container">
-    <div class="sheet" style="margin-top:12px">
+    <div class="sheet">
       <div id="chrome">
         <div class="chrome-row">
           <a id="backLink" href="index.html">← Zpět na seznam</a>
