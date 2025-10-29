@@ -33,42 +33,56 @@
 }
 
 /* ChordPro render */
-.cp{
-  font-family:system-ui,Segoe UI,Arial,sans-serif;
-  color:var(--ink);
-  font-size:var(--cpfs);
-  line-height:var(--cp-line);  /* ← používáme proměnnou */
-}
-.cp .line{
-  position:relative;
-  white-space:pre-wrap;
-  overflow: visible;   /* ← přidej sem */
+.cp {
+  font-family: system-ui, Segoe UI, Arial, sans-serif;
+  color: var(--ink);
+  font-size: var(--cpfs);
+  line-height: var(--cp-line);
 }
 
-.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) }
- /* ← menší rezerva */
-.cp .ch{
-  position:absolute; left:0; top:0;
-  font-weight:700;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:calc(1em * var(--chordScale));
-  color:var(--chordColor);
+/* každý řádek může přirozeně zalamovat po slovech */
+.cp .line {
+  position: relative;
+  white-space: normal;        /* dovolí zalomení po slovech */
+  overflow: visible;
 }
-.cp .ly{ visibility:visible }
 
-/* režim bez akordů – ještě těsnější */
-.cp.nochords .ch{ display:none }
-.cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
-/* lámej jen na mezerách, ne uprostřed slov */
-/* dělení pouze mezi slovy, ne uvnitř slov – zachová výšku akordů */
-.cp .line{
-  white-space: normal;        /* dovolí zalomení */
-  word-break: keep-all;       /* neláme uvnitř slov */
+/* každý akord+slovo tvoří nerozlučný celek */
+.cp .seg {
+  position: relative;
+  display: inline-block;
+  padding-top: var(--cp-pad);
+  vertical-align: bottom;
+  white-space: nowrap;        /* drží akord se svým slovem pohromadě */
+  margin-right: 0.15em;       /* malá mezera mezi segmenty */
+}
+
+/* akordy */
+.cp .ch {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(1em * var(--chordScale));
+  color: var(--chordColor);
+}
+
+/* text pod akordem */
+.cp .ly {
+  display: inline-block;
+  white-space: pre-wrap;
+  word-break: keep-all;
   overflow-wrap: normal;
+  visibility: visible;
 }
-.cp .ly{
-  display: inline-block;      /* každé slovo může jít na nový řádek */
-  white-space: pre-wrap;      /* zachová mezery v textu */
+
+/* režim bez akordů – těsnější text */
+.cp.nochords .ch {
+  display: none;
+}
+.cp.nochords .seg {
+  padding-top: var(--cp-pad-nochords);
 }
 
     /* „plátno“ -> bez rámečku/pozadí (žádná bublina) */
