@@ -45,7 +45,8 @@
   overflow: visible;   /* ← přidej sem */
 }
 
-.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) } /* ← menší rezerva */
+.cp .seg{ position:relative; display:inline; padding-top:var(--cp-pad) }
+ /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
   font-weight:700;
@@ -58,8 +59,12 @@
 /* režim bez akordů – ještě těsnější */
 .cp.nochords .ch{ display:none }
 .cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
-
-
+/* lámej jen na mezerách, ne uprostřed slov */
+.cp, .cp .line, .cp .seg, .cp .ly{
+  word-break: normal;
+  overflow-wrap: normal;  /* žádné „anywhere“ nebo „break-word“ */
+  hyphens: none;          /* vypnout automatickou hyfenaci */
+}
     /* „plátno“ -> bez rámečku/pozadí (žádná bublina) */
     .sheet{ padding:0; background:transparent; border:none; box-shadow:none; }
 
