@@ -91,9 +91,8 @@ body.chrome-hidden #chrome{
   opacity: 0;
 }
 
-/* obsah stránky dostane horní padding = výška lišty (jen když je viditelná) */
-body:not(.chrome-hidden) #view{
-  padding-top: var(--chromeH);   /* výšku doplní JS */
+body.chrome-hidden #view {
+  padding-top: clamp(10px, 2vh, 24px);
 }
 
 
