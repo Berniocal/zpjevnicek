@@ -332,15 +332,55 @@ function renderChordPro(text, transposeSemi=0, capo=0){
   for(const raw of lines){
     if(!raw.trim()){ cont.appendChild(document.createElement('br')); continue; }
     const line=document.createElement('div'); line.className='line';
-    let i=0, cur=''; while(i<raw.length){
-      if(raw[i]==='['){ const j=raw.indexOf(']', i+1); if(j!==-1){ cur=raw.slice(i+1,j); i=j+1; continue; } }
-      let j=i; while(j<raw.length && raw[j]!=='[') j++;
-      const lyr=raw.slice(i,j)||' ';
-      const seg=document.createElement('span'); seg.className='seg';
-      const ch=document.createElement('span'); ch.className='ch'; ch.textContent = cur ? transposeChord(cur, rootTrans) : '';
-      const ly=document.createElement('span'); ly.className='ly'; ly.textContent = lyr;
-      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg); i=j;
+    let i = 0, pending = null;
+    while (i < raw.length) {
+      if (raw[i] === '[') {
+        const close = raw.indexOf(']', i + 1);
+        if (close !== -1) {
+          const token = raw.slice(i + 1, close); // akord v hranatých závorkách
+          i = close + 1;
+
+          // podíváme se, co je hned za akordem
+          if (i >= raw.length || raw[i] === '[') {
+            // Konec řádku nebo další akord → hned vlož prázdný segment s tímto akordem
+            const seg = document.createElement('span'); seg.className = 'seg';
+            const ch  = document.createElement('span'); ch.className  = 'ch';
+            ch.textContent = transposeChord(token, rootTrans);
+            const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = ' ';
+            seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
+            pending = null; // nic nečeká
+            continue;
+          } else {
+            // za akordem následuje text → držíme ho jako "pending" pro příští slabiku
+            pending = token;
+            continue;
+          }
+        }
+        // neuzavřená závorka ⇒ spadne do textového zpracování níže
+      }
+
+      // nasbírej text až do dalšího '[' a spáruj ho s pending akordem (pokud je)
+      let j = i;
+      while (j < raw.length && raw[j] !== '[') j++;
+      const lyr = raw.slice(i, j) || ' ';
+      const seg = document.createElement('span'); seg.className = 'seg';
+      const ch  = document.createElement('span'); ch.className  = 'ch';
+      ch.textContent = pending ? transposeChord(pending, rootTrans) : '';
+      const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = lyr;
+      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
+      pending = null; // akord už byl použit
+      i = j;
     }
+
+    // bezpečnostní pojistka: kdyby přece jen něco zůstalo "rozjeté"
+    if (pending) {
+      const seg = document.createElement('span'); seg.className = 'seg';
+      const ch  = document.createElement('span'); ch.className  = 'ch';
+      ch.textContent = transposeChord(pending, rootTrans);
+      const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = ' ';
+      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
+    }
+
     cont.appendChild(line);
   }
   return cont;
