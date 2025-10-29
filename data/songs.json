@@ -270,5 +270,13 @@
     "author": "Harlej",
     "file": "songs/034-svarak-harlej.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "035-mezi-horami-cechomor",
+    "number": 35,
+    "title": "Mezi horami",
+    "author": "Čechomor",
+    "file": "songs/035-mezi-horami-cechomor.pro",
+    "type": "chordpro"
   }
 ]
