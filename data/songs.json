@@ -318,5 +318,13 @@
     "author": "Michal Hrůza",
     "file": "songs/040-budu-ti-vypravet-michal-hruza.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "041-cekam-na-signal-nightwork",
+    "number": 41,
+    "title": "Čekám na signál",
+    "author": "Nightwork",
+    "file": "songs/041-cekam-na-signal-nightwork.pro",
+    "type": "chordpro"
   }
 ]
