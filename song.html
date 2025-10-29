@@ -45,7 +45,7 @@
   overflow: visible;   /* ← přidej sem */
 }
 
-.cp .seg{ position:relative; display:inline; padding-top:var(--cp-pad) }
+.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) }
  /* ← menší rezerva */
 .cp .ch{
   position:absolute; left:0; top:0;
@@ -60,6 +60,18 @@
 .cp.nochords .ch{ display:none }
 .cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
 /* lámej jen na mezerách, ne uprostřed slov */
+/* dělení pouze mezi slovy, ne uvnitř slov – zachová výšku akordů */
+.cp .line{
+  white-space: normal;        /* dovolí zalomení */
+  word-break: keep-all;       /* neláme uvnitř slov */
+  overflow-wrap: normal;
+}
+.cp .ly{
+  display: inline-block;      /* každé slovo může jít na nový řádek */
+  white-space: pre-wrap;      /* zachová mezery v textu */
+}
+
+    
 .cp, .cp .line, .cp .seg, .cp .ly{
   word-break: normal;
   overflow-wrap: normal;  /* žádné „anywhere“ nebo „break-word“ */
