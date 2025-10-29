@@ -262,5 +262,13 @@
     "author": "Kryštof",
     "file": "songs/033-tak-nejak-malo-tancim-krystof.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "034-svarak-harlej",
+    "number": 34,
+    "title": "Svařák",
+    "author": "Harlej",
+    "file": "songs/034-svarak-harlej.pro",
+    "type": "chordpro"
   }
 ]
