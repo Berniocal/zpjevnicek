@@ -286,5 +286,13 @@
     "author": "Čechomor",
     "file": "songs/036-gorale-cechomor.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "037-zivotni-support-lesbiens",
+    "number": 37,
+    "title": "Životní",
+    "author": "Support Lesbiens",
+    "file": "songs/037-zivotni-support-lesbiens.pro",
+    "type": "chordpro"
   }
 ]
