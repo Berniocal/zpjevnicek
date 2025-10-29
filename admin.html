@@ -365,6 +365,25 @@
     for (const r of out){ const empty=!r.trim(); if (empty && prevEmpty) continue; compact.push(r); prevEmpty=empty; }
     return compact.join('\n');
   }
+// zajistí, že text končí dvěma řádky s jednou pomlčkou: "-", "-"
+function ensureDashEnding(text){
+  // normalizace konců řádků
+  text = text.replace(/\r/g, '');
+  const lines = text.split('\n');
+
+  // odstraň prázdné řádky na konci
+  while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+
+  // spočítej, kolik "-" už je na konci
+  let cnt = 0;
+  for (let i = lines.length - 1; i >= 0 && lines[i].trim() === '-'; i--) cnt++;
+
+  // doplň, aby byly aspoň dvě
+  while (cnt < 2) { lines.push('-'); cnt++; }
+
+  // přidej závěrečný newline pro hezký konec souboru
+  return lines.join('\n') + '\n';
+}
 
   // Uložit do GitHubu
   qs('#saveBtn').onclick = async () => {
@@ -380,7 +399,8 @@
       const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
       const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
       if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
-
+      // ⬇⬇⬇ DOPLNĚNO: pojistka na koncové dva řádky s "-"
+      body = ensureDashEnding(body);
       const lines = [];
       lines.push(`{title: ${titleEl.value.trim()}}`);
       if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
