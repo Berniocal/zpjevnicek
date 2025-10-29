@@ -91,10 +91,9 @@ body.chrome-hidden #chrome{
   opacity: 0;
 }
 
-body.chrome-hidden #view {
-  padding-top: clamp(10px, 2vh, 24px);
+body.chrome-hidden #view{
+  padding-top: env(safe-area-inset-top, 0px);
 }
-
 
     /* řádek s odkazem a tlačítkem v liště */
     .chrome-row{
