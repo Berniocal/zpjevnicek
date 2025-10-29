@@ -12,29 +12,41 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
 
-  <!-- ✅ Override: zrušit bublinu a rozšířit obsah -->
+  <!-- Overrides -->
   <style>
-    /* širší plátno, ale stále responzivní */
-    .container{
-  max-width: min(1200px, 96vw);  /* klidně 100vw pro úplnou šířku */
-  padding-left:6px;             /* ← tady měníš levé odsazení */
-  padding-right:6px;            /* ← tady pravé odsazení */
-}
+    /* ⬇⬇⬇ Odsazení od krajů + šířka stránky (uprav jen tyto tři řádky podle chuti) */
+    .container{ max-width:min(1200px,96vw); padding-left:12px; padding-right:12px; }
+    /* Bez „bubliny“ kolem seznamu */
+    .card{ background:transparent!important; border:0!important; box-shadow:none!important; padding:0!important; margin:0!important; }
+    .card .sep{ display:none!important; }
 
-    /* „bublina“ pryč – žádné pozadí, rámeček, stín, padding navíc */
-    .card{
-      background: transparent !important;
-      border: 0 !important;
-      box-shadow: none !important;
-      padding: 0 !important;
-      margin: 0 !important;
+    /* Layout položek seznamu + ellipsy */
+    #list{ margin:0; padding:0; list-style:none; }
+    .item{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #1f2b46; }
+    .item .meta{ display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+
+    /* Stejná bublina pro čísla (fixní průměr) + zarovnání */
+    .item .meta .badge:first-child{
+      width:38px; min-width:38px; height:38px; border-radius:999px;
+      display:inline-flex; align-items:center; justify-content:center; padding:0;
+      font-variant-numeric: tabular-nums;
     }
-    /* oddělovač pod filtrací netřeba */
-    .card .sep{ display: none !important; }
 
-    /* lehké dorovnání mezer, když není card padding */
-    .controls{ margin: 8px 0 10px; }
-    #list{ margin: 0; }
+    /* Název – vždy jeden řádek s …, zabere zbytek místa mezi číslem a autorem */
+    .item .meta .title{
+      display:block; flex:1; min-width:0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    /* Autor vpravo – také jeden řádek s …; uprav max-width dle potřeby */
+    .item > .badge{
+      max-width:40%; min-width:0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    /* Filtry bez extra mezer, když není card padding */
+    .controls{ margin:8px 0 10px; display:flex; gap:10px; }
+    .controls input{ flex:1; }
   </style>
 </head>
 <body>
@@ -64,7 +76,7 @@
           <option value="author">Řadit podle autora</option>
         </select>
       </div>
-      <hr class="sep"/>
+
       <ul id="list"></ul>
       <div id="empty" class="empty" style="display:none">
         Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.
@@ -116,17 +128,13 @@ sort.addEventListener('change', render);
 load();
 </script>
 
-<!-- Registrace SW + AUTO-UPDATE -->
+<!-- SW + auto-update -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' });
-
-      // 1) Už stažená nová verze? → přepnout hned
       if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-
-      // 2) Nová verze se právě instaluje → po installed ji hned aktivuj
       reg.addEventListener('updatefound', () => {
         const sw = reg.installing;
         if (!sw) return;
@@ -136,60 +144,46 @@ if ('serviceWorker' in navigator) {
           }
         });
       });
-
-      // 3) Po přepnutí řídícího SW automaticky jednorázově reloadni
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
+        if (refreshing) return; refreshing = true; window.location.reload();
       });
-
-      // 4) Občasná kontrola aktualizací (např. každou hodinu)
-      setInterval(() => reg.update().catch(()=>{}), 60 * 60 * 1000);
-    } catch (e) {
-      console.error(e);
-    }
+      setInterval(() => reg.update().catch(()=>{}), 60*60*1000);
+    } catch (e) { console.error(e); }
   });
 }
 </script>
-  <!-- ✅ Automatické stahování všech písní při Wi-Fi / 4G -->
+
+<!-- Prefetch všech písní při dobrém připojení -->
 <script>
-  function goodConnection(){
-    const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
-    if (!c) return true;
-    if (c.saveData) return false;
-    const okTypes = ['wifi','ethernet','unknown'];
-    return okTypes.includes(c.type) || (c.effectiveType || '').includes('4g');
-  }
-
-  async function prefetchAllSongs(){
-    if (!navigator.onLine) return;
-    if (!goodConnection()) return;
-    try{
-      const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
-      if (reg && reg.active) {
-        reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
-        console.log('[Zpjěvníček] Automatické stahování písní spuštěno.');
-      }
-    }catch(e){ console.warn(e); }
-  }
-
-  // spusť po načtení stránky a zkus to znovu každých 30 minut
-  window.addEventListener('load', prefetchAllSongs);
-  setInterval(prefetchAllSongs, 30*60*1000);
+function goodConnection(){
+  const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+  if (!c) return true;
+  if (c.saveData) return false;
+  const okTypes = ['wifi','ethernet','unknown'];
+  return okTypes.includes(c.type) || (c.effectiveType || '').includes('4g');
+}
+async function prefetchAllSongs(){
+  if (!navigator.onLine) return;
+  if (!goodConnection()) return;
+  try{
+    const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
+    if (reg && reg.active) reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
+  }catch(e){ console.warn(e); }
+}
+window.addEventListener('load', prefetchAllSongs);
+setInterval(prefetchAllSongs, 30*60*1000);
 </script>
 
-<!-- ⬇⬇⬇ Globální aplikace uložené velikosti textu -->
+<!-- Globální aplikace uložené velikosti textu -->
 <script>
-  const ZPJ_FONT_KEY = 'zpj-fontScale';
-  (function applyGlobalSongScale(){
-    const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
-    if (!isNaN(val) && val > 0) {
-      document.documentElement.style.setProperty('--song-scale', String(val));
-    }
-  })();
+const ZPJ_FONT_KEY = 'zpj-fontScale';
+(function applyGlobalSongScale(){
+  const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
+  if (!isNaN(val) && val > 0) {
+    document.documentElement.style.setProperty('--song-scale', String(val));
+  }
+})();
 </script>
-
 </body>
 </html>
