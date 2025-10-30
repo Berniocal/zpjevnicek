@@ -42,5 +42,3 @@ i Tebe tak [F]mrazí,
 A tak [Am]doufám, že to co mě 
 i tebe tak [F]mrazí,
 [G]nejsou jen tři tečky na konci [C]frá[Em]zí!:/
--
--
