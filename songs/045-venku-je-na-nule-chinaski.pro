@@ -31,5 +31,3 @@ já [D]těžší o své hříchy.
 [Em]Po zemi táhne se [Cmaj]lezavá zima.
 [D]No, kdo by to tu neměl, 
 [D]kdo by to tu neměl [A2]rád?[A2]
--
--
