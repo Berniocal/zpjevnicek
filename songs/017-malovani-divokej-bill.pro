@@ -41,5 +41,3 @@ ty čteš [B]poslední [C]stránku,
 [Dmi]Jak v kleci máš [B]se [C]pro nevinný
 [Dmi]noci dlouhý [B]jsou plný [C]touhy
 a [Dm]lásky nás tří...
--
--
