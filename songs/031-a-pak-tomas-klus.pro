@@ -30,5 +30,3 @@ nic stejné nebude [D]dál, [E]svět promění se
 Pak, [A]koně klus promění v cva[C#]l,
 nic stejné nebude [D]dál, [E]svět promění se
 pak..
--
--
