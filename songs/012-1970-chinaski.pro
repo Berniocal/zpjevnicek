@@ -45,5 +45,3 @@ dospěly [Hm]do Kristových [Hm]let
 a [A]je to zvláštní s[A]vět
 A tak i [D]Husákovy [D]děti 
 dospěly [Hm]do Kristových [Hm]let :/
-- 
--
