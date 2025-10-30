@@ -37,6 +37,5 @@ na 1. [Am]Signální jak jsem [C]vobletěl svět
 jak tě to [G]vomámí a [D]nepustí zpět
 
 /:Jaký si to [F]uděláš [B]takový to [Dmi]máš:/
- -
 -
- 
+-
