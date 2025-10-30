@@ -342,5 +342,13 @@
     "author": "Kryštof",
     "file": "songs/043-ty-a-ja-krystof.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "044-vrchlabi-chinaski",
+    "number": 44,
+    "title": "Vrchlabí",
+    "author": "Chinaski",
+    "file": "songs/044-vrchlabi-chinaski.pro",
+    "type": "chordpro"
   }
 ]
