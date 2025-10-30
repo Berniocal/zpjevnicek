@@ -36,5 +36,3 @@ Tak nějak málo [D]tančím… [Gmaj7][Em][A]
 Tak nějak málo [D]líbám… [Gmaj7][Em][A]
 Tak nějak málo [D]brečím… [Gmaj7][Em][A]
 Tak nějak málo [D]zpívám…[Gmaj7][Em][A]
--
--
