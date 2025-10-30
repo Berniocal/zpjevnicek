@@ -433,17 +433,6 @@
     for (const r of out){ const empty=!r.trim(); if (empty && prevEmpty) continue; compact.push(r); prevEmpty=empty; }
     return compact.join('\n');
   }
-  // zajistí, že text končí dvěma řádky s jednou pomlčkou: "-", "-"
-  function ensureDashEnding(text){
-    text = text.replace(/\r/g, '');
-    const lines = text.split('\n');
-    while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
-    let cnt = 0;
-    for (let i = lines.length - 1; i >= 0 && lines[i].trim() === '-'; i--) cnt++;
-    while (cnt < 2) { lines.push('-'); cnt++; }
-    return lines.join('\n') + '\n';
-  }
-
   // Uložit novou píseň do GitHubu
   qs('#saveBtn').onclick = async () => {
     try {
@@ -458,7 +447,7 @@
       const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
       const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
       if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
-      body = ensureDashEnding(body);
+      body = body.replace(/\r/g, '');
 
       const lines = [];
       lines.push(`{title: ${titleEl.value.trim()}}`);
@@ -619,7 +608,6 @@
     if (eKeyEl.value.trim())    lines.push(`{key: ${eKeyEl.value.trim()}}`);
     lines.push('');
     let body = editBodyEl.value.replace(/\r/g,'');
-    body = ensureDashEnding(body);
     lines.push(body);
     return lines.join('\n');
   }
