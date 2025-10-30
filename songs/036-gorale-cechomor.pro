@@ -24,5 +24,3 @@
 /:[D]Ej gora[G]le [A]nie bijta [D]sie  
 [D]ma goralka [G]z przodu z tylu 
 [A]podzielita [D]sie:/
--
--
