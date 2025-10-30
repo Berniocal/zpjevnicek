@@ -32,5 +32,3 @@ a [G]mám už dosť zby[D]točných pokút
 [A]náhlim sa po t[D/F#]vojom boku
 a [G]mám už dosť zby[D]točných pokút
 [A]máá[D/F#]ám sa [G]báť?[D]:/
--
--
