@@ -24,4 +24,3 @@ Mohl bys' jim vyprávěti (třeba).
 [G]Náš táta tu dneska není (není). 
 To je, pane, překvapení (není) 
 /: [C]Proč je doma, [F]já to [C]vím. [F]Záso[C]bil se [G]lahvo[C]vým :/
--
