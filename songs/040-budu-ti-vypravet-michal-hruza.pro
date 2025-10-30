@@ -1,5 +1,6 @@
 {title: Budu ti vyprávět}
 {artist: Michal Hrůza}
+
 [D]  [Dmaj]            
 Náš [D]svět, promění se [A]hned
 když zavřeš oči, budu [Hm]vyprávět
@@ -28,5 +29,3 @@ to bych si vlastně hrozně [G]přál
 Ó, [D]Evo [F#]nebudu ti [Hm]lhát[G]
 můžeš se mi [D]smát o-o-o-[F#]oú
 asi tě mám [H]rád[A] 
--
--
