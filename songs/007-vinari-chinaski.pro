@@ -55,5 +55,5 @@ R: [D]My máme rádi [A]víno,
 [C]Všechno co [G]na světě máš rád
 [D]a ochutnat ti[A]dáme
 [C]Slunce a [G]nekonečný vinohrad
-- 
+-
 -
