@@ -47,5 +47,3 @@ a ty mus[G]íš [C]bý[G]ti [C]má,
 [Dmi]lebo mi tě [E]Pán Bůh [Am]dá.
 a ty mus[G]íš [C]bý[G]ti [C]má,
 [Dmi]lebo mi tě [E]Pán Bůh [Am]dá.
--
--
