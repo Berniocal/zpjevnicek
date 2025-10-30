@@ -26,9 +26,9 @@
   --cp-pad:1.05em;       /* bylo 1.15em – výška pro akord nad textem */
   --cp-pad-nochords:0.20em;
     /* vlastní okraje „plátna“ písně + šířka posuvníku */
-  --song-pad-top: 0px;
+  --song-pad-top: 2px;
   --song-pad-bottom: 24px;
-  --song-pad-x: 1px;     /* ← tady budeš měnit levý/pravý „vnitřní“ okraj textu */
+  --song-pad-x: 8px;     /* ← tady budeš měnit levý/pravý „vnitřní“ okraj textu */
   --scrollbarW: 3px;     /* ~1/6 běžné šířky (cca 18px → 3px) */
 
 }
@@ -81,7 +81,7 @@
   top:0; left:0; right:0;   /* přes celou šířku */
   z-index:5;
   background:var(--card);
-  padding:0px 0px 0px;
+  padding:12px 12px 8px;
   border-bottom:1px solid #192544;
   transition: transform .2s ease, opacity .2s ease;
 }
@@ -102,7 +102,7 @@ body.chrome-hidden #view{
     }
     button.ghost{
       background:transparent; border:1px solid #2c3b60; border-radius:8px;
-      padding:0px 0px; color:var(--ink); cursor:pointer;
+      padding:4px 8px; color:var(--ink); cursor:pointer;
     }
     button.ghost:hover{ background:#17213a; }
 
@@ -158,7 +158,7 @@ body.chrome-hidden #view{
 body.chrome-hidden .sheet{ margin-top: 0 !important; padding-top: 0 !important;}
 
 
-    @media (max-width:640px){ #view{ padding-left:0px; padding-right:0px } }
+    @media (max-width:640px){ #view{ padding-left:2px; padding-right:2px } }
 
     .auto-scroll{
   position:fixed; right:16px; bottom:16px;
