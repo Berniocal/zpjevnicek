@@ -51,5 +51,3 @@ co [C]chutná ti a voní
 [G]Přesně podle toho, 
 co [C]nasypeš si do ní:/
 A tak [Am]dáváš a [C]doufáš, ale vá[Em]háš
--
--
