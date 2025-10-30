@@ -77,5 +77,3 @@ a[A] zkouším zahnat zlej sen,[D]
 [F#m]a teď už nej[Hm]sem.
 Dív[Hm]am sa do slovníka [A]a smutno je mi,[D]
 že už som l[G]en cudzink[A]a v tvojej zemi.[Hm]
--
--
