@@ -69,5 +69,3 @@ točí se [G]svět, jsem na srač[D]ky.
 [Am]co myslíš, osude?
 [Em]Na to nelze říci než 
 "[C]Jinak to [G]nebude.":/
--
--
