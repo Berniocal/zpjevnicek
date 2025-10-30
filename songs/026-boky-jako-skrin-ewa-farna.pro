@@ -67,5 +67,3 @@ však za plat si
 Co naplat, když [Am]k tomu ráda jím,
 ráda [Am]jím, co naplat
 [D]Mám boky jako skříň, jako skříň…[G]
--
--
