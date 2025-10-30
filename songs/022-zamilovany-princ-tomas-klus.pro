@@ -31,5 +31,3 @@ jak se [G]svěřit s tajem[Em]stvím,
 Jak [C]jí to [D]říct, 
 jak se [G]svěřit s tajem[Em]stvím,
 že jsem [C]kuchtík s pasem [D]králov[G]ským.
--
--
