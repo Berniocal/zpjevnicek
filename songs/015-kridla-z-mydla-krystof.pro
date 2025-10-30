@@ -38,5 +38,3 @@ v[D]ím, že na mě zbylo
 [D]když se [A]vsází, že další [F#m]fází je [D]pád.[D]
 [A]Křídla mít [F#m]z mýdla a [D]tát, 
 [D]když se [A]vsází, že další [F#m]fází je [D]pád.[D]
--
--
