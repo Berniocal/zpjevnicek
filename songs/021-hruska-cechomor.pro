@@ -21,6 +21,4 @@ přes [D]vody [G]hlubo[A]ké
 Kéž [D]bych byl [G]nikdy [A]nepo[D]znal 
 panny čer[A]noo[D]ké 
 Kéž [D]bych byl [G]nikdy [A]nepo[D]znal 
-panny čer[A]noo[D]ké 
--
--
+panny čer[A]noo[D]ké
