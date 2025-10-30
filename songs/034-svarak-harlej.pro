@@ -30,5 +30,3 @@ Mám [G]ráád svařené [Am]víno červené,
 já mám [C]rád, rád sva[G]řák.
 Mám [G]ráád svařené [Am]víno červené,
 já mám [C]rád, rád sva[G]řák.
--
--
