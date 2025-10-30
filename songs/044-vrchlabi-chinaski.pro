@@ -32,5 +32,3 @@ Vstříc novým Vrchlabím vždy s [A]úsměvem!
 Pár přátel [G]na ces[D/F#]tách od jara [Em]do zi[C]my.
 Přes [G]všechen [D/F#]čas všech[Em]ny ty [C]dny,
 přes [G]všechno [D/F#]trápení pořád [Em]jsme to [C]my:/
--
--
