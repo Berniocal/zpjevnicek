@@ -44,5 +44,3 @@ budem [Em]tam jen sami d[D]va.
 tu [Em]holubici pouštím [D]do oblak.
 Přes [G]matný stěny já [C]vidím dál,
 [Em]maluju to jako bysme [D]byli pár.:/
--
--
