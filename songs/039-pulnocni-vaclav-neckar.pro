@@ -37,5 +37,3 @@ Neopouštěj [D]nás, [A]až začnem se [C9]bát, [G]bát[G]
 Ale[D]luja[D], ale[Hm]luuu[G]ja[A]
 Ale[D]luja[D], ale[Hm]luuu[G]ja[A]
 Ale[D]luja
--
--
