@@ -47,5 +47,3 @@ máš [A]těžký srdce a mokrý řasy.
 [F#m]Když vycházíš ze dveří, 
 tak [E]sama tomu nevěříš. 
 [A]     [D]Nenech se.    [A]   [D]   [A]   [D]Nenech se.
- -
--
