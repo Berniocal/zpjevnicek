@@ -16,5 +16,3 @@ Zamor[G]dova[Am]ný :/
 /:[Am]Tu šla [G]Anička, [Am]plakat [G]Janíč[Am]ka :/
 /:[C]Hneď na hrob padla [G]a viac ne[Am]vstala
 Dobrá [G]Ani[Am]čka :/
--
--
