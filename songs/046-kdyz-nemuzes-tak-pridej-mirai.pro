@@ -55,5 +55,3 @@ slovo [C]nejde - neexistuje
 Když [G]nemůžeš, tak přidej víc!
 [G]Zakřič prostě z plných plic,
 že to [Em]dáš, na to máš, že to [C]dáš:/
--
--
