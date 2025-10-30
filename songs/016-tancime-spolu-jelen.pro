@@ -39,5 +39,3 @@ ti [G]pořád [D]mám co [C]říct
 [G]  [C]  [G]  [D]  [C] [Em]  [C]  [G]  [D]  [C] 
 Na to se [Em]nezapomíná, ve s[C]klenici vína
 [G]hledám [D]co jsi mi [C]vzal...
--
--
