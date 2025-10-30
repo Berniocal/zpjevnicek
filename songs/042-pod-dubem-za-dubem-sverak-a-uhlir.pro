@@ -47,5 +47,3 @@ nejlepší jsou v okre[C]se.[E]
 tam si na tě počíháme,
 [E]pod dubem, za dubem
 tam tě vošku[Am]bem.[G7]
--
--
