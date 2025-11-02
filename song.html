@@ -2,740 +2,396 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
- <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
   <title>Píseň</title>
- <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
-<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
-<meta name="theme-color" content="#0f1729" />
-<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
-
+  <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
+  <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
+  <meta name="theme-color" content="#0f1729" />
+  <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
 
   <script defer src="https://unpkg.com/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
   <style>
-    html, body { margin:0; }
-:root{
-    --cpfs: calc(20px * var(--song-scale, 1));
-  --chromeH:0px;
-  --chordColor:#22c55e;
-  --chordScale:1.05;
+    html,body{margin:0}
+    :root{
+      --cpfs: calc(20px * var(--song-scale, 1));
+      --chromeH:0px;
+      --chordColor:#22c55e;
+      --chordScale:1.05;
+      --cp-line:1.25;
+      --cp-pad:1.05em;
+      --cp-pad-nochords:0.20em;
+      --song-pad-top:2px;
+      --song-pad-bottom:24px;
+      --song-pad-x:8px;
+      --scrollbarW:3px;
+    }
 
-  /* ↓↓↓ nové „knoflíky“ pro svislé mezery */
-  --cp-line:1.25;        /* bylo 1.9 – celkové řádkování textu */
-  --cp-pad:1.05em;       /* bylo 1.15em – výška pro akord nad textem */
-  --cp-pad-nochords:0.20em;
-    /* vlastní okraje „plátna“ písně + šířka posuvníku */
-  --song-pad-top: 2px;
-  --song-pad-bottom: 24px;
-  --song-pad-x: 8px;     /* ← tady budeš měnit levý/pravý „vnitřní“ okraj textu */
-  --scrollbarW: 3px;     /* ~1/6 běžné šířky (cca 18px → 3px) */
+    /* ChordPro render + zalamování po slovech */
+    .cp{ font-family:system-ui,Segoe UI,Arial,sans-serif; color:var(--ink); font-size:var(--cpfs); line-height:var(--cp-line); }
+    .cp .line{ position:relative; white-space:normal; overflow:visible; word-break:keep-all; overflow-wrap:normal; }
+    .cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) }
+    .cp .ch{ position:absolute; left:0; top:0; font-weight:700; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:calc(1em * var(--chordScale)); color:var(--chordColor); }
+    .cp .ly{ display:inline-block; white-space:pre-wrap; visibility:visible }
+    .cp.nochords .ch{ display:none }
+    .cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
 
-}
-
-/* ChordPro render */
-.cp{
-  font-family:system-ui,Segoe UI,Arial,sans-serif;
-  color:var(--ink);
-  font-size:var(--cpfs);
-  line-height:var(--cp-line);  /* ← používáme proměnnou */
-}
-.cp .line{
-  position:relative;
-  white-space:pre-wrap;
-  overflow: visible;   /* ← přidej sem */
-}
-
-.cp .seg{ position:relative; display:inline-block; padding-top:var(--cp-pad) }
- /* ← menší rezerva */
-.cp .ch{
-  position:absolute; left:0; top:0;
-  font-weight:700;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:calc(1em * var(--chordScale));
-  color:var(--chordColor);
-}
-.cp .ly{ visibility:visible }
-
-/* režim bez akordů – ještě těsnější */
-.cp.nochords .ch{ display:none }
-.cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
-/* lámej jen na mezerách, ne uprostřed slov */
-/* dělení pouze mezi slovy, ne uvnitř slov – zachová výšku akordů */
-.cp .line{
-  white-space: normal;        /* dovolí zalomení */
-  word-break: keep-all;       /* neláme uvnitř slov */
-  overflow-wrap: normal;
-}
-.cp .ly{
-  display: inline-block;      /* každé slovo může jít na nový řádek */
-  white-space: pre-wrap;      /* zachová mezery v textu */
-}
-
-    /* „plátno“ -> bez rámečku/pozadí (žádná bublina) */
+    /* Plátno bez bubliny */
     .sheet{ padding:0; background:transparent; border:none; box-shadow:none; }
 
- /* horní lišta – fixní, aby neměnila výšku stránky */
-#chrome{
-  position:fixed;           /* ⬅ bylo sticky */
-  top:0; left:0; right:0;   /* přes celou šířku */
-  z-index:5;
-  background:var(--card);
-  padding:12px 12px 8px;
-  border-bottom:1px solid #192544;
-  transition: transform .2s ease, opacity .2s ease;
-}
-
-/* když je lišta skrytá, jen ji odsuneme, ale layout se nemění */
-body.chrome-hidden #chrome{
-  transform: translateY(-110%);
-  opacity: 0;
-}
-
-body.chrome-hidden #view{
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-    /* řádek s odkazem a tlačítkem v liště */
-    .chrome-row{
-      display:flex; justify-content:space-between; align-items:center; gap:8px;
+    /* Horní lišta */
+    #chrome{
+      position:fixed; top:0; left:0; right:0; z-index:5;
+      background:var(--card); padding:12px 12px 8px;
+      border-bottom:1px solid #192544; transition:transform .2s ease, opacity .2s ease;
     }
-    button.ghost{
-      background:transparent; border:1px solid #2c3b60; border-radius:8px;
-      padding:4px 8px; color:var(--ink); cursor:pointer;
+    body.chrome-hidden #chrome{ transform:translateY(-110%); opacity:0; height:0; padding:0; margin:0; border:0; overflow:hidden; }
+
+    /* Obsah */
+    #view{
+      height:100vh; max-height:100vh; overflow:auto; background:transparent;
+      border:0; border-radius:0; box-shadow:none;
+      padding: var(--song-pad-top) 0 var(--song-pad-bottom) var(--song-pad-x);
+      scrollbar-width:thin; scrollbar-color:#2c3b60 transparent;
     }
-    button.ghost:hover{ background:#17213a; }
+    #view::-webkit-scrollbar{ width:var(--scrollbarW) }
+    #view::-webkit-scrollbar-track{ background:transparent }
+    #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px }
 
-    /* skrytá lišta: nesmí zabírat místo */
-    body.chrome-hidden #chrome{
-      transform: translateY(-110%);
-      opacity: 0;
-      height: 0;
-      padding: 0;
-      margin: 0;
-      border: 0;
-      overflow: hidden;
-    }
-
-/* obsah: plná výška viewportu; lištu řešíme jen paddingem */
-#view{
-  height: 100vh;
-  max-height: 100vh;
-  overflow:auto;
-  background:transparent;
-  border:0; border-radius:0; box-shadow:none;
-  /* pravý vnitřní okraj 0 → scrollbar na úplný kraj obrazovky */
-  padding: var(--song-pad-top) 0 var(--song-pad-bottom) var(--song-pad-x);
-  /* tenký scrollbar (Firefox) */
-  scrollbar-width: thin;
-  scrollbar-color: #2c3b60 transparent;
-}
-
-/* WebKit scrollbar: tenký a úplně u pravého okraje */
-#view::-webkit-scrollbar{
-  width: var(--scrollbarW);
-}
-#view::-webkit-scrollbar-track{
-  background: transparent;
-}
-#view::-webkit-scrollbar-thumb{
-  background: #2c3b60;
-  border-radius: 2px;
-}
-
-/* když je lišta vidět, zůstává stávající chování */
-body:not(.chrome-hidden) #view{
-  padding-top: var(--chromeH);
-}
-
-/* když je lišta schovaná, využij úplně horní okraj
-   (ponech jen případný bezpečný okraj u výřezu) */
-body.chrome-hidden #view{
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-/* pro jistotu – kdyby se inline margin-top někde vrátil */
-body.chrome-hidden .sheet{ margin-top: 0 !important; padding-top: 0 !important;}
-
+    body:not(.chrome-hidden) #view{ padding-top: var(--chromeH); }
+    body.chrome-hidden #view{ padding-top: env(safe-area-inset-top, 0px); }
 
     @media (max-width:640px){ #view{ padding-left:2px; padding-right:2px } }
 
     .auto-scroll{
-  position:fixed; right:16px; bottom:16px;
-  width:56px; height:56px; border-radius:999px;
-  background:transparent;
-  border:2px solid #2c3b60;
-  color:var(--ink);
-  font-size:28px; line-height:1;
-  display:flex; align-items:center; justify-content:center;
-  z-index:10;
-  opacity:.9; 
-  cursor:pointer;
-}
-.auto-scroll:hover{ opacity:1 }
-.auto-scroll:active{ transform:scale(.98) }
-.auto-scroll.hidden{ display:none }
-/* Jen pro song.html: žádné odsazení kontejneru vpravo */
-.container{ padding-right: 0 !important; }
-
+      position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:999px;
+      background:transparent; border:2px solid #2c3b60; color:var(--ink);
+      font-size:28px; line-height:1; display:flex; align-items:center; justify-content:center;
+      z-index:10; opacity:.9; cursor:pointer;
+    }
+    .auto-scroll.hidden{ display:none }
+    .container{ padding-right:0 !important; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="sheet">
       <div id="chrome">
-        <div class="chrome-row">
-          <a id="backLink" href="index.html">← Zpět na seznam</a>
-          <button id="toggleChrome" class="ghost" title="Skrýt / zobrazit lištu">▾</button>
+        <div class="chrome-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <a id="backLink" href="index.html">← Zpět</a>
+          <button id="toggleChrome" class="ghost" style="background:transparent;border:1px solid #2c3b60;border-radius:8px;padding:4px 8px;color:var(--ink);cursor:pointer">▾</button>
         </div>
 
         <h2 id="title" style="margin:8px 0">Načítám…</h2>
         <div class="badge" id="meta"></div>
 
-        <!-- Ovládání pro noty (alphaTab) -->
         <div id="controls-score" class="player" style="display:none">
           <button id="play">Přehrát</button>
           <button id="stop">Stop</button>
           <label>Tempo <input id="tempo" type="range" min="30" max="200" value="100"></label>
         </div>
 
-        <!-- Ovládání pro ChordPro -->
-<div id="controls-cp" class="player" style="display:none">
-  <!-- <span class="kbd">ChordPro</span> -->
-
-  <span class="kbd">Transponovat:
-    <button id="down" type="button">−</button>
-    <button id="up"   type="button">+</button>
-  </span>
-
-<span class="kbd">Rolování:
-  <button id="toggleAutoBtn" type="button" aria-label="Zobrazit/skrýt tlačítko autoposuvu">
-    <span id="autoBtnIcon">✅</span>
-  </button>
-</span>
-
-
-  <span class="kbd">Velikost:
-    <button id="fontDown" type="button">−</button>
-    <button id="fontUp"   type="button">+</button>
-  </span>
-
-  <span class="kbd">Akordy:
-    <button id="toggleChords" type="button" aria-label="Přepnout akordy">
-      <span id="chordsIcon">✅</span>
-    </button>
-  </span>
-</div>
-
+        <div id="controls-cp" class="player" style="display:none;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="kbd">Transponovat:
+            <button id="down" type="button">−</button>
+            <button id="up"   type="button">+</button>
+          </span>
+          <span class="kbd">Rolování:
+            <button id="toggleAutoBtn" type="button" aria-label="Zobrazit/skrýt tlačítko autoposuvu">
+              <span id="autoBtnIcon">✅</span>
+            </button>
+          </span>
+          <span class="kbd">Velikost:
+            <button id="fontDown" type="button">−</button>
+            <button id="fontUp"   type="button">+</button>
+          </span>
+          <span class="kbd">Akordy:
+            <button id="toggleChords" type="button" aria-label="Přepnout akordy">
+              <span id="chordsIcon">✅</span>
+            </button>
+          </span>
+        </div>
       </div>
 
-      <!-- TEXT PÍSNĚ – plná šířka -->
       <div id="view"></div>
     </div>
   </div>
 
-<script>
-const params = new URLSearchParams(location.search);
-const id = params.get('id');
-let song;
+  <button id="autoScroll" class="auto-scroll" title="Auto posuv">∨</button>
 
-// uživatelský stav
-let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
-let SONGS_LIST = [];
-let SONG_INDEX = -1;
-let justSwipedTs = 0;
-// Stav skrytí horní lišty (globální)
-let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
+  <script>
+  const params = new URLSearchParams(location.search);
+  const id   = params.get('id');
+  const plId = params.get('pl');  // kontext: playlist nebo hlavní seznam
+  let song, SONGS_LIST=[], SONG_INDEX=-1;
 
-// Aplikuj naposledy uložený stav lišty hned po načtení skriptu,
-// aby byla lišta schovaná i po přechodu swipem/po restartu PWA.
-if (CHROME_HIDDEN) {
-  document.body.classList.add('chrome-hidden');
-}
-// Autoposuv – stav + funkce
-let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0'; // výchozí: viditelné
-let autoMode = 0;        // 0 = vyp, 1 = pomalu, 2 = rychle
-let _autoRaf = 0;
-let _lastTs = 0;
+  let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
+  let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
+  let autoMode = 0, _autoRaf = 0, _lastTs = 0;
+  let justSwipedTs = 0;
 
-/* === konec nové logiky === */
+  let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
+  if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
 
-function updateAutoBtnVisibility(){
-  const ico = document.getElementById('autoBtnIcon');
-  const floater = document.getElementById('autoScroll');
-  if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
-  if (floater) floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
-}
-
-function stopAutoScroll(){
-  autoMode = 0;
-  if (_autoRaf) cancelAnimationFrame(_autoRaf);
-  _autoRaf = 0; _lastTs = 0;
-}
-
-function runAutoScroll(){
-  if (_autoRaf) cancelAnimationFrame(_autoRaf);
-  _lastTs = 0;
-
-  const view = document.getElementById('view');
-  const speeds = { 1: 20, 2: 45 }; // px/s – klidně uprav
-
-  function tick(ts){
-    if (autoMode === 0) return;
-    if (!_lastTs) _lastTs = ts;
-    const dt = (ts - _lastTs) / 1000; _lastTs = ts;
-
-    const spd = speeds[autoMode] || 0;
-    if (spd > 0) {
-      const max = view.scrollHeight - view.clientHeight;
-      if (view.scrollTop >= max - 1){
-        stopAutoScroll();
-      } else {
-        view.scrollTop = Math.min(max, view.scrollTop + spd * dt);
+  function updateAutoBtnVisibility(){
+    const ico = document.getElementById('autoBtnIcon');
+    const floater = document.getElementById('autoScroll');
+    if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
+    if (floater) floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
+  }
+  function stopAutoScroll(){ autoMode=0; if(_autoRaf) cancelAnimationFrame(_autoRaf); _autoRaf=0; _lastTs=0; }
+  function runAutoScroll(){
+    if(_autoRaf) cancelAnimationFrame(_autoRaf); _lastTs=0;
+    const view = document.getElementById('view'); const speeds = {1:20,2:45};
+    function tick(ts){
+      if(autoMode===0) return;
+      if(!_lastTs) _lastTs=ts;
+      const dt=(ts-_lastTs)/1000; _lastTs=ts;
+      const spd=speeds[autoMode]||0;
+      if(spd>0){
+        const max=view.scrollHeight-view.clientHeight;
+        if(view.scrollTop>=max-1){ stopAutoScroll(); } else { view.scrollTop=Math.min(max, view.scrollTop+spd*dt); }
       }
+      if(autoMode!==0) _autoRaf=requestAnimationFrame(tick);
     }
-    if (autoMode !== 0) _autoRaf = requestAnimationFrame(tick);
+    _autoRaf=requestAnimationFrame(tick);
   }
-  _autoRaf = requestAnimationFrame(tick);
-}
 
-// Česká/German stupnice: B = B♭ (A#), H = B
-const NOTES_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
-const ALT = {
-  // běžné křížky/měkká
-  'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#',
-  // B a H
-  'A#':'B',  // A# zapisujeme jako B
-  'Bb':'B',  // Bb zapisujeme jako B
-  'Hb':'B',  // H♭ = B
-  'Cb':'H',  // C♭ = H
-  'B#':'C',  // B# -> C (u nás by dávalo smysl i H#, ale standardně C)
-  'H#':'C',  // H# -> C
-  // ostatní enharmonie
-  'E#':'F','Fb':'E'
-};
-
-// POZN.: Máš už NOTES_CZ a ALT z minula (C, C#, …, A, B, H).
-function normRoot(r){ return ALT[r] || r; }
-
-function transposeNote(n, semi){
-  // bereme velká písmena, normalizujeme (Hb → B, A# → B, atd.)
-  const up = n.toUpperCase();
-  const norm = normRoot(up);
-  const i = NOTES_CZ.indexOf(norm);
-  if (i < 0) return n; // není to platná nota → vrať beze změny (zachová původní zápis)
-  return NOTES_CZ[(i + semi + 120) % 12];
-}
-
-// Obecná transpozice tokenu z hranatých závorek:
-// - pokud ZAČÍNÁ notou → transponuj ji (C, D, …, B, H + #/b), zbytek nech
-// - pokud obsahuje "/<nota>" → transponuj i basovou notu za lomítkem
-// - jinak vrať token beze změny
-function transposeChord(token, semi){
-  //   1) root     2) qual (cokoliv)       3) /bass        4) tail za basem (kdyby tam něco bylo)
-  const m = token.match(/^([A-Ha-h](?:#|b)?)(.*?)(?:\/([A-Ha-h](?:#|b)?)(.*))?$/);
-  if (!m) return token; // nezačíná notou → necháme beze změny
-
-  const rootRaw = m[1];
-  const qual    = m[2] || '';
-  const bassRaw = m[3] || null;
-  const tail    = m[4] || '';
-
-  const rootT = transposeNote(rootRaw, semi);
-  const bassT = bassRaw ? transposeNote(bassRaw, semi) : null;
-
-  return rootT + qual + (bassT ? '/' + bassT : '') + tail;
-}
-
-// parser ChordPro s odstraněním prázdných řádků kolem a sloučením vícenásobných mezer
-function parseChordPro(text){
-  const meta = {};
-  const raw = text.replace(/\r/g, '').split('\n');
-  const body = [];
-  for (const line of raw) {
-    const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-    if (m) { meta[m[1].toLowerCase()] = m[2]; continue; }
-    body.push(line);
+  const NOTES_CZ=['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
+  const ALT={ 'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','A#':'B','Bb':'B','Hb':'B','Cb':'H','B#':'C','H#':'C','E#':'F','Fb':'E' };
+  function normRoot(r){ return ALT[r]||r; }
+  function transposeNote(n,semi){ const up=n.toUpperCase(); const norm=normRoot(up); const i=NOTES_CZ.indexOf(norm); if(i<0) return n; return NOTES_CZ[(i+semi+120)%12]; }
+  function transposeChord(token,semi){
+    const m=token.match(/^([A-Ha-h](?:#|b)?)(.*?)(?:\/([A-Ha-h](?:#|b)?)(.*))?$/); if(!m) return token;
+    const rootT=transposeNote(m[1],semi); const bassT=m[3]?transposeNote(m[3],semi):null; return rootT+(m[2]||'')+(bassT?'/'+bassT:'')+(m[4]||'');
   }
-  while (body.length && !body[0].trim()) body.shift();
-  while (body.length && !body[body.length - 1].trim()) body.pop();
-  const lines = [];
-  let prevEmpty = false;
-  for (const l of body) {
-    const empty = !l.trim();
-    if (empty && prevEmpty) continue;
-    lines.push(l);
-    prevEmpty = empty;
+  function parseChordPro(text){
+    const meta={}; const raw=text.replace(/\r/g,'').split('\n'); const body=[];
+    for(const line of raw){ const m=line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/); if(m){ meta[m[1].toLowerCase()]=m[2]; continue; } body.push(line); }
+    while(body.length && !body[0].trim()) body.shift(); while(body.length && !body[body.length-1].trim()) body.pop();
+    const lines=[]; let prevEmpty=false; for(const l of body){ const empty=!l.trim(); if(empty && prevEmpty) continue; lines.push(l); prevEmpty=empty; }
+    return {meta,lines};
   }
-  return { meta, lines };
-}
-
-function renderChordPro(text, transposeSemi=0, capo=0){
-  const {lines} = parseChordPro(text); const rootTrans = transposeSemi - (capo|0);
-  const cont=document.createElement('div'); cont.className='cp';
-  for(const raw of lines){
-    if(!raw.trim()){ cont.appendChild(document.createElement('br')); continue; }
-    const line=document.createElement('div'); line.className='line';
-    let i = 0, pending = null;
-    while (i < raw.length) {
-      if (raw[i] === '[') {
-        const close = raw.indexOf(']', i + 1);
-        if (close !== -1) {
-          const token = raw.slice(i + 1, close); // akord v hranatých závorkách
-          i = close + 1;
-
-          // podíváme se, co je hned za akordem
-          if (i >= raw.length || raw[i] === '[') {
-            // Konec řádku nebo další akord → hned vlož prázdný segment s tímto akordem
-            const seg = document.createElement('span'); seg.className = 'seg';
-            const ch  = document.createElement('span'); ch.className  = 'ch';
-            ch.textContent = transposeChord(token, rootTrans);
-            const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = ' ';
-            seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
-            pending = null; // nic nečeká
-            continue;
-          } else {
-            // za akordem následuje text → držíme ho jako "pending" pro příští slabiku
-            pending = token;
-            continue;
+  function renderChordPro(text,transposeSemi=0,capo=0){
+    const {lines}=parseChordPro(text); const rootTrans=transposeSemi-(capo|0);
+    const cont=document.createElement('div'); cont.className='cp';
+    for(const raw of lines){
+      if(!raw.trim()){ cont.appendChild(document.createElement('br')); continue; }
+      const line=document.createElement('div'); line.className='line';
+      let i=0, pending=null;
+      while(i<raw.length){
+        if(raw[i]==='['){
+          const close=raw.indexOf(']', i+1);
+          if(close!==-1){
+            const token=raw.slice(i+1, close); i=close+1;
+            if(i>=raw.length || raw[i]==='['){
+              const seg=document.createElement('span'); seg.className='seg';
+              const ch=document.createElement('span'); ch.className='ch'; ch.textContent=transposeChord(token,rootTrans);
+              const ly=document.createElement('span'); ly.className='ly'; ly.textContent=' ';
+              seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg); pending=null; continue;
+            } else { pending=token; continue; }
           }
         }
-        // neuzavřená závorka ⇒ spadne do textového zpracování níže
+        let j=i; while(j<raw.length && raw[j]!=='[') j++;
+        const lyr=raw.slice(i,j)||' ';
+        const seg=document.createElement('span'); seg.className='seg';
+        const ch=document.createElement('span'); ch.className='ch'; ch.textContent=pending?transposeChord(pending,rootTrans):'';
+        const ly=document.createElement('span'); ly.className='ly'; ly.textContent=lyr;
+        seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg); pending=null; i=j;
       }
-
-      // nasbírej text až do dalšího '[' a spáruj ho s pending akordem (pokud je)
-      let j = i;
-      while (j < raw.length && raw[j] !== '[') j++;
-      const lyr = raw.slice(i, j) || ' ';
-      const seg = document.createElement('span'); seg.className = 'seg';
-      const ch  = document.createElement('span'); ch.className  = 'ch';
-      ch.textContent = pending ? transposeChord(pending, rootTrans) : '';
-      const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = lyr;
-      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
-      pending = null; // akord už byl použit
-      i = j;
+      if(pending){
+        const seg=document.createElement('span'); seg.className='seg';
+        const ch=document.createElement('span'); ch.className='ch'; ch.textContent=transposeChord(pending,rootTrans);
+        const ly=document.createElement('span'); ly.className='ly'; ly.textContent=' ';
+        seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
+      }
+      cont.appendChild(line);
     }
-
-    // bezpečnostní pojistka: kdyby přece jen něco zůstalo "rozjeté"
-    if (pending) {
-      const seg = document.createElement('span'); seg.className = 'seg';
-      const ch  = document.createElement('span'); ch.className  = 'ch';
-      ch.textContent = transposeChord(pending, rootTrans);
-      const ly = document.createElement('span'); ly.className = 'ly'; ly.textContent = ' ';
-      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
-    }
-
-    cont.appendChild(line);
+    return cont;
   }
-  return cont;
-}
-// minimální mezera mezi akordy v px (klidně si uprav)
-const MIN_CHORD_GAP = 4;
 
-// Po vložení vyrenderovaného bloku zarovná akordy v každé .line,
-// aby se nepřekrývaly – případně posune ten další doprava.
-function fixChordOverlaps(root){
-  const lines = root.querySelectorAll('.line');
-
-  lines.forEach(line => {
-    // 0) reset všech posunů
-    line.querySelectorAll('.seg').forEach(seg => {
-      seg.style.marginLeft = '';
-    });
-
-    let prevRight = -Infinity;
-    let lastTop   = null;
-
-    // 1) projdi akordy zleva doprava a podle potřeby posuň CELÝ SEGMENT (akord + slabiku)
-    const chords = Array.from(line.querySelectorAll('.ch'));
-
-    chords.forEach(ch => {
-      const seg = ch.parentElement;              // <span class="seg">
-      const chRect = ch.getBoundingClientRect();
-
-      // pokud jsme se vizuálně zalomili na další řádek, začínáme "na zelené louce"
-      if (lastTop !== null && (chRect.top - lastTop) > 0.5) {
-        prevRight = -Infinity;
-      }
-      lastTop = chRect.top;
-
-      const needLeft = prevRight + MIN_CHORD_GAP;    // kam nejdřív může začít další akord
-      const need     = needLeft - chRect.left;       // kolik chybí
-
-      if (need > 0) {
-        const cur = parseFloat(seg.style.marginLeft || '0');
-        seg.style.marginLeft = (cur + need) + 'px';
-        // po posunu přečteme novou pravou hranu akordu
-        const newRect = ch.getBoundingClientRect();
-        prevRight = newRect.right;
-      } else {
-        prevRight = chRect.right;
-      }
-    });
-
-    // 2) NORMALIZACE: segmenty, které začínají NOVÝ vizuální řádek, nesmí mít margin-left
-    const segs = Array.from(line.querySelectorAll('.seg'));
-    if (segs.length) {
-      const rects = segs.map(s => s.getBoundingClientRect());
-      const firstLeft = Math.min(...rects.map(r => r.left));
-      const firstTop  = Math.min(...rects.map(r => r.top));
-      const LEFT_TOL = 16;  // tolerance pro padding/zaokrouhlení
-      const TOP_TOL  = 0.5;
-
-      segs.forEach((seg, i) => {
-        const r = rects[i];
-        const startsNewRow = (r.top - firstTop) > TOP_TOL && (r.left - firstLeft) < LEFT_TOL;
-        if (startsNewRow) seg.style.marginLeft = '0px';
+  const MIN_CHORD_GAP=4;
+  function fixChordOverlaps(root){
+    const lines=root.querySelectorAll('.line');
+    lines.forEach(line=>{
+      line.querySelectorAll('.seg').forEach(seg=>{ seg.style.marginLeft=''; });
+      let prevRight=-Infinity, lastTop=null;
+      const chords=Array.from(line.querySelectorAll('.ch'));
+      chords.forEach(ch=>{
+        const seg=ch.parentElement; const chRect=ch.getBoundingClientRect();
+        if(lastTop!==null && (chRect.top-lastTop)>0.5){ prevRight=-Infinity; }
+        lastTop=chRect.top;
+        const needLeft=prevRight+MIN_CHORD_GAP; const need=needLeft-chRect.left;
+        if(need>0){ const cur=parseFloat(seg.style.marginLeft||'0'); seg.style.marginLeft=(cur+need)+'px'; const newRect=ch.getBoundingClientRect(); prevRight=newRect.right; }
+        else { prevRight=chRect.right; }
       });
-    }
-  });
-}
+      const segs=Array.from(line.querySelectorAll('.seg'));
+      if(segs.length){
+        const rects=segs.map(s=>s.getBoundingClientRect());
+        const firstLeft=Math.min(...rects.map(r=>r.left));
+        const firstTop =Math.min(...rects.map(r=>r.top));
+        const LEFT_TOL=16, TOP_TOL=0.5;
+        segs.forEach((seg,i)=>{ const r=rects[i]; const startsNewRow=(r.top-firstTop)>TOP_TOL && (r.left-firstLeft)<LEFT_TOL; if(startsNewRow) seg.style.marginLeft='0px'; });
+      }
+    });
+  }
 
+  let relayoutScheduled=false;
+  function relayoutChords(){
+    if(relayoutScheduled) return; relayoutScheduled=true;
+    requestAnimationFrame(()=>{ relayoutScheduled=false; const cp=document.querySelector('#view .cp'); if(cp) fixChordOverlaps(cp); });
+  }
 
+  function updateChromeHeight(){
+    const ch=document.getElementById('chrome');
+    const h=ch?ch.getBoundingClientRect().height:0;
+    document.documentElement.style.setProperty('--chromeH',(h||0)+'px');
+  }
+  function setChromeHidden(hidden){
+    CHROME_HIDDEN=!!hidden;
+    document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN);
+    localStorage.setItem('chromeHidden', CHROME_HIDDEN?'1':'0');
+    updateChromeHeight();
+  }
 
-let relayoutScheduled = false;
-function relayoutChords(){
-  if (relayoutScheduled) return;
-  relayoutScheduled = true;
-  requestAnimationFrame(() => {
-    relayoutScheduled = false;
-    const cp = document.querySelector('#view .cp');
-    if (cp) fixChordOverlaps(cp);
-  });
-}
+  function wireDoubleToggle(){
+    const view=document.getElementById('view');
+    if(!view) return;
+    view.addEventListener('dblclick', ()=>{ if(Date.now()-justSwipedTs<350) return; setChromeHidden(!document.body.classList.contains('chrome-hidden')); });
+    let lastTapTime=0,lastX=0,lastY=0, recentToggleTs=0;
+    view.addEventListener('touchend',(e)=>{
+      if(e.touches&&e.touches.length) return; if(Date.now()-justSwipedTs<350) return;
+      const t=Date.now(); const touch=e.changedTouches[0]; const x=touch.clientX, y=touch.clientY;
+      const withinTime=(t-lastTapTime)<300; const withinDist=Math.hypot(x-lastX,y-lastY)<30;
+      if(withinTime && withinDist){ e.preventDefault(); setChromeHidden(!document.body.classList.contains('chrome-hidden')); recentToggleTs=t; lastTapTime=0; }
+      else { lastTapTime=t; lastX=x; lastY=y; }
+    },{passive:false});
+  }
 
-function updateChromeHeight(){
-  const ch = document.getElementById('chrome');
-  const h = ch ? ch.getBoundingClientRect().height : 0;
-  document.documentElement.style.setProperty('--chromeH', (h||0) + 'px');
-}
+  function applyChordVisibility(){
+    const cp=document.querySelector('#view .cp');
+    if(cp){ if(HIDE_CHORDS) cp.classList.add('nochords'); else cp.classList.remove('nochords'); }
+    const ico=document.getElementById('chordsIcon'); if(ico) ico.textContent = HIDE_CHORDS ? '❌' : '✅';
+  }
 
-function setChromeHidden(hidden){
-  CHROME_HIDDEN = !!hidden;
-  document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN);
-  localStorage.setItem('chromeHidden', CHROME_HIDDEN ? '1' : '0');
-  // obsah má padding-top přes CSS; jen pro jistotu zaktualizuj výšku
-  updateChromeHeight();
-}
-/* ---- Dvoj-klik / dvoj-tap bez blikání ---- */
-function wireDoubleToggle(){
-  const view = document.getElementById('view');
-  if (!view) return;
+  function wireSwipeNavigation(){
+    const view=document.getElementById('view'); if(!view) return;
+    let sx=0,sy=0,startTime=0;
+    view.addEventListener('touchstart',(e)=>{ if(e.touches.length!==1) return; const t=e.touches[0]; sx=t.clientX; sy=t.clientY; startTime=Date.now(); },{passive:true});
+    view.addEventListener('touchend',(e)=>{
+      if(!startTime) return; const t=e.changedTouches[0]; const dx=t.clientX-sx; const dy=t.clientY-sy; const dt=Date.now()-startTime;
+      const ABSX=Math.abs(dx), ABSY=Math.abs(dy); const isSwipe=ABSX>70 && ABSY<60 && dt<600;
+      if(isSwipe){ e.preventDefault(); justSwipedTs=Date.now(); if(dx<0) goNextSong(); else goPrevSong(); }
+      startTime=0;
+    },{passive:false});
+  }
 
-  let lastTapTime = 0, lastX = 0, lastY = 0;
-  let recentToggleTs = 0;
+  function goNextSong(){
+    if(SONGS_LIST.length<2 || SONG_INDEX<0) return;
+    const next=(SONG_INDEX+1)%SONGS_LIST.length; const nextId=SONGS_LIST[next].id;
+    location.href=`song.html?id=${encodeURIComponent(nextId)}${plId?`&pl=${encodeURIComponent(plId)}`:''}`;
+  }
+  function goPrevSong(){
+    if(SONGS_LIST.length<2 || SONG_INDEX<0) return;
+    const prev=(SONG_INDEX-1+SONGS_LIST.length)%SONGS_LIST.length; const prevId=SONGS_LIST[prev].id;
+    location.href=`song.html?id=${encodeURIComponent(prevId)}${plId?`&pl=${encodeURIComponent(plId)}`:''}`;
+  }
 
-  // PC: dblclick
-  view.addEventListener('dblclick', ()=>{
-    if (Date.now() - recentToggleTs < 400) return;
-    if (Date.now() - justSwipedTs < 350) return;
-    setChromeHidden(!document.body.classList.contains('chrome-hidden'));
-  });
+  async function load(){
+    const all = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
 
-  // Mobil: double-tap na touchend
-  view.addEventListener('touchend', (e)=>{
-    if (e.touches && e.touches.length) return;
-    if (Date.now() - justSwipedTs < 350) return;
-    const t = Date.now();
-    const touch = e.changedTouches[0];
-    const x = touch.clientX, y = touch.clientY;
-    const withinTime = (t - lastTapTime) < 300;
-    const withinDist = Math.hypot(x - lastX, y - lastY) < 30;
-
-    if (withinTime && withinDist) {
-      e.preventDefault();
-      setChromeHidden(!document.body.classList.contains('chrome-hidden'));
-      recentToggleTs = t;
-      lastTapTime = 0;
+    if(plId){
+      // pořadí dle playlistu
+      let pls=[]; try{ pls=JSON.parse(localStorage.getItem('zpj-playlists')||'[]'); }catch{}
+      const pl=pls.find(p=>p.id===plId);
+      const byId=new Map(all.map(s=>[s.id,s]));
+      SONGS_LIST = pl ? pl.ids.map(i=>byId.get(i)).filter(Boolean) : all;
     } else {
-      lastTapTime = t; lastX = x; lastY = y;
+      SONGS_LIST = all;
     }
-  }, {passive:false});
-}
 
-function applyChordVisibility() {
-  const view = document.getElementById('view');
-  const cp = view?.querySelector('.cp');
-  if (cp) {
-    if (HIDE_CHORDS) cp.classList.add('nochords');
-    else cp.classList.remove('nochords');
-  }
+    song = SONGS_LIST.find(s=>s.id===id) || all.find(s=>s.id===id);
+    SONG_INDEX = SONGS_LIST.findIndex(s=>s && s.id===id);
 
-  // aktualizace stavové ikonky
-  const ico = document.getElementById('chordsIcon');
-  if (ico) ico.textContent = HIDE_CHORDS ? '❌' : '✅';
-}
+    if(!song){ document.getElementById('title').textContent='Píseň nenalezena'; return; }
+    document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
+    document.getElementById('meta').textContent = song.author || '';
 
-
-/* ---- Swipe navigace ---- */
-function wireSwipeNavigation(){
-  const view = document.getElementById('view');
-  if (!view) return;
-
-  let sx=0, sy=0, startTime=0;
-  view.addEventListener('touchstart', (e)=>{
-    if (e.touches.length !== 1) return; // ignoruj pinch
-    const t = e.touches[0];
-    sx = t.clientX; sy = t.clientY; startTime = Date.now();
-  }, {passive:true});
-
-  view.addEventListener('touchend', (e)=>{
-    if (!startTime) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - sx;
-    const dy = t.clientY - sy;
-    const dt = Date.now() - startTime;
-
-    const ABSX = Math.abs(dx), ABSY = Math.abs(dy);
-    const isSwipe = ABSX > 70 && ABSY < 60 && dt < 600;
-    if (isSwipe) {
-      e.preventDefault();
-      justSwipedTs = Date.now();
-      if (dx < 0) goNextSong(); else goPrevSong();
+    // Back link – podle kontextu
+    const backLink=document.getElementById('backLink');
+    if(plId){
+      backLink.textContent='← Zpět na playlist';
+      backLink.onclick=(e)=>{ e.preventDefault(); location.href='/zpjevnicek/#playlists'; };
+    }else{
+      backLink.textContent='← Zpět na seznam';
+      backLink.onclick=(e)=>{ e.preventDefault(); if(document.referrer.includes('/zpjevnicek/')) history.back(); else location.href='/zpjevnicek/'; };
     }
-    startTime = 0;
-  }, {passive:false});
-}
 
-function goNextSong(){
-  if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
-  const next = (SONG_INDEX + 1) % SONGS_LIST.length;
-  location.href = `song.html?id=${encodeURIComponent(SONGS_LIST[next].id)}`;
-}
-function goPrevSong(){
-  if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
-  const prev = (SONG_INDEX - 1 + SONGS_LIST.length) % SONGS_LIST.length;
-  location.href = `song.html?id=${encodeURIComponent(SONGS_LIST[prev].id)}`;
-}
+    if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
+      document.getElementById('controls-cp').style.display='flex';
+      const text = await fetch(song.file).then(r=>r.text());
+      let trans=0;
 
-async function load(){
-  const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json());
-  SONGS_LIST = data;
-  song = data.find(s => s.id === id);
-  SONG_INDEX = data.findIndex(s => s.id === id);
+      const render=()=>{
+        const view=document.getElementById('view');
+        const el=renderChordPro(text, trans, 0);
+        view.innerHTML=''; view.appendChild(el);
+        requestAnimationFrame(()=>{ fixChordOverlaps(el); });
+        applyChordVisibility(); updateChromeHeight();
+      };
 
-  if(!song){ document.getElementById('title').textContent='Píseň nenalezena'; return; }
-  document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
-  document.getElementById('meta').textContent = song.author || '';
+      render();
+      document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
+      document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
 
-  if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
-    document.getElementById('controls-cp').style.display='flex';
-    const text = await fetch(song.file).then(r=>r.text());
-  let trans = 0;
-const render = () => {
-  const view = document.getElementById('view');
+      const ZPJ_FONT_KEY='zpj-fontScale';
+      function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
+      function setScale(s){ const c=Math.min(3, Math.max(0.5,s)); document.documentElement.style.setProperty('--song-scale', String(c)); localStorage.setItem(ZPJ_FONT_KEY, String(c)); relayoutChords(); }
+      let scale=getScale();
+      document.getElementById('fontUp').onclick   = ()=>{ scale=Math.min(3, +(scale+0.1).toFixed(2)); setScale(scale); };
+      document.getElementById('fontDown').onclick = ()=>{ scale=Math.max(0.5, +(scale-0.1).toFixed(2)); setScale(scale); };
 
-  // vytvoř element s písní
- const el = renderChordPro(text, trans, 0); // capo už nepoužíváme
+      document.getElementById('toggleChords').onclick = ()=>{
+        HIDE_CHORDS=!HIDE_CHORDS; localStorage.setItem('hideChords', HIDE_CHORDS?'1':'0'); applyChordVisibility(); relayoutChords();
+      };
 
+    } else {
+      document.getElementById('controls-score').style.display='flex';
+      const el=document.getElementById('view');
+      const at=new alphaTab.AlphaTabApi(el, { file:song.file, player:{ enablePlayer:true }});
+      document.getElementById('play').onclick = ()=> at.playPause();
+      document.getElementById('stop').onclick = ()=> at.stop();
+      document.getElementById('tempo').oninput = e=> at.playbackSpeed = e.target.value/100;
+      at.renderFinished.on(()=> updateChromeHeight());
+    }
 
-  // vlož do DOM
-  view.innerHTML = '';
-  view.appendChild(el);
-
-  // po vložení nech prohlížeč spočítat layout a teprve pak oprav přesahy
-  requestAnimationFrame(() => {
-    fixChordOverlaps(el);
-  });
-
-  applyChordVisibility();
-  updateChromeHeight();
-};
-
-    render();
-
-    document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
-    document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
-  
-// --- jednotná velikost napříč PWA přes 'zpj-fontScale' ---
-const ZPJ_FONT_KEY = 'zpj-fontScale';
-
-// získej aktuální scale (výchozí 1)
-function getScale(){
-  const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale')) || 1;
-  return s > 0 ? s : 1;
-}
-function setScale(s){
-  const clamped = Math.min(3, Math.max(0.5, s)); // povolíme 0.5× až 3×
-  document.documentElement.style.setProperty('--song-scale', String(clamped));
-  localStorage.setItem(ZPJ_FONT_KEY, String(clamped));
-  relayoutChords(); // po změně přepočti akordy
-}
-
-// inicializace (kdyby už scale běží z IIFE, jen ho načteme)
-let scale = getScale();
-
-document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); };
-document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); };
-
-document.getElementById('toggleChords').onclick = ()=>{
-  HIDE_CHORDS = !HIDE_CHORDS;
-  localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
-  applyChordVisibility();
-  relayoutChords(); // ← přidej
-};
-
-  } else {
-    document.getElementById('controls-score').style.display='flex';
-    const el=document.getElementById('view');
-    const at=new alphaTab.AlphaTabApi(el, { file:song.file, player:{ enablePlayer:true }});
-    document.getElementById('play').onclick = ()=> at.playPause();
-    document.getElementById('stop').onclick = ()=> at.stop();
-    document.getElementById('tempo').oninput = e=> at.playbackSpeed = e.target.value/100;
-    at.renderFinished.on(()=> updateChromeHeight());
-  }
-// přepínač viditelnosti plovoucího tlačítka (v liště)
-const tgl = document.getElementById('toggleAutoBtn');
-if (tgl) {
-  tgl.onclick = ()=>{
-    AUTO_BTN_VISIBLE = !AUTO_BTN_VISIBLE;
-    localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE ? '1' : '0');
+    // Autoscroll toggles
+    const tgl=document.getElementById('toggleAutoBtn');
+    if(tgl){ tgl.onclick=()=>{ AUTO_BTN_VISIBLE=!AUTO_BTN_VISIBLE; localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE?'1':'0'); updateAutoBtnVisibility(); }; }
+    const autoBtn=document.getElementById('autoScroll');
+    if(autoBtn){ autoBtn.onclick=()=>{ autoMode=(autoMode+1)%3; if(autoMode===0) stopAutoScroll(); else runAutoScroll(); }; }
     updateAutoBtnVisibility();
-  };
-}
-
-// cyklování režimů autoposuvu (0 -> 1 -> 2 -> 0) – plovoucí tlačítko vpravo dole
-const autoBtn = document.getElementById('autoScroll');
-if (autoBtn){
-  autoBtn.onclick = ()=>{
-    autoMode = (autoMode + 1) % 3;
-    if (autoMode === 0) stopAutoScroll();
-    else runAutoScroll();
-  };
-}
-
-// po prvním renderu nastav viditelnost plovoucího tlačítka podle uloženého stavu
-updateAutoBtnVisibility();
+  }
 
   wireDoubleToggle();
   wireSwipeNavigation();
   updateChromeHeight();
 
-  // PC tlačítko pro přepínání lišty
-  const toggleBtn = document.getElementById('toggleChrome');
-  if (toggleBtn) toggleBtn.onclick = ()=> setChromeHidden(!document.body.classList.contains('chrome-hidden'));
-}
-load();
+  const toggleBtn=document.getElementById('toggleChrome');
+  if(toggleBtn) toggleBtn.onclick=()=> setChromeHidden(!document.body.classList.contains('chrome-hidden'));
 
-// ---- šetrné přepočty při změně velikosti okna / orientace ----
-let _resizeTO;
-function onResizeReflow(){
-  updateChromeHeight();
-  relayoutChords();
-}
+  (async function init(){
+    await load();
+  })();
 
-window.addEventListener('resize', () => {
-  clearTimeout(_resizeTO);
-  _resizeTO = setTimeout(onResizeReflow, 120); // debounce
-});
+  // Resize/orientation
+  let _resizeTO;
+  function onResizeReflow(){ updateChromeHeight(); relayoutChords(); }
+  window.addEventListener('resize', ()=>{ clearTimeout(_resizeTO); _resizeTO=setTimeout(onResizeReflow,120); });
+  window.addEventListener('orientationchange', ()=>{ setTimeout(onResizeReflow,150); });
 
-window.addEventListener('orientationchange', () => {
-  setTimeout(onResizeReflow, 150); // po otočení nech layout ustálit
-});
-
-
-</script>
-<script>
+  // SW registrace (ponecháno)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
@@ -743,18 +399,13 @@ window.addEventListener('orientationchange', () => {
         .catch(console.error);
     });
   }
-</script>
 
-<button id="autoScroll" class="auto-scroll" title="Auto posuv">∨</button>
-<script>
+  // Uplatni globální scale
   (function applyGlobalSongScale(){
-    const ZPJ_FONT_KEY = 'zpj-fontScale';
-    const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
-    if (!isNaN(val) && val > 0) {
-      document.documentElement.style.setProperty('--song-scale', String(val));
-    }
+    const ZPJ_FONT_KEY='zpj-fontScale';
+    const val=parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
+    if(!isNaN(val) && val>0){ document.documentElement.style.setProperty('--song-scale', String(val)); }
   })();
-</script>
-
+  </script>
 </body>
 </html>
