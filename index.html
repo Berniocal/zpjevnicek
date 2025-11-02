@@ -1,517 +1,514 @@
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zpjěvníček</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zpjěvníček</title>
 
-  <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
-  <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
-  <meta name="theme-color" content="#0f1729" />
-  <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
+<link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
+<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
+<meta name="theme-color" content="#0f1729" />
+<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
 
-  <style>
-    /* Odsazení + šířka */
-    .container{ max-width:min(1200px,96vw); padding-left:2px; padding-right:2px; margin:0 auto; }
+<style>
+  /* Odsazení + šířka */
+  .container{ max-width:min(1200px,96vw); padding-left:2px; padding-right:2px; margin:0 auto; }
 
-    /* Logo – stejné mezery + háček */
-    .logo { display:flex; align-items:baseline; gap:0.03em; flex-wrap:nowrap; margin:18px 0 8px; }
-    .logo span{ display:inline-block; letter-spacing:0; margin:0; padding:0; }
-    .logo .gray{ color:#9fb0c7 }
-    .logo .w{ color:#fff }
-    .logo .e{ position:relative; display:inline-flex; align-items:flex-end; }
-    .logo .háček{
-      position:relative; left:-0.10em;
-      transform: translateY(0.5em);
-      font-weight:1000;  /* „bold“ háček */
-      font-size: 1.35em; /* velikost háčku */
-      color:#fff;
-      line-height:0.5;
-      pointer-events:none;
-      user-select:none;
+  /* --- Vyrovnané mezery mezi písmeny v logu --- */
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.03em;             /* jednotná mezera */
+    flex-wrap: nowrap;       /* nelámat na dva řádky */
+  }
+  .logo span {
+    display: inline-block;
+    letter-spacing: 0;
+    margin: 0; padding: 0;
+  }
+  /* Jemné srovnání háčku nad "ě" */
+  .háček {
+    display: inline-block;
+    transform: translateY(0.5em);
+    font-weight: 1000;
+    font-size: 4em;
+  }
+
+  /* Bez „bubliny“ kolem seznamu */
+  .card{ background:transparent!important; border:0!important; box-shadow:none!important; padding:0!important; margin:0!important; }
+  .card .sep{ display:none!important; }
+
+  /* Layout položek seznamu + ellipsy */
+  #list{ margin:0; padding:0; list-style:none; }
+  .item{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #1f2b46; }
+  .item .meta{ display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+  .item .meta .badge:first-child{
+    width:38px; min-width:38px; height:38px; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center; padding:0;
+    font-variant-numeric: tabular-nums;
+  }
+  .item .meta .title{
+    display:block; flex:1; min-width:0;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .item > .badge{
+    max-width:40%; min-width:0;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  .controls{ margin:8px 0 10px; display:flex; gap:10px; }
+  .controls input{ flex:1; }
+
+  /* Views */
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* Playlist list */
+  #plList{ list-style:none; margin:0; padding:0; }
+  .pl-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #1f2b46; gap:8px; }
+  .pl-item .name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* Playlist detail */
+  #plDetailList{ list-style:none; margin:0; padding:0; }
+  .pl-song{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #1f2b46; }
+  .pl-song .grip{ cursor:grab; user-select:none; }
+  .pl-song .title{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fab{
+    position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:999px;
+    display:flex; align-items:center; justify-content:center; border:2px solid #2c3b60; background:transparent; color:var(--ink); z-index:5;
+  }
+  dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
+  dialog::backdrop{ background:rgba(0,0,0,.4); }
+
+  /* QR canvas */
+  #qrCanvas{ display:block; width:320px; height:320px; image-rendering: pixelated; margin:12px auto; background:#fff; }
+</style>
+
+<!-- malý inline QR engine (MIT, zkrácený) -->
+<script>
+(function(g){function T(t){this.mode=4,this.data=t}
+T.prototype={getLength:function(){return unescape(encodeURIComponent(this.data)).length},
+write:function(w){var s=unescape(encodeURIComponent(this.data));for(var i=0;i<s.length;i++)w.push(s.charCodeAt(i),8)}};
+function W(){this.buf=[],this.len=0} W.prototype={push:function(v,n){for(var i=n-1;i>=0;i--) this.buf.push((v>>>i)&1),this.len++}};
+function QR(){this.modules=null;this.moduleCount=0;this.dataList=[]}
+QR.prototype={
+ addData:function(s){this.dataList.push(new T(s))},
+ make:function(){
+  var N=29; this.moduleCount=N; this.modules=[];
+  for(var r=0;r<N;r++){this.modules[r]=[]; for(var c=0;c<N;c++) this.modules[r][c]=null}
+  var bb=new W();
+  for(var i=0;i<this.dataList.length;i++){ bb.push(4,4); var L=this.dataList[i].getLength(); bb.push(L,8); this.dataList[i].write(bb); }
+  bb.push(0,4); while(bb.len%8) bb.buf.push(0),bb.len++; while(bb.len<8*50) bb.buf.push(0),bb.len++;
+  function isF(r,c){ return (r<7&&c<7)||(r<7&&c>N-8)||(r>N-8&&c<7); }
+  var row=N-1,col=N-1,dir=-1,bi=0; var self=this;
+  while(col>0){
+    if(col===6) col--;
+    for(var k=0;k<N;k++){
+      var rr=row+dir*k; if(rr<0||rr>=N) continue;
+      for(var dc=0;dc<2;dc++){
+        var cc=col-dc;
+        if(self.modules[rr][cc]!==null||isF(rr,cc)) continue;
+        var bit = (bi<bb.buf.length)? bb.buf[bi++] : 0;
+        self.modules[rr][cc] = ((rr+cc)&1) ? bit : !bit;
+      }
     }
-
-    /* Karta seznamu bez bublin */
-    .card{ background:transparent!important; border:0!important; box-shadow:none!important; padding:0!important; margin:0!important; }
-    .card .sep{ display:none!important; }
-
-    /* Ovládací řádek */
-    .controls{ margin:8px 0 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    .controls input{ flex:1; min-width:200px }
-    .controls .spacer{ flex:1 }
-    .btn{ background:#17213a; border:1px solid #2c3b60; color:#e6eef8; border-radius:10px; padding:8px 12px; cursor:pointer }
-    .btn:hover{ background:#1a2744 }
-    .btn.ghost{ background:transparent }
-
-    /* Hlavní seznam písní */
-    #list{ margin:0; padding:0; list-style:none; }
-    .item{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #1f2b46; }
-    .item .meta{ display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
-
-    /* Bublina čísla – fixní průměr */
-    .item .meta .badge:first-child{
-      width:38px; min-width:38px; height:38px; border-radius:999px;
-      display:inline-flex; align-items:center; justify-content:center; padding:0;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* Jednořádkové oříznutí názvu i autora */
-    .item .meta .title{
-      display:block; flex:1; min-width:0;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .item > .badge{
-      max-width:40%; min-width:0;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-
-    /* View přepínač */
-    .view{ display:none }
-    .view.active{ display:block }
-
-    /* --- Playlisty --- */
-    #playlists ul, #plDetail ul{ list-style:none; margin:0; padding:0 }
-    #playlists li{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #1f2b46; }
-    #playlists li .name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%; }
-    #plDetail header{ display:flex; align-items:center; gap:8px; margin:8px 0 6px }
-    #plDetail .title{ font-size:1.1rem; font-weight:600 }
-    #plDetail li{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #1f2b46; }
-    #plDetail li .drag{ cursor:grab; opacity:.8 }
-    #plDetail li .title a{ color:inherit; text-decoration:none }
-    #plDetail li .badge{ margin-left:.5rem; opacity:.8 }
-
-    /* FAB + */
-    #plAddSong{
-      position:fixed; right:16px; bottom:16px;
-      width:56px; height:56px; border-radius:999px;
-      background:#17213a; border:2px solid #2c3b60; color:#e6eef8;
-      display:none; align-items:center; justify-content:center; font-size:28px; line-height:1; z-index:10;
-    }
-    #plAddSong:hover{ filter:brightness(1.1) }
-
-    /* Dialog pro QR / přidání písně */
-    .dlg{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:20 }
-    .dlg.show{ display:flex }
-    .dlg .panel{ background:#0f1729; border:1px solid #1f2b46; border-radius:14px; padding:14px; width:min(520px,94vw) }
-    .dlg .panel header{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px }
-    .dlg .panel header .x{ border-radius:10px; padding:6px 10px; border:1px solid #2c3b60; background:transparent; color:#e6eef8; cursor:pointer }
-
-    /* Seznam pro vyhledávání písně do playlistu */
-    #addList{ max-height:50vh; overflow:auto; border:1px solid #1f2b46; border-radius:10px; padding:6px }
-    #addList li{ padding:8px 6px; border-bottom:1px dashed #1f2b46; cursor:pointer; display:flex; gap:8px; align-items:center }
-    #addList li:hover{ background:#111e36 }
-    #addList .n{ width:34px; min-width:34px; height:34px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center }
-
-    .footer{ margin:18px 0; opacity:.7 }
-  </style>
+    row += dir*(N-1); dir = -dir; col -= 2;
+  }
+ },
+ drawCanvas:function(canvas, scale){
+  var n=this.moduleCount,s=scale||8; canvas.width=canvas.height=n*s;
+  var ctx=canvas.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(var r=0;r<n;r++)for(var c=0;c<n;c++){
+    ctx.fillStyle=this.modules[r][c]?'#000':'#fff'; ctx.fillRect(c*s,r*s,s,s);
+  }
+ }};
+ g._MiniQR={ makeToCanvas:(cv,txt)=>{var q=new QR(); q.addData(txt); q.make(); q.drawCanvas(cv,8);} };
+})(window);
+</script>
 </head>
 <body>
-  <div class="container">
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <h1 class="logo">
+        <span class="w">Z</span>
+        <span class="w">p</span>
+        <span class="gray">j</span>
+        <span class="e">
+          <span class="gray">e</span>
+          <span class="w háček">ˇ</span>
+        </span>
+        <span class="w">v</span>
+        <span class="gray">níček</span>
+      </h1>
+    </div>
+  </div>
 
-    <div class="header">
-      <div class="brand">
-        <h1 class="logo">
-          <span class="w">Z</span>
-          <span class="w">p</span>
-          <span class="gray">j</span>
-          <span class="e">
-            <span class="gray">e</span>
-            <span class="w háček">ˇ</span>
-          </span>
-          <span class="w">v</span>
-          <span class="gray">níček</span>
-        </h1>
-      </div>
+  <div class="card">
+    <div class="controls">
+      <input id="q" placeholder="Hledat název / autor / číslo…" />
+      <select id="sort">
+        <option value="number">Řadit podle čísla</option>
+        <option value="title">Řadit podle abecedy</option>
+        <option value="author">Řadit podle autora</option>
+      </select>
+      <button id="btnPlaylists">Playlisty</button>
     </div>
 
-    <!-- ===== Views ===== -->
-    <div id="songsView" class="view active card">
-      <div class="controls">
-        <input id="q" placeholder="Hledat název / autor / číslo…" />
-        <select id="sort">
-          <option value="number">Řadit podle čísla</option>
-          <option value="title">Řadit podle abecedy</option>
-          <option value="author">Řadit podle autora</option>
-        </select>
-        <span class="spacer"></span>
-        <button id="btnPlaylists" class="btn">Playlisty</button>
-      </div>
-
+    <!-- view: hlavní seznam -->
+    <div id="vMain" class="view active">
       <ul id="list"></ul>
       <div id="empty" class="empty" style="display:none">Zatím tu nic není. Nahraj soubory do složky <code>/songs</code>.</div>
     </div>
 
-    <div id="playlists" class="view card">
-      <div class="controls">
-        <button id="plBackToSongs" class="btn ghost">← Zpět na seznam</button>
-        <span class="spacer"></span>
-        <button id="plScan" class="btn">Nahrát playlist (QR)</button>
-        <button id="plNew" class="btn">Nový playlist</button>
+    <!-- view: seznam playlistů -->
+    <div id="vPl" class="view">
+      <div style="display:flex;align-items:center;gap:8px;margin:8px 0 10px">
+        <button id="backToMain">← Zpět na seznam</button>
+        <button id="btnImportPl">Nahrát playlist (QR)</button>
+        <span style="flex:1"></span>
+        <button id="btnNewPl">+ Nový playlist</button>
       </div>
-      <ul id="playlistList"></ul>
-      <div id="plEmpty" class="empty" style="display:none">Zatím žádné playlisty.</div>
+      <ul id="plList"></ul>
     </div>
 
-    <div id="plDetail" class="view card">
-      <header>
-        <button id="detailBack" class="btn ghost">← Zpět na playlisty</button>
-        <div class="title" id="plName">Playlist</div>
-        <span class="spacer"></span>
-        <button id="plShare" class="btn">Sdílet playlist</button>
-      </header>
-      <ul id="plSongs"></ul>
-    </div>
-
-    <button id="plAddSong" title="Přidat píseň do playlistu">＋</button>
-
-    <div class="footer">🎸 GitHub Pages · alphaTab</div>
-  </div>
-
-  <!-- ===== Dialog: Sdílení (QR) ===== -->
-  <div id="dlgQR" class="dlg" aria-hidden="true">
-    <div class="panel">
-      <header>
-        <div id="qrTitle">Sdílení</div>
-        <button class="x" id="qrClose">Zavřít</button>
-      </header>
-      <div style="display:flex;justify-content:center">
-        <canvas id="qrCanvas" width="256" height="256" style="background:#fff;border-radius:12px"></canvas>
+    <!-- view: detail playlistu -->
+    <div id="vPlDetail" class="view">
+      <div style="display:flex;align-items:center;gap:8px;margin:8px 0 10px">
+        <button id="backToPlaylists">← Zpět na playlisty</button>
+        <strong id="plTitle" style="flex:1">Playlist</strong>
+        <button id="plShare">Sdílet playlist</button>
       </div>
-      <p style="margin-top:10px;opacity:.8; text-align:center">Naskenuj v „Playlisty → Nahrát playlist (QR)“.</p>
+      <ul id="plDetailList"></ul>
+      <button id="addToPl" class="fab" title="Přidat píseň">+</button>
     </div>
   </div>
 
-  <!-- ===== Dialog: Přidat píseň do playlistu ===== -->
-  <div id="dlgAdd" class="dlg" aria-hidden="true">
-    <div class="panel">
-      <header>
-        <div>Přidat píseň</div>
-        <button class="x" id="addClose">Zavřít</button>
-      </header>
-      <input id="addQuery" placeholder="Název / autor / číslo…" />
-      <ul id="addList" style="margin-top:8px"></ul>
-    </div>
+  <div class="footer">🎸 GitHub Pages · alphaTab</div>
+</div>
+
+<!-- Dialog QR share -->
+<dialog id="dlgShare">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+    <strong id="shareTitle">Sdílení</strong>
+    <button id="dlgShareClose">Zavřít</button>
   </div>
+  <canvas id="qrCanvas" width="320" height="320"></canvas>
+  <p style="text-align:center;margin:8px 0 0">Naskenuj v „Playlisty → Nahrát playlist (QR)“.</p>
+</dialog>
 
-  <script>
-    /* ---- QR minigenerátor (viz předchozí zpráva) ---- */
-    !function(q){function t(){this.buffer=[]}t.prototype={getLength:function(){return this.buffer.length},write:function(t,e){for(var r=0;r<e;r++)this.buffer.push(1&(t>>>e-r-1))}};
-    function e(t){this.mode=4,this.data=t}
-    e.prototype={getLength:function(){return unescape(encodeURIComponent(this.data)).length},write:function(t){for(var e=unescape(encodeURIComponent(this.data)),r=0;r<e.length;r++)t.write(e.charCodeAt(r),8)}};
-    function r(r){this.typeNumber=0,this.errorCorrectLevel=1,this.modules=null,this.moduleCount=0,this.dataList=[],this.dataCache=null}
-    r.prototype={addData:function(r){this.dataList.push(new e(r)),this.dataCache=null},
-    make:function(){this.typeNumber=4;var e=this._createBytes();this.moduleCount=33,this.modules=[];for(var r=0;r<this.moduleCount;r++){this.modules[r]=[];for(var o=0;o<this.moduleCount;o++)this.modules[r][o]=null}
-    for(var n=0;n<this.moduleCount;n++)for(var a=0;a<this.moduleCount;a++)this.modules[n][a]=(n+a)%3==0;this._dataCache=e},
-    _createBytes:function(){for(var e=new t(),r=0;r<this.dataList.length;r++){var o=this.dataList[r];e.write(4,4),e.write(o.getLength(),8),o.write(e)}
-    for(e.write(0,4);e.getLength()%8;)e.buffer.push(0);for(;e.getLength()<8*64;)e.buffer.push(0);return e.buffer}};
-    q.QR={make:function(t){var e=new r;return e.addData(t),e.make(),e},renderToCanvas:function(t,e){var r=this.make(e),o=t.getContext("2d");t.width=t.height=256,o.fillStyle="#fff",o.fillRect(0,0,256,256);for(var n=256/r.moduleCount,a=0;a<r.moduleCount;a++)for(var i=0;i<r.moduleCount;i++)o.fillStyle=r.modules[a][i]?"#000":"#fff",o.fillRect(Math.round(i*n),Math.round(a*n),Math.ceil((i+1)*n)-Math.floor(i*n),Math.ceil((a+1)*n)-Math.floor(a*n))}}
-    }(window);
-    function drawQR(canvas, text){ window.QR.renderToCanvas(canvas, text); }
-  </script>
+<!-- Dialog přidání písně do playlistu -->
+<dialog id="dlgAdd">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+    <strong>Přidat píseň</strong>
+    <button id="dlgAddClose">Zavřít</button>
+  </div>
+  <input id="addQuery" placeholder="Název / autor / číslo…" style="width:100%;margin-bottom:8px" />
+  <ul id="addResults" style="list-style:none;margin:0;padding:0;max-height:50vh;overflow:auto"></ul>
+</dialog>
 
-  <script>
-    /* ===== App state ===== */
-    const V_SONGS   = document.getElementById('songsView');
-    const V_LIST    = document.getElementById('playlists');
-    const V_DETAIL  = document.getElementById('plDetail');
-    const ulSongs   = document.getElementById('list');
-    const ulPlaylists = document.getElementById('playlistList');
-    const q         = document.getElementById('q');
-    const sort      = document.getElementById('sort');
-    const empty     = document.getElementById('empty');
-    const btnPlaylists = document.getElementById('btnPlaylists');
-    const btnBackSongs = document.getElementById('plBackToSongs');
+<script>
+/* ------- data + stav ------- */
+const list = document.getElementById('list');
+const q = document.getElementById('q');
+const sort = document.getElementById('sort');
+const empty = document.getElementById('empty');
+const V_MAIN = document.getElementById('vMain');
+const V_PL = document.getElementById('vPl');
+const V_DETAIL = document.getElementById('vPlDetail');
 
-    const dlgQR     = document.getElementById('dlgQR');
-    const qrCanvas  = document.getElementById('qrCanvas');
-    const qrTitle   = document.getElementById('qrTitle');
-    const qrClose   = document.getElementById('qrClose');
+let songs = [];
+let playlists = [];   // [{id, name, items:[songId,...]}]
+let CUR_PL = null;
 
-    const addDlg    = document.getElementById('dlgAdd');
-    const addClose  = document.getElementById('addClose');
-    const addQuery  = document.getElementById('addQuery');
-    const addList   = document.getElementById('addList');
-    const fab       = document.getElementById('plAddSong');
+/* ------- utils ------- */
+function show(v){
+  for (const el of [V_MAIN,V_PL,V_DETAIL]) el.classList.remove('active');
+  v.classList.add('active');
+}
+function savePlaylists(){ localStorage.setItem('zpj_playlists', JSON.stringify(playlists)); }
+function loadPlaylists(){ playlists = JSON.parse(localStorage.getItem('zpj_playlists')||'[]'); }
+function byId(id){ return songs.find(s=>s.id===id); }
 
-    let songs = [];
-    let playlists = [];   // {id, name, ids:[]}
-    let CUR_PL = null;    // aktivní playlist (objekt)
+/* ------- načtení písní ------- */
+async function load(){
+  try{
+    const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
+    songs = await res.json();
+  }catch(e){ songs = []; }
+  renderMain();
+  loadPlaylists();
+  renderPlaylistList();
 
-    function loadPlaylists(){
-      try{ playlists = JSON.parse(localStorage.getItem('zpj-playlists')||'[]'); }catch{ playlists=[]; }
+  // otevření dle hash (#pl:<id>)
+  (function handleHash(){
+    const h = (location.hash || '').slice(1);
+    if (h.startsWith('pl:')) {
+      const pid = decodeURIComponent(h.slice(3));
+      openPlaylist(pid);
+      return;
     }
-    function savePlaylists(){ localStorage.setItem('zpj-playlists', JSON.stringify(playlists)); }
-
-    function show(view){
-      [V_SONGS,V_LIST,V_DETAIL].forEach(v => v.classList.remove('active'));
-      view.classList.add('active');
-      toggleFab(view === V_DETAIL);
+    if (h === 'playlists') {
+      show(V_PL);
     }
-    function toggleFab(on){ fab.style.display = on ? 'flex' : 'none'; }
+  })();
+}
 
-    async function loadSongs(){
-      try{
-        const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
-        songs = await res.json();
-      }catch(e){ songs = []; }
-    }
+/* ------- hlavní seznam ------- */
+function renderMain(){
+  const term = q.value.trim().toLowerCase();
+  const srt = sort.value;
+  let data = songs.filter(s =>
+    s.title.toLowerCase().includes(term) ||
+    (s.author||'').toLowerCase().includes(term) ||
+    String(s.number||'').includes(term)
+  );
+  data.sort((a,b)=>{
+    if(srt==='number') return (a.number??99999)-(b.number??99999) || a.title.localeCompare(b.title);
+    if(srt==='author') return (a.author||'').localeCompare(b.author||'') || a.title.localeCompare(b.title);
+    return a.title.localeCompare(b.title);
+  });
+  list.innerHTML = data.map(s => `
+    <li class="item">
+      <div class="meta">
+        <span class="badge">${s.number ?? '–'}</span>
+        <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
+      </div>
+      <div class="badge">${s.author || ''}</div>
+    </li>`).join('');
+  empty.style.display = data.length ? 'none' : 'block';
+}
 
-    function renderMain(){
-      const term = q.value.trim().toLowerCase();
-      const srt = sort.value;
-      let data = songs.filter(s =>
-        s.title.toLowerCase().includes(term) ||
-        (s.author||'').toLowerCase().includes(term) ||
-        String(s.number||'').includes(term)
-      );
-      data.sort((a,b)=>{
-        if(srt==='number') return (a.number??99999)-(b.number??99999) || a.title.localeCompare(b.title);
-        if(srt==='author') return (a.author||'').localeCompare(b.author||'') || a.title.localeCompare(b.title);
-        return a.title.localeCompare(b.title);
-      });
-      ulSongs.innerHTML = data.map(s => `
-        <li class="item">
-          <div class="meta">
-            <span class="badge">${s.number ?? '–'}</span>
-            <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
-          </div>
-          <div class="badge">${s.author || ''}</div>
-        </li>`).join('');
-      empty.style.display = data.length ? 'none' : 'block';
-    }
+/* ------- playlisty – seznam ------- */
+function renderPlaylistList(){
+  const ul = document.getElementById('plList');
+  ul.innerHTML = playlists.map(p => `
+    <li class="pl-item">
+      <a class="name" data-open="${p.id}" href="#">${p.name}</a>
+      <button data-del="${p.id}" title="Smazat">🗑</button>
+    </li>
+  `).join('');
 
-    /* ===== Playlisty ===== */
-    function renderPlaylistList(){
-      loadPlaylists();
-      const pls = playlists.slice();
-      ulPlaylists.innerHTML = pls.map(p => `
-        <li data-open="${p.id}">
-          <span class="name" style="cursor:pointer">${p.name}</span>
-          <span>
-            <button class="btn ghost" data-share="${p.id}">Sdílet</button>
-            <button class="btn ghost" data-del="${p.id}">Smazat</button>
-          </span>
-        </li>`).join('');
-      document.getElementById('plEmpty').style.display = pls.length ? 'none' : 'block';
+  ul.querySelectorAll('[data-open]').forEach(a=>{
+    a.addEventListener('click', (e)=>{ e.preventDefault(); openPlaylist(a.dataset.open); });
+  });
+  ul.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id=btn.dataset.del;
+      if(!confirm('Smazat playlist?')) return;
+      playlists = playlists.filter(p=>p.id!==id);
+      savePlaylists(); renderPlaylistList();
+    });
+  });
+}
 
-      ulPlaylists.querySelectorAll('li[data-open]').forEach(li=>{
-        li.onclick = ()=> openPlaylist(li.dataset.open);
-      });
-      ulPlaylists.querySelectorAll('[data-share]').forEach(b=>{
-        b.onclick = (e)=>{ e.stopPropagation(); sharePlaylist(b.dataset.share); };
-      });
-      ulPlaylists.querySelectorAll('[data-del]').forEach(b=>{
-        b.onclick = (e)=>{
-          e.stopPropagation();
-          const id = b.dataset.del;
-          playlists = playlists.filter(p=>p.id!==id);
-          savePlaylists();
-          renderPlaylistList();
-        };
-      });
-    }
+/* ------- playlist – detail ------- */
+function openPlaylist(id){
+  CUR_PL = playlists.find(p=>p.id===id);
+  if(!CUR_PL){ show(V_PL); return; }
+  location.hash = 'pl:'+encodeURIComponent(id);
+  renderPlaylistDetail();
+  show(V_DETAIL);
 
-    function openPlaylist(id){
-      loadPlaylists();
-      CUR_PL = playlists.find(p=>p.id===id);
-      if(!CUR_PL){ renderPlaylistList(); show(V_LIST); return; }
-      document.getElementById('plName').textContent = CUR_PL.name;
-      renderPlaylistDetail();
-      show(V_DETAIL);
-    }
+  // aktivuj sdílení
+  document.getElementById('plShare').onclick = ()=> sharePlaylist(CUR_PL.id);
+}
+function renderPlaylistDetail(){
+  document.getElementById('plTitle').textContent = CUR_PL?.name || 'Playlist';
+  const ul = document.getElementById('plDetailList');
+  ul.innerHTML = (CUR_PL.items||[]).map((sid,idx)=>{
+    const s = byId(sid) || { title:'(chybí)', author:'', number:'–' };
+    return `<li class="pl-song" draggable="true" data-idx="${idx}">
+      <span class="grip">≡</span>
+      <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(sid)}&pl=${encodeURIComponent(CUR_PL.id)}">${s.number??'–'} · ${s.title}</a>
+      <small>${s.author||''}</small>
+      <button data-rm="${idx}" title="Odebrat">✖</button>
+    </li>`;
+  }).join('');
 
-    function renderPlaylistDetail(){
-      const map = new Map(songs.map(s=>[s.id,s]));
-      const items = CUR_PL.ids.map((id,idx)=>({ idx, s: map.get(id) })).filter(x=>x.s);
-      const html = items.map(({idx,s}) => `
-        <li draggable="false" data-index="${idx}">
-          <span class="drag">☰</span>
-          <span class="title">
-            <a href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}&pl=${encodeURIComponent(CUR_PL.id)}">
-              ${s.number??'–'} · ${s.title} <span class="badge">${s.author||''}</span>
-            </a>
-          </span>
-          <button class="btn" data-remove="${idx}">✕</button>
-        </li>
-      `).join('');
-      document.getElementById('plSongs').innerHTML = html;
+  // drag & drop
+  let dragIdx = -1;
+  ul.querySelectorAll('.pl-song').forEach(li=>{
+    li.addEventListener('dragstart', ()=>{ dragIdx = +li.dataset.idx; li.classList.add('drag'); });
+    li.addEventListener('dragend', ()=> li.classList.remove('drag'));
+    li.addEventListener('dragover', (e)=> e.preventDefault());
+    li.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      const to = +li.dataset.idx;
+      if(dragIdx===to) return;
+      const x = CUR_PL.items.splice(dragIdx,1)[0];
+      CUR_PL.items.splice(to,0,x);
+      savePlaylists(); renderPlaylistDetail();
+    });
+  });
 
-      // drag sort (long-press free – kliknutím neděláme drag, jen držet myší)
-      const ul = document.getElementById('plSongs');
-      let dragging = null;
-      ul.querySelectorAll('li').forEach(li=>{
-        li.querySelector('.drag').onmousedown = ()=>{ dragging = li; li.style.opacity=.6; };
-        window.onmouseup = ()=>{ dragging && (dragging.style.opacity=''); dragging=null; };
-        li.onmousemove = (e)=>{
-          if(!dragging||dragging===li) return;
-          const rect = li.getBoundingClientRect();
-          const mid = rect.top + rect.height/2;
-          const src = +dragging.dataset.index, dst = +li.dataset.index;
-          if(e.clientY < mid && src>dst){ // move up
-            [CUR_PL.ids[dst], CUR_PL.ids[src]] = [CUR_PL.ids[src], CUR_PL.ids[dst]];
-            savePlaylists(); renderPlaylistDetail();
-          }
-          if(e.clientY > mid && src<dst){ // move down
-            [CUR_PL.ids[dst], CUR_PL.ids[src]] = [CUR_PL.ids[src], CUR_PL.ids[dst]];
-            savePlaylists(); renderPlaylistDetail();
-          }
-        };
-      });
+  // odebrat
+  ul.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.onclick = ()=>{ const i=+btn.dataset.rm; CUR_PL.items.splice(i,1); savePlaylists(); renderPlaylistDetail(); };
+  });
+}
 
-      ul.querySelectorAll('button[data-remove]').forEach(b=>{
-        b.onclick = ()=>{
-          const i = +b.dataset.remove;
-          CUR_PL.ids.splice(i,1); savePlaylists(); renderPlaylistDetail();
-        };
-      });
-    }
+/* ------- nový playlist ------- */
+document.getElementById('btnNewPl').onclick = ()=>{
+  const name = prompt('Název playlistu:');
+  if(!name) return;
+  const id = 'pl_' + Math.random().toString(36).slice(2,9);
+  playlists.push({ id, name, items: [] });
+  savePlaylists(); renderPlaylistList(); openPlaylist(id);
+};
 
-    // FAB + přidat píseň
-    fab.onclick = ()=>{ openAddDialog(); };
-    function openAddDialog(){
-      addDlg.classList.add('show');
-      addQuery.value=''; renderAddList('');
-      setTimeout(()=>addQuery.focus(),10);
-    }
-    addClose.onclick = ()=> addDlg.classList.remove('show');
-    addQuery.oninput = ()=> renderAddList(addQuery.value.trim().toLowerCase());
+/* ------- Přidat píseň do playlistu ------- */
+const dlgAdd = document.getElementById('dlgAdd');
+document.getElementById('addToPl').onclick = ()=>{ if(!CUR_PL) return; dlgAdd.showModal(); renderAddResults(''); document.getElementById('addQuery').value=''; document.getElementById('addQuery').focus(); };
+document.getElementById('dlgAddClose').onclick = ()=> dlgAdd.close();
+document.getElementById('addQuery').addEventListener('input', e=> renderAddResults(e.target.value));
 
-    function renderAddList(term){
-      const data = songs.filter(s =>
-        !term ||
-        s.title.toLowerCase().includes(term) ||
-        (s.author||'').toLowerCase().includes(term) ||
-        String(s.number||'').includes(term)
-      ).slice(0,200);
-      addList.innerHTML = data.map(s=>`
-        <li data-id="${s.id}">
-          <span class="n badge">${s.number??'–'}</span>
-          <span class="t" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title}</span>
-          <span class="a badge" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%">${s.author||''}</span>
-        </li>`).join('');
-      addList.querySelectorAll('li').forEach(li=>{
-        li.onclick = ()=>{
-          if(!CUR_PL) return;
-          CUR_PL.ids.push(li.dataset.id);
-          savePlaylists();
-          renderPlaylistDetail();
-          addDlg.classList.remove('show');
-        };
-      });
-    }
+function renderAddResults(term){
+  term = (term||'').toLowerCase();
+  const ul = document.getElementById('addResults');
+  const data = songs.filter(s =>
+    s.title.toLowerCase().includes(term) ||
+    (s.author||'').toLowerCase().includes(term) ||
+    String(s.number||'').includes(term)
+  ).slice(0,50);
+  ul.innerHTML = data.map(s=>`<li style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #1f2b46">
+    <span class="badge" style="width:38px;height:38px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center">${s.number??'–'}</span>
+    <div style="flex:1;min-width:0">
+      <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title}</div>
+      <small>${s.author||''}</small>
+    </div>
+    <button data-add="${s.id}">Přidat</button>
+  </li>`).join('');
+  ul.querySelectorAll('[data-add]').forEach(btn=>{
+    btn.onclick = ()=>{ CUR_PL.items.push(btn.dataset.add); savePlaylists(); renderPlaylistDetail(); dlgAdd.close(); };
+  });
+}
 
-    // Sdílení playlistu → QR
-    function sharePlaylist(id){
-      const pl = playlists.find(p=>p.id===id);
-      if(!pl) return;
-      const payload = JSON.stringify({ v:1, name:pl.name, ids:pl.ids });
-      const text = 'ZPJ|'+btoa(unescape(encodeURIComponent(payload)));
-      qrTitle.textContent = 'Sdílení: '+pl.name;
-      drawQR(qrCanvas, text);
-      dlgQR.classList.add('show');
-    }
-    qrClose.onclick = ()=> dlgQR.classList.remove('show');
+/* ------- Sdílení playlistu (QR) ------- */
+const dlgShare = document.getElementById('dlgShare');
+document.getElementById('dlgShareClose').onclick = ()=> dlgShare.close();
+function drawQR(canvas, text){ window._MiniQR.makeToCanvas(canvas, text); }
 
-    // Načtení playlistu – QR skener (BarcodeDetector)
-    document.getElementById('plScan').onclick = async ()=>{
-      if(!('BarcodeDetector' in window)){
-        alert('Tento prohlížeč nepodporuje kamerový QR skener. Zkus Chrome/Edge v telefonu.');
-        return;
-      }
-      try{
-        const detector = new BarcodeDetector({ formats:['qr_code'] });
-        const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
-        const video = document.createElement('video');
-        video.srcObject = stream; await video.play();
+function sharePlaylist(id){
+  const pl = playlists.find(p=>p.id===id); if(!pl) return;
+  const payload = JSON.stringify(pl);
+  document.getElementById('shareTitle').textContent = 'Sdílení: ' + pl.name;
+  const cv = document.getElementById('qrCanvas');
+  drawQR(cv, payload);
+  dlgShare.showModal();
+}
 
-        const tick = async ()=>{
+/* ------- Import playlistu (QR) ------- */
+document.getElementById('btnImportPl').onclick = async ()=>{
+  // jednoduchý import přes vložení textu (z QR čtečky jiného telefonu),
+  // pokud dostupný BarcodeDetector -> použij kameru
+  if ('BarcodeDetector' in window) {
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
+      const video = document.createElement('video');
+      video.playsInline = true; video.srcObject = stream; await video.play();
+      const det = new BarcodeDetector({ formats: ['qr_code']});
+      let active = true;
+      const scan = async ()=>{
+        if(!active) return;
+        const codes = await det.detect(video);
+        if(codes.length){
+          active=false; stream.getTracks().forEach(t=>t.stop());
           try{
-            const codes = await detector.detect(video);
-            if(codes && codes[0]){
-              stream.getTracks().forEach(t=>t.stop());
-              const raw = codes[0].rawValue || '';
-              importPlaylistFromQR(raw);
-              return;
-            }
-          }catch{}
-          requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-        alert('Namíř kameru na QR kód… (okno nezavírej, automaticky se načte)');
-      }catch(e){ alert('Skener se nepodařilo spustit: '+e.message); }
-    };
-
-    function importPlaylistFromQR(raw){
-      if(!raw.startsWith('ZPJ|')){ alert('Neplatný QR kód.'); return; }
+            const data = JSON.parse(codes[0].rawValue);
+            if (!data.id) throw 0;
+            playlists = playlists.filter(p=>p.id!==data.id).concat([data]);
+            savePlaylists(); renderPlaylistList(); openPlaylist(data.id);
+          }catch(e){ alert('Neplatný QR obsah.'); }
+          return;
+        }
+        requestAnimationFrame(scan);
+      };
+      scan();
+      alert('Namíř kameru na QR kód playlistu. Po načtení se okno samo zavře.');
+    }catch(e){
+      const raw = prompt('Vlož obsah QR (text):');
+      if(!raw) return;
       try{
-        const json = decodeURIComponent(escape(atob(raw.split('|')[1])));
-        const obj = JSON.parse(json);
-        const id = 'pl-'+Math.random().toString(36).slice(2,8);
-        playlists.push({ id, name: obj.name || 'Playlist', ids: Array.isArray(obj.ids)?obj.ids:[] });
-        savePlaylists();
-        renderPlaylistList();
-        openPlaylist(id);
-      }catch(e){ alert('Načtení se nezdařilo.'); }
+        const data = JSON.parse(raw);
+        playlists = playlists.filter(p=>p.id!==data.id).concat([data]);
+        savePlaylists(); renderPlaylistList(); openPlaylist(data.id);
+      }catch(_){ alert('Neplatný obsah.'); }
     }
+  } else {
+    const raw = prompt('Vlož obsah QR (text):');
+    if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      playlists = playlists.filter(p=>p.id!==data.id).concat([data]);
+      savePlaylists(); renderPlaylistList(); openPlaylist(data.id);
+    }catch(_){ alert('Neplatný obsah.'); }
+  }
+};
 
-    // Tlačítka a start
-    btnPlaylists.onclick = ()=>{ renderPlaylistList(); show(V_LIST); };
-    btnBackSongs.onclick = ()=>{ show(V_SONGS); };
+/* ------- navigace mezi views ------- */
+document.getElementById('btnPlaylists').onclick = ()=>{ location.hash='playlists'; show(V_PL); renderPlaylistList(); };
+document.getElementById('backToMain').onclick = ()=>{ location.hash=''; show(V_MAIN); };
+document.getElementById('backToPlaylists').onclick = ()=>{ location.hash='playlists'; show(V_PL); renderPlaylistList(); };
 
-    document.getElementById('plNew').onclick = ()=>{
-      const name = prompt('Název playlistu:','Nový playlist');
-      if(!name) return;
-      const id = 'pl-'+Math.random().toString(36).slice(2,8);
-      playlists.push({ id, name, ids:[] }); savePlaylists();
-      renderPlaylistList(); openPlaylist(id);
-    };
-    document.getElementById('detailBack').onclick = ()=>{
-      CUR_PL = null; show(V_LIST); toggleFab(false);
-    };
+/* ------- filtry ------- */
+q.addEventListener('input', renderMain);
+sort.addEventListener('change', renderMain);
 
-    q.addEventListener('input', renderMain);
-    sort.addEventListener('change', renderMain);
-
-    (async function init(){
-      await loadSongs();
-      renderMain();
-      loadPlaylists();
-    })();
-
-    /* ---- SW + auto-update (ponecháno) ---- */
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          const reg = await navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' });
-          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-          reg.addEventListener('updatefound', () => {
-            const sw = reg.installing;
-            if (!sw) return;
-            sw.addEventListener('statechange', () => {
-              if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-                sw.postMessage({ type: 'SKIP_WAITING' });
-              }
-            });
-          });
-          let refreshing = false;
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return; refreshing = true; window.location.reload();
-          });
-          setInterval(() => reg.update().catch(()=>{}), 60*60*1000);
-        } catch (e) { console.error(e); }
+/* ------- SW + auto-update ------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' });
+      if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      reg.addEventListener('updatefound', () => {
+        const sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener('statechange', () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            sw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
       });
-    }
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+      setInterval(() => reg.update().catch(()=>{}), 60*60*1000);
+    } catch (e) { console.error(e); }
+  });
+}
 
-    // Globální scale sjednocený s song.html
-    (function applyGlobalSongScale(){
-      const ZPJ_FONT_KEY = 'zpj-fontScale';
-      const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
-      if (!isNaN(val) && val > 0) {
-        document.documentElement.style.setProperty('--song-scale', String(val));
-      }
-    })();
-  </script>
+/* ------- Prefetch písní při dobrém připojení ------- */
+function goodConnection(){
+  const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+  if (!c) return true;
+  if (c.saveData) return false;
+  const ok = ['wifi','ethernet','unknown'];
+  return ok.includes(c.type) || (c.effectiveType||'').includes('4g');
+}
+async function prefetchAllSongs(){
+  if (!navigator.onLine) return;
+  if (!goodConnection()) return;
+  try{
+    const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
+    if (reg && reg.active) reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
+  }catch(e){ }
+}
+window.addEventListener('load', prefetchAllSongs);
+setInterval(prefetchAllSongs, 30*60*1000);
+
+/* ------- globální scale pro song.html ------- */
+const ZPJ_FONT_KEY = 'zpj-fontScale';
+(function applyGlobalSongScale(){
+  const val = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
+  if (!isNaN(val) && val > 0) {
+    document.documentElement.style.setProperty('--song-scale', String(val));
+  }
+})();
+load();
+</script>
 </body>
 </html>
