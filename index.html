@@ -36,15 +36,26 @@
     .footer{ margin:14px 0 28px }
 
     /* ========== LOGO – vyrovnané mezery a háček ========== */
-    .logo{
-      display:flex; align-items:baseline; gap:0.18em; flex-wrap:nowrap;
-    }
-    .logo span{ display:inline-block; letter-spacing:0; margin:0; padding:0; }
-    /* háček nad „ě“: níž, tučnější a o chlup větší */
-    .háček{
-      position:relative; top:-0.06em; margin-left:-0.22em;
-      font-weight:900; font-size:1.08em;
-    }
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.03em;             /* jednotná mezera mezi písmeny – uprav podle oka (0.15–0.2em) */
+  flex-wrap: nowrap;       /* ať se to neláme na dva řádky */
+}
+
+.logo span {
+  display: inline-block;
+  letter-spacing: 0;       /* vypni vnitřní spacing */
+  margin: 0;
+  padding: 0;
+}
+/* Jemné srovnání háčku nad "ě" */
+.háček {
+  display: inline-block;
+  transform: translateY(0.5em);   /* posuň ho dolů nebo nahoru podle potřeby */
+  font-weight: 1000;                /* tučně */
+   font-size: 4em;  
+}
 
     /* ========== PLAYLIST UI ========== */
     .view{ display:none }
