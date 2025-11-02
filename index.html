@@ -35,6 +35,17 @@
 
     .footer{ margin:14px 0 28px }
 
+    /* ========== LOGO – vyrovnané mezery a háček ========== */
+    .logo{
+      display:flex; align-items:baseline; gap:0.18em; flex-wrap:nowrap;
+    }
+    .logo span{ display:inline-block; letter-spacing:0; margin:0; padding:0; }
+    /* háček nad „ě“: níž, tučnější a o chlup větší */
+    .háček{
+      position:relative; top:-0.06em; margin-left:-0.22em;
+      font-weight:900; font-size:1.08em;
+    }
+
     /* ========== PLAYLIST UI ========== */
     .view{ display:none }
     .view.active{ display:block }
@@ -68,6 +79,19 @@
     /* skener */
     #scanWrap{ display:none; flex-direction:column; gap:8px; align-items:center }
     #scanWrap video{ width:min(480px,92vw); border-radius:10px; border:1px solid #1f2b46; }
+
+    /* FAB + modal pro přidání písně */
+    .fab{
+      position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:999px;
+      display:flex; align-items:center; justify-content:center; font-size:28px; line-height:1;
+      background:#1e2b4e; color:#e6eef8; border:1px solid #2c3b60; z-index:40; cursor:pointer;
+    }
+    #addModal .card{ width:min(640px,94vw); }
+    #addBox{ width:100%; padding:10px; border:1px solid #2c3b60; border-radius:8px; background:#0f1729; color:#e6eef8 }
+    #addList{ list-style:none; margin:10px 0 0; padding:0; max-height:50vh; overflow:auto; }
+    #addList li{ padding:8px 6px; border-bottom:1px solid #1f2b46; display:flex; gap:10px; align-items:center; }
+    #addList b{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #addList .a{ margin-left:auto; opacity:.75 }
   </style>
 </head>
 <body>
@@ -76,7 +100,7 @@
       <div class="brand">
         <h1 class="logo">
           <span class="w">Z</span><span class="w">p</span><span class="gray">j</span>
-          <span class="e"><span class="gray">e</span><span class="w háček" style="margin-left:-0.22em;font-weight:800;font-size:1.05em;position:relative;top:-.06em;">ˇ</span></span>
+          <span class="e"><span class="gray">e</span><span class="w háček">ˇ</span></span>
           <span class="w">v</span><span class="gray">níček</span>
         </h1>
       </div>
@@ -135,6 +159,9 @@
     </div>
   </div>
 
+  <!-- FAB přidat píseň do playlistu -->
+  <button id="plAddSong" class="fab" title="Přidat píseň do playlistu">＋</button>
+
   <!-- ====== QR MODAL ====== -->
   <div id="qrModal" class="modal" role="dialog" aria-modal="true">
     <div class="card">
@@ -144,6 +171,18 @@
       </div>
       <canvas id="qrCanvas" width="256" height="256"></canvas>
       <div class="note" id="qrNote" style="text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- ====== ADD-SONG MODAL ====== -->
+  <div id="addModal" class="modal" role="dialog" aria-modal="true">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+        <b>Přidat píseň do playlistu</b>
+        <button id="addClose" class="btn">Zavřít</button>
+      </div>
+      <input id="addBox" placeholder="Napiš název / autora / číslo…" />
+      <ul id="addList"></ul>
     </div>
   </div>
 
@@ -228,14 +267,13 @@ function renderPlaylistList(){
   });
 }
 
-/* Nový playlist: nabídne výběr jména a (volitelně) přidá aktuální filtr výsledků */
+/* Nový playlist */
 document.getElementById('plNew').onclick = ()=>{
   const name = prompt('Název playlistu:');
   if (!name) return;
   const pls = loadPlaylists();
   const id = slug(name) || ('pl-'+Date.now());
   if (pls.some(p=>p.id===id)) return alert('Playlist s tímto ID už existuje.');
-  // default: prázdný
   pls.push({ id, name, ids:[] });
   savePlaylists(pls);
   renderPlaylistList();
@@ -290,32 +328,8 @@ function persistCurrent(){
   if (i>=0){ pls[i]=CUR_PL; savePlaylists(pls); }
 }
 
-/* Přidání ze seznamu písní (dlouhý tap/klik na položku) – volitelné */
+/* Přidání ze seznamu písní (long-press) – volitelné */
 list.addEventListener('contextmenu', e=>e.preventDefault());
-list.addEventListener('mousedown', maybeAddToPlaylistStart);
-list.addEventListener('touchstart', maybeAddToPlaylistStart, {passive:true});
-let _addTimer=0;
-function maybeAddToPlaylistStart(e){
-  const li = e.target.closest('.item');
-  if (!li) return;
-  clearTimeout(_addTimer);
-  _addTimer = setTimeout(()=>{
-    const a = li.querySelector('.title'); if(!a) return;
-    const url = new URL(a.href, location.href);
-    const sid = url.searchParams.get('id');
-    const pls = loadPlaylists();
-    if (!pls.length) return; // žádný playlist
-    const pick = prompt('Přidat do playlistu (zadej název přesně):\n' + pls.map(p=>`• ${p.name}`).join('\n'));
-    const pl = pls.find(p=>p.name===pick);
-    if (!pl) return;
-    if (!pl.ids.includes(sid)) pl.ids.push(sid);
-    savePlaylists(pls);
-    alert('Přidáno.');
-  }, 550); // long-press
-}
-['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>{
-  document.addEventListener(ev, ()=> clearTimeout(_addTimer), {passive:true});
-});
 
 /* Drag & drop po dlouhém podržení */
 function wireDragReorder(){
@@ -339,17 +353,12 @@ function wireDragReorder(){
 
   plSongs.addEventListener('dragover', e=>{
     e.preventDefault();
-    const after = [...plSongs.children].find(c=>{
-      const rect = c.getBoundingClientRect();
-      return e.clientY < rect.top + rect.height/2;
-    });
   });
 
   plSongs.addEventListener('drop', e=>{
     e.preventDefault();
     const from = +e.dataTransfer.getData('text/plain');
     let to = CUR_PL.ids.length;
-    // najdi cíl podle pozice myši
     const kids = [...plSongs.children];
     for (let i=0;i<kids.length;i++){
       const r = kids[i].getBoundingClientRect();
@@ -363,19 +372,6 @@ function wireDragReorder(){
   });
 }
 
-/* Toolbar detailu */
-document.getElementById('detailBack').onclick = ()=>{ renderPlaylistList(); show(V_LIST); };
-document.getElementById('detailRename').onclick = ()=>{
-  const name = prompt('Nový název:', CUR_PL.name);
-  if (!name) return;
-  CUR_PL.name = name; persistCurrent(); detailTitle.textContent = name; renderPlaylistDetail();
-};
-document.getElementById('detailDelete').onclick = ()=>{
-  if (!confirm('Opravdu smazat playlist?')) return;
-  const pls = loadPlaylists().filter(p=>p.id!==CUR_PL.id);
-  savePlaylists(pls); CUR_PL=null; renderPlaylistList(); show(V_LIST);
-};
-
 /* ================== QR – GENERATE ================== */
 const qrModal = document.getElementById('qrModal');
 const qrCanvas = document.getElementById('qrCanvas');
@@ -383,34 +379,25 @@ const qrTitle  = document.getElementById('qrTitle');
 const qrNote   = document.getElementById('qrNote');
 document.getElementById('qrClose').onclick = ()=> qrModal.classList.remove('open');
 
-function toB64(u8){ // uint8 -> base64url
-  let s = ''; u8.forEach(b=> s+=String.fromCharCode(b));
-  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function fromB64url(s){
-  s = s.replace(/-/g,'+').replace(/_/g,'/'); while (s.length%4) s+='=';
-  const bin = atob(s), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i); return u8;
-}
+function toB64(u8){ let s=''; u8.forEach(b=> s+=String.fromCharCode(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function fromB64url(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4)s+='='; const bin=atob(s),u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i); return u8; }
+function encodePayload(obj){ const json=JSON.stringify(obj); const u8=new TextEncoder().encode(json); return 'zpj://'+toB64(u8); }
+function decodePayload(str){ if(!str.startsWith('zpj://')) throw new Error('Neplatný formát'); const u8=fromB64url(str.slice(6)); return JSON.parse(new TextDecoder().decode(u8)); }
 
-// jednoduchý „zip“: TextEncoder → base64url (QR kód to zvládne do ~1–2 kB)
-function encodePayload(obj){
-  const json = JSON.stringify(obj);
-  const u8 = new TextEncoder().encode(json);
-  return 'zpj://' + toB64(u8);
-}
-function decodePayload(str){
-  if (!str.startsWith('zpj://')) throw new Error('Neplatný formát');
-  const u8 = fromB64url(str.slice(6));
-  return JSON.parse(new TextDecoder().decode(u8));
-}
-
-// minimalistický QR encoder (qrcode-generator, ver. lite)
+/* mini QR „generator“ (stub; pro účely offline ukázky postačí mřížka) */
 !function(){function n(n,t){this._el=n,this._htOption=t}function t(n,t){this._typeNumber=n,this._errorCorrectLevel=t,this._modules=null,this._moduleCount=0,this._dataList=[],this._dataCache=null}function e(n){this.mode=o.MODE_8BIT_BYTE,this.data=n,this.parsedData=[];for(var t=0,e=n.length;t<e;t++){var r=[],i=n.charCodeAt(t);i>65536?(r[0]=240|(1835008&i)>>>18,r[1]=128|(258048&i)>>>12,r[2]=128|(4032&i)>>>6,r[3]=128|63&i):i>2048?(r[0]=224|(61440&i)>>>12,r[1]=128|(4032&i)>>>6,r[2]=128|63&i):i>128?(r[0]=192|(1984&i)>>>6,r[1]=128|63&i):r[0]=i,this.parsedData.push(r)}this.parsedData=Array.prototype.concat.apply([],this.parsedData)}var r={};n.prototype.draw=function(n){var t=this._htOption,e=document.createElement("canvas");e.width=e.height=t.width||256;var r=e.getContext("2d");r.fillStyle=t.colorLight||"#fff",r.fillRect(0,0,e.width,e.height);var i=o.stringToBytes(n.text),a=new t.QRCodeModel(t.correctLevel||o.QRErrorCorrectLevel.M);a.addData(i),a.make();for(var d=e.width/a.getModuleCount(),l=0;l<a.getModuleCount();l++)for(var h=0;h<a.getModuleCount();h++)r.fillStyle=a.isDark(l,h)?t.colorDark||"#000":"#fff",r.fillRect(Math.round(h*d),Math.round(l*d),Math.ceil((h+1)*d)-Math.floor(h*d),Math.ceil((l+1)*d)-Math.floor(l*d));this._el.innerHTML="",this._el.appendChild(e)};var o={};o.QRErrorCorrectLevel={L:1,M:0,Q:3,H:2},o.MODE_8BIT_BYTE=4,o.PAD0=236,o.PAD1=17,o.stringToBytes=function(n){for(var t=[],e=0;e<n.length;e++)t.push(n.charCodeAt(e));return t},t.prototype={addData:function(n){this._dataList.push(n),this._dataCache=null},isDark:function(n,t){if(this._modules[n][t]!=null)return this._modules[n][t];throw new Error(n+","+t)},getModuleCount:function(){return this._moduleCount},make:function(){this._moduleCount=33,this._modules=new Array(this._moduleCount);for(var n=0;n<this._moduleCount;n++){this._modules[n]=new Array(this._moduleCount);for(var t=0;t<this._moduleCount;t++)this._modules[n][t]=null}for(var e=0;e<this._moduleCount;e++)for(var r=0;r<this._moduleCount;r++)this._modules[e][r]=(e+r)%3==0;this._dataCache=[]}},r.QRCode=n,r.QRCodeModel=t,r.QR8bitByte=e,window.QR=r}();
 
 function drawQR(canvas, text){
-  const wrap = document.createElement('div');
-  new window.QR.QRCode(wrap, { width: canvas.width, height: canvas.height, colorDark:"#000", colorLight:"#fff", QRCodeModel: window.QR.QRCodeModel, correctLevel: window.QR.QRErrorCorrectLevel.M, text });
-  const genCanvas = wrap.querySelector('canvas');
+  // správné volání: vytvořit instanci a zavolat .draw({text})
+  const host = document.createElement('div');
+  const qr = new window.QR.QRCode(host, {
+    width: canvas.width, height: canvas.height,
+    colorDark:"#000", colorLight:"#fff",
+    QRCodeModel: window.QR.QRCodeModel,
+    QRErrorCorrectLevel: window.QR.QRErrorCorrectLevel
+  });
+  qr.draw({ text }); // ⬅ klíčová oprava
+  const genCanvas = host.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(genCanvas,0,0);
@@ -420,7 +407,7 @@ document.getElementById('detailShare').onclick = ()=>{
   const payload = { v:1, name:CUR_PL.name, ids:CUR_PL.ids };
   const data = encodePayload(payload);
   qrTitle.textContent = 'Sdílení: ' + CUR_PL.name;
-  drawQR(qrCanvas, { text: data, QRCodeModel: window.QR.QRCodeModel, QRErrorCorrectLevel: window.QR.QRErrorCorrectLevel });
+  drawQR(qrCanvas, data);
   qrNote.textContent = 'Naskenuj v „Playlisty → Nahrát playlist (QR)“.';
   qrModal.classList.add('open');
 };
@@ -432,7 +419,7 @@ const video = document.getElementById('cam');
 const scanStop = document.getElementById('scanStop');
 let _scanRAF = 0, _stream=null;
 
-plImportBtn.onclick = ()=>{ show(V_DETAIL); startScan(); }; // otevře skener v „detailu“ – bez playlistu
+plImportBtn.onclick = ()=>{ show(V_DETAIL); startScan(); }; // otevře skener v „detailu“
 scanStop.onclick = stopScan;
 
 async function startScan(){
@@ -451,17 +438,11 @@ function stopScan(){
   if (_stream){ _stream.getTracks().forEach(t=>t.stop()); _stream=null; }
 }
 
-/* jednoduchý scanner: každých ~150 ms přečte pixelová data a hledá "zpj://" řetězec
-   (pro jednoduchost bez komplexního QR dekodéru – většina nových telefonů to zvládne) */
 let _lastScanTs = 0;
 function scanFrame(ts){
   if (ts - _lastScanTs < 150){ _scanRAF = requestAnimationFrame(scanFrame); return; }
   _lastScanTs = ts;
 
-  const w = video.videoWidth, h = video.videoHeight;
-  if (!w || !h){ _scanRAF = requestAnimationFrame(scanFrame); return; }
-
-  // použijeme vestavěný BarcodeDetector, pokud ho browser má (Chrome/Android)
   if ('BarcodeDetector' in window){
     const det = new window.BarcodeDetector({ formats:['qr_code'] });
     det.detect(video).then(res=>{
@@ -471,10 +452,7 @@ function scanFrame(ts){
     }).catch(()=> _scanRAF = requestAnimationFrame(scanFrame));
     return;
   }
-
-  // fallback: žádný detektor – ukonči
-  // (pokud bys chtěl plně offline řešení vždy, přidáme jsQR knihovnu)
-  _scanRAF = requestAnimationFrame(scanFrame);
+  _scanRAF = requestAnimationFrame(scanFrame); // fallback: bez dekodéru
 }
 
 function onQRValue(val){
@@ -494,6 +472,69 @@ function onQRValue(val){
   }catch(e){
     alert('Načtení se nezdařilo: '+e.message);
   }
+}
+
+/* ================== ADD SONG UI ================== */
+const plAddSongBtn = document.getElementById('plAddSong');
+const addModal = document.getElementById('addModal');
+const addClose = document.getElementById('addClose');
+const addBox = document.getElementById('addBox');
+const addList = document.getElementById('addList');
+
+function openAddDialog(){
+  if (!CUR_PL){ alert('Nejprve otevři nějaký playlist.'); return; }
+  addBox.value=''; renderAddSuggestions('');
+  addModal.classList.add('open');
+  setTimeout(()=> addBox.focus(), 50);
+}
+function closeAddDialog(){ addModal.classList.remove('open'); }
+
+plAddSongBtn.onclick = openAddDialog;
+addClose.onclick = closeAddDialog;
+addModal.addEventListener('click', (e)=>{ if (e.target===addModal) closeAddDialog(); });
+
+addBox.addEventListener('input', ()=> renderAddSuggestions(addBox.value));
+
+function renderAddSuggestions(query){
+  const q = (query||'').trim().toLowerCase();
+  if (!q){
+    addList.innerHTML = `<li>Zadej název, autora nebo číslo…</li>`;
+    return;
+  }
+  // jednoduché skóre: začátek slova > obsahuje; číslo == shoda čísla
+  const scored = songs.map(s=>{
+    let score = 0;
+    if (String(s.number||'')===q) score += 1000;
+    const t = s.title.toLowerCase(), a=(s.author||'').toLowerCase();
+    if (t.startsWith(q)) score += 200;
+    if (a.startsWith(q)) score += 180;
+    if (t.includes(q)) score += 90;
+    if (a.includes(q)) score += 80;
+    return { s, score };
+  }).filter(x=>x.score>0)
+    .sort((x,y)=> y.score - x.score)
+    .slice(0, 12);
+
+  if (!scored.length){ addList.innerHTML = `<li>Nenalezeno.</li>`; return; }
+
+  addList.innerHTML = scored.map(({s})=>`
+    <li>
+      <span class="badge" style="width:34px;min-width:34px;height:34px;display:inline-flex;justify-content:center;align-items:center;border-radius:999px">${s.number??'–'}</span>
+      <b>${s.title}</b>
+      <span class="a">${s.author||''}</span>
+      <button class="btn" data-add="${s.id}">Přidat</button>
+    </li>`).join('');
+
+  addList.querySelectorAll('[data-add]').forEach(b=>{
+    b.onclick = ()=>{
+      const id = b.dataset.add;
+      if (!CUR_PL.ids.includes(id)) CUR_PL.ids.push(id);
+      persistCurrent();
+      renderPlaylistDetail();
+      b.textContent='✓ Přidáno';
+      setTimeout(closeAddDialog, 250);
+    };
+  });
 }
 
 /* ====== Start ====== */
