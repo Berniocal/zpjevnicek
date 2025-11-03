@@ -81,14 +81,7 @@
   }
   dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
   dialog::backdrop{ background:rgba(0,0,0,.4); }
-
-  /* QR canvas – necháváme, ale aktuálně nepoužíváme */
-  #qrCanvas{ display:block; width:320px; height:320px; image-rendering: pixelated; margin:12px auto; background:#fff; }
 </style>
-
-<!-- (Volitelné) QR knihovna – aktuálně nevyužitá -->
-<script defer src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-
 </head>
 <body>
 <div class="container">
@@ -129,8 +122,7 @@
     <div id="vPl" class="view">
       <div style="display:flex;align-items:center;gap:8px;margin:8px 0 10px">
         <button id="backToMain">← Zpět na seznam</button>
-        <!-- Ponecháno: Nahrát playlist (QR) – můžeš skrýt, když nechceš -->
-        <button id="btnImportPl">Nahrát playlist (QR/odkaz)</button>
+        <button id="btnImportPl">Importovat playlist (odkaz/JSON)</button>
         <span style="flex:1"></span>
         <button id="btnNewPl">+ Nový playlist</button>
       </div>
@@ -151,16 +143,6 @@
 
   <div class="footer">🎸 GitHub Pages · alphaTab</div>
 </div>
-
-<!-- Dialog „Sdílet“ – necháme kvůli budoucím možnostem -->
-<dialog id="dlgShare">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
-    <strong id="shareTitle">Sdílení</strong>
-    <button id="dlgShareClose">Zavřít</button>
-  </div>
-  <canvas id="qrCanvas" width="320" height="320" style="display:none"></canvas>
-  <p id="shareHelp" style="text-align:center;margin:8px 0 0"></p>
-</dialog>
 
 <!-- Dialog přidání písně do playlistu -->
 <dialog id="dlgAdd">
@@ -385,7 +367,7 @@ function renderAddResults(term){
   });
 }
 
-/* ------- Sdílení playlistu OD KAZEM ------- */
+/* ------- Sdílení playlistu přes ODKAZ ------- */
 async function sharePlaylistLink(id){
   const pl = playlists.find(p=>p.id===id); if(!pl) return;
   const payload = b64encodeUtf8(JSON.stringify(pl));
@@ -409,57 +391,30 @@ async function sharePlaylistLink(id){
   }
 }
 
-/* ------- Import playlistu (QR/odkaz) – rychlá volba ------- */
+/* ------- Import playlistu (odkaz/JSON) ------- */
 document.getElementById('btnImportPl').onclick = async ()=>{
-  // 1) pokud je v URL #import=..., zpracuj ihned (uživateli stačí vložit link a otevřít)
+  // 1) pokud je v URL #import=..., zpracuj ihned (uživateli stačí otevřít odkaz)
   if (tryImportFromHash()) return;
 
-  // 2) jinak zkus QR (BarcodeDetector), ale nabízíme i manuální vložení odkazu/JSONu:
-  if ('BarcodeDetector' in window) {
-    try{
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
-      const video = document.createElement('video');
-      video.playsInline = true; video.srcObject = stream; await video.play();
-      const det = new BarcodeDetector({ formats: ['qr_code']});
-      let active = true;
-      const scan = async ()=>{
-        if(!active) return;
-        const codes = await det.detect(video);
-        if(codes.length){
-          active=false; stream.getTracks().forEach(t=>t.stop());
-          try{
-            const raw = codes[0].rawValue;
-            if (raw.startsWith('http') && raw.includes('#import=')) {
-              location.href = raw; // necháme proběhnout tryImportFromHash
-              return;
-            }
-            const data = JSON.parse(raw);
-            if (!data.id) throw 0;
-            playlists = playlists.filter(p=>p.id!==data.id).concat([data]);
-            savePlaylists(); renderPlaylistList(); openPlaylist(data.id);
-          }catch(e){ alert('Neplatný QR obsah.'); }
-          return;
-        }
-        requestAnimationFrame(scan);
-      };
-      scan();
-      alert('Namíř kameru na QR/odkazový kód playlistu. Po načtení se okno samo zavře.');
-      return;
-    }catch(e){ /* spadne do manuálu */ }
-  }
-
-  // 3) manuál: vlož odkaz nebo JSON
+  // 2) manuál: vlož odkaz nebo JSON
   const raw = prompt('Vlož odkaz (#import=...) nebo JSON playlistu:');
   if(!raw) return;
+
+  // pokud je to odkaz, přesměruj a nech zpracovat tryImportFromHash
   if (raw.includes('#import=')) {
-    location.href = raw; // přesměruj a nech import z hashe
+    location.href = raw;
     return;
   }
+
+  // jinak zkus JSON
   try{
     const data = JSON.parse(raw);
+    if (!data || !data.id) throw 0;
     playlists = playlists.filter(p=>p.id!==data.id).concat([data]);
     savePlaylists(); renderPlaylistList(); openPlaylist(data.id);
-  }catch(_){ alert('Neplatný obsah.'); }
+  }catch(_){
+    alert('Neplatný obsah. Vlož funkční odkaz nebo JSON playlistu.');
+  }
 };
 
 /* ------- navigace mezi views ------- */
