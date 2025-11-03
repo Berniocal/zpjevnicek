@@ -87,49 +87,8 @@
 </style>
 
 <!-- QR knihovna – správně vložené atributy -->
-<script defer src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js?v=2"></script>
 
-<!-- malý inline QR engine (MIT, zkrácený) -->
-<script>
-(function(g){function T(t){this.mode=4,this.data=t}
-T.prototype={getLength:function(){return unescape(encodeURIComponent(this.data)).length},
-write:function(w){var s=unescape(encodeURIComponent(this.data));for(var i=0;i<s.length;i++)w.push(s.charCodeAt(i),8)}};
-function W(){this.buf=[],this.len=0} W.prototype={push:function(v,n){for(var i=n-1;i>=0;i--) this.buf.push((v>>>i)&1),this.len++}};
-function QR(){this.modules=null;this.moduleCount=0;this.dataList=[]}
-QR.prototype={
- addData:function(s){this.dataList.push(new T(s))},
- make:function(){
-  var N=29; this.moduleCount=N; this.modules=[];
-  for(var r=0;r<N;r++){this.modules[r]=[]; for(var c=0;c<N;c++) this.modules[r][c]=null}
-  var bb=new W();
-  for(var i=0;i<this.dataList.length;i++){ bb.push(4,4); var L=this.dataList[i].getLength(); bb.push(L,8); this.dataList[i].write(bb); }
-  bb.push(0,4); while(bb.len%8) bb.buf.push(0),bb.len++; while(bb.len<8*50) bb.buf.push(0),bb.len++;
-  function isF(r,c){ return (r<7&&c<7)||(r<7&&c>N-8)||(r>N-8&&c<7); }
-  var row=N-1,col=N-1,dir=-1,bi=0; var self=this;
-  while(col>0){
-    if(col===6) col--;
-    for(var k=0;k<N;k++){
-      var rr=row+dir*k; if(rr<0||rr>=N) continue;
-      for(var dc=0;dc<2;dc++){
-        var cc=col-dc;
-        if(self.modules[rr][cc]!==null||isF(rr,cc)) continue;
-        var bit = (bi<bb.buf.length)? bb.buf[bi++] : 0;
-        self.modules[rr][cc] = ((rr+cc)&1) ? bit : !bit;
-      }
-    }
-    row += dir*(N-1); dir = -dir; col -= 2;
-  }
- },
- drawCanvas:function(canvas, scale){
-  var n=this.moduleCount,s=scale||8; canvas.width=canvas.height=n*s;
-  var ctx=canvas.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  for(var r=0;r<n;r++)for(var c=0;c<n;c++){
-    ctx.fillStyle=this.modules[r][c]?'#000':'#fff'; ctx.fillRect(c*s,r*s,s,s);
-  }
- }};
- g._MiniQR={ makeToCanvas:(cv,txt)=>{var q=new QR(); q.addData(txt); q.make(); q.drawCanvas(cv,8);} };
-})(window);
-</script>
 </head>
 <body>
 <div class="container">
@@ -392,7 +351,17 @@ function renderAddResults(term){
 /* ------- Sdílení playlistu (QR) ------- */
 const dlgShare = document.getElementById('dlgShare');
 document.getElementById('dlgShareClose').onclick = ()=> dlgShare.close();
-function drawQR(canvas, text){ window._MiniQR.makeToCanvas(canvas, text); }
+async function drawQR(canvas, text){
+  // jistota bíle/černé, správná ECC a rozměr plátna
+  const size = Math.min(canvas.width || 320, 640);   // drž šířku plátna
+  canvas.width = canvas.height = size;
+  await QRCode.toCanvas(canvas, text, {
+    width: size,
+    margin: 1,
+    errorCorrectionLevel: 'M', // klidně 'Q', pokud chceš „tučnější“ kód
+    color: { dark: '#000000', light: '#ffffff' }
+  });
+}
 
 function sharePlaylist(id){
   const pl = playlists.find(p=>p.id===id); if(!pl) return;
