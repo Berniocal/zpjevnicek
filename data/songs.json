@@ -382,5 +382,13 @@
     "author": "Tomáš Klus",
     "file": "songs/048-dobre-rano-tomas-klus.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "049-mars-a-venuse-jelen",
+    "number": 49,
+    "title": "Mars a Venuše",
+    "author": "Jelen",
+    "file": "songs/049-mars-a-venuse-jelen.pro",
+    "type": "chordpro"
   }
 ]
