@@ -398,5 +398,13 @@
     "author": "Pavel Calta",
     "file": "songs/050-pisnicka-pavel-calta.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "051-hoja-hoj",
+    "number": 51,
+    "title": "Hoja hoj",
+    "author": "",
+    "file": "songs/051-hoja-hoj.pro",
+    "type": "chordpro"
   }
 ]
