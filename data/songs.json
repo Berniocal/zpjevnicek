@@ -374,5 +374,13 @@
     "author": "Sebastian",
     "file": "songs/047-az-na-to-prijde-sebastian.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "048-dobre-rano-tomas-klus",
+    "number": 48,
+    "title": "Dobré ráno",
+    "author": "Tomáš Klus",
+    "file": "songs/048-dobre-rano-tomas-klus.pro",
+    "type": "chordpro"
   }
 ]
