@@ -390,5 +390,13 @@
     "author": "Jelen",
     "file": "songs/049-mars-a-venuse-jelen.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "050-pisnicka-pavel-calta",
+    "number": 50,
+    "title": "Písnička",
+    "author": "Pavel Calta",
+    "file": "songs/050-pisnicka-pavel-calta.pro",
+    "type": "chordpro"
   }
 ]
