@@ -406,5 +406,13 @@
     "author": "",
     "file": "songs/051-hoja-hoj.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "052-slovensky-klin-chinaski",
+    "number": 52,
+    "title": "Slovenský klín",
+    "author": "Chinaski",
+    "file": "songs/052-slovensky-klin-chinaski.pro",
+    "type": "chordpro"
   }
 ]
