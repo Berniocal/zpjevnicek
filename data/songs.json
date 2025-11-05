@@ -430,5 +430,13 @@
     "author": "Lucie",
     "file": "songs/054-amerika-lucie.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "055-dlouhej-kour-chinaski",
+    "number": 55,
+    "title": "Dlouhej kouř",
+    "author": "Chinaski",
+    "file": "songs/055-dlouhej-kour-chinaski.pro",
+    "type": "chordpro"
   }
 ]
