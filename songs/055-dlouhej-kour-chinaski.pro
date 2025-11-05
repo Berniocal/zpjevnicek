@@ -1,6 +1,7 @@
 {title: Dlouhej kouř}
 {artist: Chinaski}
 
+[D] [F#m] [C] [G]
 [D]Když budeš hodná naučím tě [C]číst
 naučím tě [G]číst mezi [D]řádky
 pokušení [C]znáš tak zapo[G]meň cestu [D]zpátky
