@@ -446,5 +446,13 @@
     "author": "Chinaski",
     "file": "songs/056-kutil-chinaski.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "057-jelen-jelen",
+    "number": 57,
+    "title": "Jelen",
+    "author": "Jelen",
+    "file": "songs/057-jelen-jelen.pro",
+    "type": "chordpro"
   }
 ]
