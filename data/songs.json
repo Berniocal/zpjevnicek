@@ -494,5 +494,13 @@
     "author": "Filmová",
     "file": "songs/062-s-tebou-me-bavi-svet-filmova.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "063-cesta-mirai",
+    "number": 63,
+    "title": "Cesta",
+    "author": "Mirai",
+    "file": "songs/063-cesta-mirai.pro",
+    "type": "chordpro"
   }
 ]
