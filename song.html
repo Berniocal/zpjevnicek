@@ -43,11 +43,13 @@
     padding:12px 12px 8px; border-bottom:1px solid #192544; transition: transform .2s ease, opacity .2s ease; }
   body.chrome-hidden #chrome{ transform: translateY(-110%); opacity:0; height:0; padding:0; margin:0; border:0; overflow:hidden; }
 
-  #view{
-    height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
-    padding: var(--song-pad-top) 0 var(--song-pad-bottom) var(--song-pad-x);
-    scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
-  }
+#view{
+  height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
+  /* ⬇ změna tady: zvětšený bottom padding o safe-area + pár px navíc */
+  padding: var(--song-pad-top) 0 calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px) var(--song-pad-x);
+  scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
+}
+
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
   #view::-webkit-scrollbar-track{ background:transparent; }
   #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px; }
