@@ -414,6 +414,20 @@ if ('serviceWorker' in navigator) {
 })();
 
 load();
+  /* --- hardwarové tlačítko zpět (Android, PWA) --- */
+window.addEventListener('popstate', (e) => {
+  e.preventDefault();
+  const backLink = document.getElementById('backLink');
+  if (backLink) {
+    backLink.click();   // přesměruje přesně jako odkaz „← Zpět“
+  } else {
+    // pojistka – pokud z nějakého důvodu není odkaz, vrať se na seznam
+    location.href = plId
+      ? '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId)
+      : '/zpjevnicek/';
+  }
+});
+
 </script>
 </body>
 </html>
