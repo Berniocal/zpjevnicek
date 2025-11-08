@@ -502,5 +502,13 @@
     "author": "Mirai",
     "file": "songs/063-cesta-mirai.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "064-do-roka-a-do-dne-divokej-bill",
+    "number": 64,
+    "title": "Do roka a do dne",
+    "author": "Divokej Bill",
+    "file": "songs/064-do-roka-a-do-dne-divokej-bill.pro",
+    "type": "chordpro"
   }
 ]
