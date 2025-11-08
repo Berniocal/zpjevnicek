@@ -470,5 +470,13 @@
     "author": "Ready Kirken",
     "file": "songs/059-1-1-ready-kirken.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "060-lhuta-zarucni-slza",
+    "number": 60,
+    "title": "Lhůta záruční",
+    "author": "Slza",
+    "file": "songs/060-lhuta-zarucni-slza.pro",
+    "type": "chordpro"
   }
 ]
