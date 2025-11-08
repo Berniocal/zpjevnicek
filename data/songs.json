@@ -478,5 +478,13 @@
     "author": "Slza",
     "file": "songs/060-lhuta-zarucni-slza.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "061-zafukane-fleret",
+    "number": 61,
+    "title": "Zafúkané",
+    "author": "Fleret",
+    "file": "songs/061-zafukane-fleret.pro",
+    "type": "chordpro"
   }
 ]
