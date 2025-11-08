@@ -295,15 +295,19 @@ function goNextSong(){
   const next=(SONG_INDEX+1)%SONGS_LIST.length;
   const nxtId = SONGS_LIST[next];
   const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
-  location.href = `song.html?id=${encodeURIComponent(nxtId)}${extra}`;
+  // dříve: location.href = ...
+  location.replace(`song.html?id=${encodeURIComponent(nxtId)}${extra}`);
 }
+
 function goPrevSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const prev=(SONG_INDEX-1+SONGS_LIST.length)%SONGS_LIST.length;
   const prvId = SONGS_LIST[prev];
   const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
-  location.href = `song.html?id=${encodeURIComponent(prvId)}${extra}`;
+  // dříve: location.href = ...
+  location.replace(`song.html?id=${encodeURIComponent(prvId)}${extra}`);
 }
+
 
 /* --- velikost textu napříč PWA --- */
 const ZPJ_FONT_KEY='zpj-fontScale';
