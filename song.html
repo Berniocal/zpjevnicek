@@ -69,15 +69,24 @@
   }
   .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
   .container{ padding-right:0 !important; }
-  #view {
-  padding-left: 0 !important;
+/* Zmenšení okrajů textu písně */
+#view {
+  padding-top: 0 !important;     /* nahoře úplně bez mezery */
+  padding-left: 1 !important;    /* vlevo úplně bez mezery */
 }
-.cp .line {
-  margin-left: 0 !important;
-}
+
+/* jistota, že ani vnitřní kontejner nezvětšuje okraj */
 .container {
   padding-left: 0 !important;
+  padding-top: 0 !important;
 }
+
+/* případné zarovnání samotných řádků textu */
+.cp .line {
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+}
+
 
 </style>
 </head>
