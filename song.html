@@ -23,9 +23,12 @@
     --cp-line:1.25;
     --cp-pad:1.05em;
     --cp-pad-nochords:0.20em;
-    --song-pad-top: 2px;
-    --song-pad-bottom: 24px;
-    --song-pad-x: 2px;
+
+    /* >>> ZDE MĚŇ OKRAJE TEXTU PÍSNĚ <<< */
+    --song-pad-top: 0px;        /* horní vnitřní okraj */
+    --song-pad-bottom: 24px;    /* spodní vnitřní okraj (poslední řádky + safe-area) */
+    --song-pad-x: 0px;          /* levý (a případně pravý) vnitřní okraj */
+
     --scrollbarW: 3px;
   }
 
@@ -43,17 +46,17 @@
     padding:12px 12px 8px; border-bottom:1px solid #192544; transition: transform .2s ease, opacity .2s ease; }
   body.chrome-hidden #chrome{ transform: translateY(-110%); opacity:0; height:0; padding:0; margin:0; border:0; overflow:hidden; }
 
-#view{
-  height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
-  /* ⬇ změna tady: zvětšený bottom padding o safe-area + pár px navíc */
-  padding: var(--song-pad-top) 0 calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px) var(--song-pad-x);
-  scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
-}
-
+  #view{
+    height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
+    /* padding: TOP  RIGHT  BOTTOM(+safe-area)   LEFT */
+    padding: var(--song-pad-top) 0 calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px) var(--song-pad-x);
+    scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
+  }
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
   #view::-webkit-scrollbar-track{ background:transparent; }
   #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px; }
 
+  /* když je horní lišta viditelná, text se posune pod ni */
   body:not(.chrome-hidden) #view{ padding-top: var(--chromeH); }
   body.chrome-hidden #view{ padding-top: env(safe-area-inset-top, 0px); }
   body.chrome-hidden .sheet{ margin-top:0 !important; padding-top:0 !important; }
@@ -68,26 +71,9 @@
     display:flex; align-items:center; justify-content:center; z-index:10; opacity:.9; cursor:pointer;
   }
   .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
+
+  /* obal stránky bez zbytečného vnitřního odsazení */
   .container{ padding-right:0 !important; }
-/* Zmenšení okrajů textu písně */
-#view {
-  padding-top: 0 !important;     /* nahoře úplně bez mezery */
-  padding-left: 0 !important;    /* vlevo úplně bez mezery */
-}
-
-/* jistota, že ani vnitřní kontejner nezvětšuje okraj */
-.container {
-  padding-left: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* případné zarovnání samotných řádků textu */
-.cp .line {
-  margin-top: 5 !important;
-  margin-left: 5 !important;
-}
-
-
 </style>
 </head>
 <body>
@@ -295,19 +281,15 @@ function goNextSong(){
   const next=(SONG_INDEX+1)%SONGS_LIST.length;
   const nxtId = SONGS_LIST[next];
   const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
-  // dříve: location.href = ...
   location.replace(`song.html?id=${encodeURIComponent(nxtId)}${extra}`);
 }
-
 function goPrevSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const prev=(SONG_INDEX-1+SONGS_LIST.length)%SONGS_LIST.length;
   const prvId = SONGS_LIST[prev];
   const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
-  // dříve: location.href = ...
   location.replace(`song.html?id=${encodeURIComponent(prvId)}${extra}`);
 }
-
 
 /* --- velikost textu napříč PWA --- */
 const ZPJ_FONT_KEY='zpj-fontScale';
@@ -418,7 +400,8 @@ if ('serviceWorker' in navigator) {
 })();
 
 load();
-  /* --- hardwarové tlačítko zpět (Android, PWA) --- */
+
+/* --- hardwarové tlačítko zpět (Android, PWA) --- */
 window.addEventListener('popstate', (e) => {
   e.preventDefault();
   const backLink = document.getElementById('backLink');
@@ -431,7 +414,6 @@ window.addEventListener('popstate', (e) => {
       : '/zpjevnicek/';
   }
 });
-
 </script>
 </body>
 </html>
