@@ -61,20 +61,6 @@
   }
   dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
   dialog::backdrop{ background:rgba(0,0,0,.4); }
-
-  .select-wrap{ position: relative; display:inline-block; }
-.select-wrap select{ 
-  position: relative; z-index:2; 
-  color: transparent;               /* text selectu skryjeme */
-  text-shadow: 0 0 0 var(--ink);    /* kurzor a šipka zůstanou OK */
-}
-.select-wrap .select-label{
-  position:absolute; inset:0 auto 0 10px; 
-  display:flex; align-items:center;
-  pointer-events:none;              /* klik prochází na select */
-  color: var(--ink);
-  white-space:nowrap;
-}
 </style>
 </head>
 <body>
@@ -99,13 +85,9 @@
       </select>
 
       <!-- NOVÉ: výběr zpěvníku (nativní select) -->
-<span class="select-wrap">
-  <select id="book">
-    <!-- buildBookSelect() sem doplní položky; „Všechno“ bude mít value="__all__" -->
-  </select>
-  <span id="bookLabel" class="select-label">Zpěvníky</span>
-</span>
-
+      <select id="book">
+        <option value="">Všechno</option>
+      </select>
 
       <button id="btnPlaylists">Playlisty</button>
     </div>
@@ -234,70 +216,28 @@ async function load(){
     const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
     songs = await res.json();
   }catch(e){ songs = []; }
-await indexBooksIfNeeded(); // ← nejdřív do s => s.books
-buildBookSelect();          // teď už máme seznam zpěvníků
-updateBookLabel();
-renderMain();
-loadPlaylists();
-renderPlaylistList();
+  renderMain();
+  loadPlaylists();
+  renderPlaylistList();
+  buildBookSelect();          // naplň select se zpěvníky
 
   // obsluha změny výběru zpěvníků
-if (bookSel){
-  const stored = localStorage.getItem(BOOK_KEY) || '__all__';
-  if ([...bookSel.options].some(o => o.value === stored)) {
-    bookSel.value = stored;
-  } else {
-    bookSel.value = '__all__';
+  if (bookSel){
+    const stored = localStorage.getItem(BOOK_KEY);
+    if (stored && Array.from(bookSel.options).some(o=>o.value===stored)){
+      bookSel.value = stored;
+    }
+    bookSel.addEventListener('change', ()=>{
+      localStorage.setItem(BOOK_KEY, bookSel.value);
+      renderMain();
+    });
   }
-  updateBookLabel(); // po dosazení uložené hodnoty přepiš štítek
-
-  bookSel.addEventListener('change', ()=>{
-    const v = bookSel.value || '__all__';
-    localStorage.setItem(BOOK_KEY, v);
-    renderMain();
-    // po přerenderování znovu uprav štítek (a vrať placeholder, pokud je __all__)
-    updateBookLabel();
-  });
-}
-
 
   // 1) import přes odkaz
   if (tryImportFromHash()) return;
 
   // 2) vyhodnoť hash (hlavní / playlists / pl:<id>)
   handleHash();
-}
-const BOOKS_CACHE_KEY = 'zpj_books_cache_v1';
-
-function parseBooksFromText(txt){
-  const map = {};
-  const re = /^\{book:\s*([^=]+?)\s*=\s*([0-9]+)\s*\}\s*$/gmi;
-  let m;
-  while ((m = re.exec(txt)) !== null) {
-    const name = m[1].trim();
-    const num  = parseInt(m[2], 10);
-    if (name && !isNaN(num)) map[name] = num;
-  }
-  return map;
-}
-
-async function indexBooksIfNeeded(){
-  let cache = {};
-  try { cache = JSON.parse(localStorage.getItem(BOOKS_CACHE_KEY) || '{}'); } catch(_) {}
-
-  // co není v cache a má cestu k souboru – načti
-  for (const s of songs) {
-    if (!s || !s.file || cache[s.id]) continue;
-    try{
-      const txt = await fetch(s.file, { cache: 'no-store' }).then(r=>r.text());
-      const books = parseBooksFromText(txt);
-      if (Object.keys(books).length) cache[s.id] = books;
-    }catch(_){}
-  }
-
-  // propsat do songs a uložit
-  songs.forEach(s => { if (cache[s.id]) s.books = cache[s.id]; });
-  localStorage.setItem(BOOKS_CACHE_KEY, JSON.stringify(cache));
 }
 
 /* ------- naplnění selectu „Zpěvníky“ ------- */
@@ -309,41 +249,21 @@ function buildBookSelect(){
       Object.keys(s.books).forEach(name => set.add(name));
     }
   });
-
-  const prev = localStorage.getItem(BOOK_KEY) || '__all__'; // default = všechno
-
+  const prev = localStorage.getItem(BOOK_KEY) || '';
   const options = [
-    `<option value="" disabled hidden ${prev==='__all__' ? 'selected' : ''}>Zpěvníky</option>`, // placeholder pro ZAVŘENÝ stav
-    `<option value="__all__"${prev==='__all__' ? ' selected' : ''}>Všechno</option>`,
+    `<option value="">Všechno</option>`,
     ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
-      `<option value="${escapeHtml(name)}"${prev===name ? ' selected' : ''}>${escapeHtml(name)}</option>`
+      `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
     )
   ];
   bookSel.innerHTML = options.join('');
 }
-function updateBookLabel(){
-  const lab = document.getElementById('bookLabel');
-  if (!bookSel || !lab) return;
-  const v = bookSel.value || '__all__';
-  if (v === '__all__') {
-    lab.textContent = 'Zpěvníky';   // zavřený stav = „Zpěvníky“
-    // zajistíme, že v zavřeném stavu je vizuálně placeholder, ale v rozevřeném listu je zaškrtnuto „Všechno“
-    bookSel.selectedIndex = 0;      // 0 = náš hidden placeholder
-  } else {
-    // napiš název vybrané položky
-    const opt = bookSel.options[bookSel.selectedIndex];
-    lab.textContent = opt ? opt.textContent : v;
-  }
-}
-
 
 /* ------- hlavní seznam ------- */
 function renderMain(){
   const term = q.value.trim().toLowerCase();
   const srt  = sort.value;
- let selectedBook = bookSel ? bookSel.value : '';
-if (selectedBook === '__all__') selectedBook = ''; // „Všechno“ znamená žádný filtr
-
+  const selectedBook = bookSel ? bookSel.value : '';
 
   let data = songs.filter(s =>
     s.title.toLowerCase().includes(term) ||
