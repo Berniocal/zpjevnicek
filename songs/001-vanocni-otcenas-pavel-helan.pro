@@ -1,9 +1,7 @@
 {title: Vánoční Otčenáš}
 {artist: Pavel Helan}
 {key: D}
-
-{book: Zpěvníček 2 = 14}
-{book: Já písnička 5 = 203}
+{book: Zpjěvníček 1 = 1}
 
 [G]Tvůj syn se narodil ve frontě u kasy
 [C]koupil si štěrchátko a lak na řasy
