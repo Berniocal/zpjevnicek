@@ -180,6 +180,7 @@
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const plId = params.get('pl') || '';
+const book = params.get('book') || '';
 
 let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
@@ -398,14 +399,17 @@ function goNextSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const next=(SONG_INDEX+1)%SONGS_LIST.length;
   const nxtId = SONGS_LIST[next];
-  const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
+ const extra = (plId ? `&pl=${encodeURIComponent(plId)}` : '') +
+              (book ? `&book=${encodeURIComponent(book)}` : '');
   location.replace(`song.html?id=${encodeURIComponent(nxtId)}${extra}`);
 }
 function goPrevSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const prev=(SONG_INDEX-1+SONGS_LIST.length)%SONGS_LIST.length;
   const prvId = SONGS_LIST[prev];
-  const extra = plId ? `&pl=${encodeURIComponent(plId)}` : '';
+ const extra = (plId ? `&pl=${encodeURIComponent(plId)}` : '') +
+              (book ? `&book=${encodeURIComponent(book)}` : '');
+
   location.replace(`song.html?id=${encodeURIComponent(prvId)}${extra}`);
 }
 
@@ -414,33 +418,56 @@ const ZPJ_FONT_KEY='zpj-fontScale';
 function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
 function setScale(s){ const c=Math.min(3,Math.max(0.5,s)); document.documentElement.style.setProperty('--song-scale', String(c)); localStorage.setItem(ZPJ_FONT_KEY, String(c)); relayoutChords(); }
 
-/* --- načtení + render --- */
 async function load(){
-  const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json()).catch(()=>[]);
+  // 1) Načti seznam písní
+  const data = await fetch('/zpjevnicek/data/songs.json', { cache:'no-store' })
+                      .then(r=>r.json()).catch(()=>[]);
+
+  // 2) Sestav pořadí pro swipe:
+  //    - když je plId => pořadí z playlistu
+  //    - jinak když je book => jen písně ze zvoleného zpěvníku, seřazené podle čísla ve zpěvníku
+  //    - jinak všechny písně v pořadí z JSONu
   if (plId){
     const pls = JSON.parse(localStorage.getItem('zpj_playlists')||'[]');
     const pl = pls.find(p=>p.id===plId);
-    SONGS_LIST = (pl && Array.isArray(pl.items) && pl.items.length)? pl.items.slice() : data.map(s=>s.id);
+    SONGS_LIST = (pl && Array.isArray(pl.items) && pl.items.length)
+      ? pl.items.slice()
+      : data.map(s=>s.id);
+  } else if (book){
+    const filtered = data
+      .filter(s => s.books && Object.prototype.hasOwnProperty.call(s.books, book))
+      .sort((a,b) => (a.books?.[book] ?? 1e9) - (b.books?.[book] ?? 1e9));
+    SONGS_LIST = filtered.map(s=>s.id);
+    // pro návrat na index nech vybraný zpěvník i tam
+    localStorage.setItem('zpj_book', book);
   } else {
     SONGS_LIST = data.map(s=>s.id);
   }
   SONG_INDEX = SONGS_LIST.indexOf(id);
 
+  // 3) Najdi právě otevřenou píseň
   song = data.find(s=>s.id===id);
-  if(!song){ document.getElementById('title').textContent='Píseň nenalezena'; return; }
+  if(!song){
+    document.getElementById('title').textContent='Píseň nenalezena';
+    return;
+  }
   document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
   document.getElementById('meta').textContent = song.author || '';
 
-  // back link
+  // 4) Zpět odkaz (playlist / zpěvník / hlavní seznam)
   const backLink = document.getElementById('backLink');
   if (plId){
     backLink.textContent = '← Zpět na playlist';
     backLink.onclick = (e)=>{ e.preventDefault(); location.href = '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId); };
-  }else{
+  } else if (book){
+    backLink.textContent = '← Zpět na zpěvník';
+    backLink.onclick = (e)=>{ e.preventDefault(); location.href = '/zpjevnicek/'; };
+  } else {
     backLink.textContent = '← Zpět na seznam';
     backLink.onclick = (e)=>{ e.preventDefault(); if (document.referrer.includes('/zpjevnicek/')) history.back(); else location.href='/zpjevnicek/'; };
   }
 
+  // 5) Render: ChordPro vs. AlphaTab
   if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
     document.getElementById('controls-cp').style.display='flex';
     const text = await fetch(song.file).then(r=>r.text());
@@ -475,15 +502,19 @@ async function load(){
     at.renderFinished.on(()=> updateChromeHeight());
   }
 
-  // autoposuv – toggle
+  // 6) Auto-scroll: tlačítko + ikony
   const tgl = document.getElementById('toggleAutoBtn');
-  if (tgl) tgl.onclick = ()=>{ const v = !(localStorage.getItem('autoBtnVisible') === '0'); localStorage.setItem('autoBtnVisible', v ? '0' : '1'); updateAutoBtnVisibility(); };
+  if (tgl) tgl.onclick = ()=>{
+    const v = !(localStorage.getItem('autoBtnVisible') === '0');
+    localStorage.setItem('autoBtnVisible', v ? '0' : '1');
+    updateAutoBtnVisibility();
+  };
   const autoBtn=document.getElementById('autoScroll');
   if (autoBtn) autoBtn.onclick=()=>{ if (autoRunning || _autoDelayTO) stopAutoScroll(); else startAutoScroll(); };
   updateAutoBtnVisibility();
   setAutoIcon('idle');
 
-  // nastavení panel – naplň aktuálními hodnotami
+  // 7) Panel nastavení – předvyplň + ulož/reset
   const btnSettings = document.getElementById('btnSettings');
   const panel = document.getElementById('settingsPanel');
   const speedInput = document.getElementById('speedInput');
@@ -499,7 +530,6 @@ async function load(){
     btnSettings.addEventListener('click', ()=>{
       panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
     });
-    // klik mimo panel → zavřít
     document.addEventListener('click', (e)=>{
       if (!panel.contains(e.target) && e.target !== btnSettings){
         panel.style.display = 'none';
@@ -507,20 +537,18 @@ async function load(){
     });
   }
 
-  // ULOŽIT – zapiš vše, použij a zavři panel
   document.getElementById('settingsSave')?.addEventListener('click', ()=>{
-    // rychlost
     const sp = Math.max(5, Math.min(300, Number(speedInput.value)||10));
     AUTO_SPEED = sp; localStorage.setItem(AUTO_SPEED_KEY, String(sp));
-    // zpoždění
+
     const dl = Math.max(0, Math.min(30, Number(delayInput.value)||10));
     AUTO_DELAY = dl; localStorage.setItem(AUTO_DELAY_KEY, String(dl));
-    // barva akordů
+
     const col = chordColorInput.value || '#22c55e';
     CHORD_COLOR = col;
     document.documentElement.style.setProperty('--chordColor', col);
     localStorage.setItem(CHORD_COLOR_KEY, col);
-    // měřítko akordů
+
     let scl = parseFloat(chordScaleInput.value);
     if (isNaN(scl)) scl = 1.05;
     scl = Math.max(0.5, Math.min(2.5, scl));
@@ -531,38 +559,38 @@ async function load(){
     relayoutChords();
     panel.style.display = 'none';
   });
-// Reset na výchozí nastavení (ponechá panel otevřený)
-document.getElementById('settingsReset')?.addEventListener('click', () => {
-  // 1) Zapiš výchozí hodnoty do inputů
-  if (speedInput)       speedInput.value       = String(DEF_AUTO_SPEED);
-  if (delayInput)       delayInput.value       = String(DEF_AUTO_DELAY);
-  if (chordColorInput)  chordColorInput.value  = DEF_CHORD_COLOR;
-  if (chordScaleInput)  chordScaleInput.value  = String(DEF_CHORD_SCALE);
 
-  // 2) Aplikuj a ulož (stejně jako „Uložit“, jen panel nezavíráme)
-  AUTO_SPEED = DEF_AUTO_SPEED;
-  localStorage.setItem(AUTO_SPEED_KEY, String(DEF_AUTO_SPEED));
+  document.getElementById('settingsReset')?.addEventListener('click', () => {
+    if (speedInput)       speedInput.value       = String(DEF_AUTO_SPEED);
+    if (delayInput)       delayInput.value       = String(DEF_AUTO_DELAY);
+    if (chordColorInput)  chordColorInput.value  = DEF_CHORD_COLOR;
+    if (chordScaleInput)  chordScaleInput.value  = String(DEF_CHORD_SCALE);
 
-  AUTO_DELAY = DEF_AUTO_DELAY;
-  localStorage.setItem(AUTO_DELAY_KEY, String(DEF_AUTO_DELAY));
+    AUTO_SPEED = DEF_AUTO_SPEED;
+    localStorage.setItem(AUTO_SPEED_KEY, String(DEF_AUTO_SPEED));
 
-  CHORD_COLOR = DEF_CHORD_COLOR;
-  document.documentElement.style.setProperty('--chordColor', DEF_CHORD_COLOR);
-  localStorage.setItem(CHORD_COLOR_KEY, DEF_CHORD_COLOR);
+    AUTO_DELAY = DEF_AUTO_DELAY;
+    localStorage.setItem(AUTO_DELAY_KEY, String(DEF_AUTO_DELAY));
 
-  CHORD_SCALE = DEF_CHORD_SCALE;
-  document.documentElement.style.setProperty('--chordScale', String(DEF_CHORD_SCALE));
-  localStorage.setItem(CHORD_SCALE_KEY, String(DEF_CHORD_SCALE));
+    CHORD_COLOR = DEF_CHORD_COLOR;
+    document.documentElement.style.setProperty('--chordColor', DEF_CHORD_COLOR);
+    localStorage.setItem(CHORD_COLOR_KEY, DEF_CHORD_COLOR);
 
-  relayoutChords();
-  panel.style.display = 'none';
+    CHORD_SCALE = DEF_CHORD_SCALE;
+    document.documentElement.style.setProperty('--chordScale', String(DEF_CHORD_SCALE));
+    localStorage.setItem(CHORD_SCALE_KEY, String(DEF_CHORD_SCALE));
 
-});
+    relayoutChords();
+    panel.style.display = 'none';
+  });
 
+  // 8) Ostatní drátování
   wireDoubleToggle();
   wireSwipeNavigation();
   updateChromeHeight();
 }
+
+
 function applyChordVisibility(){
   const cp=document.querySelector('#view .cp'); if(!cp) return;
   if (HIDE_CHORDS) cp.classList.add('nochords'); else cp.classList.remove('nochords');
