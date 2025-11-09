@@ -90,7 +90,6 @@
     details.accordion[open] > summary::before{ transform: rotate(90deg); }
     details.accordion .accordion-body{ padding: 0 14px 14px; }
     details.accordion .accordion-body > .card{ margin-top:12px; }
-    /* první card hned po summary bez extra mezery */
     details.accordion .accordion-body > .card:first-child{ margin-top:0; }
   </style>
 </head>
@@ -103,7 +102,7 @@
       <summary>Vložit novou píseň</summary>
       <div class="accordion-body">
 
-               <div class="card">
+        <div class="card">
           <div class="grid two">
             <label>Token (PAT)
               <input id="token" placeholder="ghp_… nebo github_pat_…" />
@@ -138,10 +137,15 @@
               </select>
             </label>
 
-            <div class="limitCtl">
-              <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
-              <input id="limitVal" type="number" min="10" max="200" step="1" />
-              <button id="applyLimit" title="Nastavit hranici znaků">Nastavit limit</button>
+            <!-- NOVÉ: Zpěvníky (create) -->
+            <div class="full">
+              <label>Zpěvníky (název + číslo)
+                <div id="booksWrap" class="grid" style="gap:6px"></div>
+              </label>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                <button id="addBookRow" type="button">+ Přidat řádek</button>
+              </div>
+              <datalist id="booksNames"></datalist>
             </div>
           </div>
 
@@ -165,7 +169,7 @@
           <div id="status" class="note" style="margin-top:8px"></div>
         </div>
 
-          </div>
+      </div>
     </details>
 
     <!-- ========== SEKCE 2: UPRAVIT / SMAZAT PÍSEŇ (COLLAPSIBLE) ========== -->
@@ -203,6 +207,17 @@
             <label>Tonina (meta)
               <input id="eKey" placeholder="Am" />
             </label>
+
+            <!-- NOVÉ: Zpěvníky (edit) -->
+            <div class="full">
+              <label>Zpěvníky (název + číslo)
+                <div id="eBooksWrap" class="grid" style="gap:6px"></div>
+              </label>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                <button id="eAddBookRow" type="button">+ Přidat řádek</button>
+              </div>
+              <datalist id="eBooksNames"></datalist>
+            </div>
           </div>
 
           <label class="full">Text (ChordPro)
@@ -248,6 +263,15 @@
   const limitInput = document.getElementById('limitVal');
   const applyLimitBtn = document.getElementById('applyLimit');
 
+  // NOVÉ: háčky pro Zpěvníky (UI)
+  const booksWrap = document.getElementById('booksWrap');
+  const addBookRowBtn = document.getElementById('addBookRow');
+  const booksNamesDL = document.getElementById('booksNames');
+
+  const eBooksWrap = document.getElementById('eBooksWrap');
+  const eAddBookRowBtn = document.getElementById('eAddBookRow');
+  const eBooksNamesDL = document.getElementById('eBooksNames');
+
   // ⬇ limit znaků – načte se z localStorage, jinak 30
   let rowLimit = Number(localStorage.getItem('row_limit') || '30');
   limitInput.value = rowLimit;
@@ -286,6 +310,59 @@
     const user = host.includes('github.io') ? host.split('.')[0] : '';
     return {user, repo};
   }
+
+  // === NOVÉ: Helpery pro "Zpěvníky (books)" ===
+  function makeBookRow(container, datalistId, name = '', num = '') {
+    const row = document.createElement('div');
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '1fr 120px 36px';
+    row.style.gap = '6px';
+    row.innerHTML = `
+      <input class="bk-name" list="${datalistId}" placeholder="např. Zpěvníček 2" />
+      <input class="bk-num" type="number" min="1" step="1" placeholder="číslo" />
+      <button type="button" class="ghost bk-del" title="Smazat řádek">✕</button>
+    `;
+    container.appendChild(row);
+
+    const nameEl = row.querySelector('.bk-name');
+    const numEl  = row.querySelector('.bk-num');
+    nameEl.value = name || '';
+    numEl.value  = (num !== undefined && num !== null && num !== '') ? String(num) : '';
+
+    row.querySelector('.bk-del').onclick = () => row.remove();
+  }
+
+  function readBooks(container) {
+    const obj = {};
+    if (!container) return obj;
+    container.querySelectorAll('.bk-name').forEach((nameEl, i) => {
+      const n = (nameEl.value || '').trim();
+      const numEl = container.querySelectorAll('.bk-num')[i];
+      const v = (numEl?.value || '').trim();
+      if (n && v && !isNaN(+v)) obj[n] = +v;
+    });
+    return obj;
+  }
+
+  function fillBooks(container, datalistEl, allNames = [], dataObj = {}) {
+    datalistEl.innerHTML = '';
+    [...new Set(allNames)].sort().forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      datalistEl.appendChild(opt);
+    });
+
+    container.innerHTML = '';
+    const entries = Object.entries(dataObj);
+    if (entries.length) {
+      entries.forEach(([name, num]) => makeBookRow(container, datalistEl.id, name, num));
+    } else {
+      makeBookRow(container, datalistEl.id);
+    }
+  }
+
+  if (addBookRowBtn) addBookRowBtn.onclick = () => makeBookRow(booksWrap, 'booksNames');
+  if (eAddBookRowBtn) eAddBookRowBtn.onclick = () => makeBookRow(eBooksWrap, 'eBooksNames');
 
   /* ---------- zvýraznění dlouhých řádků ---------- */
   function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&gt;','>':'&gt;'}[m])); }
@@ -335,9 +412,7 @@
   }
 
   bodyEl.addEventListener('scroll', ()=>{
-    // posuň vnitřek s čárami; vnější .marks je ořezová maska
     marksContentEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
-    // mirror držíme ve stejném scrollu kvůli offsetům
     mirrorEl.scrollTop = bodyEl.scrollTop;
     mirrorEl.scrollLeft = bodyEl.scrollLeft;
   });
@@ -433,61 +508,77 @@
     for (const r of out){ const empty=!r.trim(); if (empty && prevEmpty) continue; compact.push(r); prevEmpty=empty; }
     return compact.join('\n');
   }
-  // Uložit novou píseň do GitHubu
-  qs('#saveBtn').onclick = async () => {
-    try {
-      const { user, repo } = detectRepo();
-      if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
 
-      const token = (qs('#token').value || '').trim();
-      if (!token) return status('Vlož prosím PAT token.', false);
-      if (!titleEl.value.trim()) return status('Doplň název písně.', false);
+  // === NOVÉ: update data/songs.json přes GitHub API
+  async function patchSongsJson({ token, id, filePath, title, author, number, books }) {
+    const { user, repo } = detectRepo();
+    if (!user || !repo) throw new Error('Nelze odvodit user/repo.');
 
-      let body = bodyEl.value.replace(/\r/g, '');
-      const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
-      const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
-      if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
-      body = body.replace(/\r/g, '');
-
-      const lines = [];
-      lines.push(`{title: ${titleEl.value.trim()}}`);
-      if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
-      if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
-      lines.push('');
-      lines.push(body);
-      const content = lines.join('\n');
-
-      const filename = filenameEl.value || 'pisen.pro';
-      const path = `songs/${filename}`;
-
-      status('Ukládám…');
-      const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({
-          message: `feat(song): add ${titleEl.value.trim()}`,
-          content: b64utf8(content),
-          branch: 'main'
-        })
-      });
-      if (!res.ok) { const t = await res.text(); throw new Error(`GitHub API ${res.status}: ${t}`); }
-      status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
-    } catch (e) {
-      console.error(e);
-      status('Chyba: ' + e.message);
+    const metaRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent('data/songs.json')}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!metaRes.ok) {
+      const t = await metaRes.text();
+      throw new Error(`Načtení songs.json selhalo: ${metaRes.status}: ${t}`);
     }
-  };
+    const metaJson = await metaRes.json();
+    const sha = metaJson.sha;
+
+    const contentJson = JSON.parse(atob(metaJson.content.replace(/\n/g, '')));
+
+    let changed = false;
+    const wantId = id;
+    const wantFile = filePath;
+    const entry = contentJson.find(x => x.id === wantId) || contentJson.find(x => x.file === wantFile);
+
+    if (entry) {
+      if (title !== undefined)  { entry.title = title; changed = true; }
+      if (author !== undefined) { entry.author = author; changed = true; }
+      if (number !== undefined && number !== '') { entry.number = Number(number); changed = true; }
+      if (books && Object.keys(books).length) { entry.books = books; changed = true; }
+      if (!entry.file && wantFile) { entry.file = wantFile; changed = true; }
+      if (!entry.id && wantId) { entry.id = wantId; changed = true; }
+      if (!entry.type) { entry.type = 'chordpro'; changed = true; }
+    } else {
+      contentJson.push({
+        id: wantId,
+        number: (number !== '' && number !== undefined) ? Number(number) : undefined,
+        title: title || '',
+        author: author || '',
+        file: wantFile,
+        type: 'chordpro',
+        ...(books && Object.keys(books).length ? { books } : {})
+      });
+      changed = true;
+    }
+
+    if (!changed) return;
+
+    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(contentJson, null, 2))));
+    const putRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent('data/songs.json')}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({
+        message: `chore(index): update songs.json for ${title || wantId}`,
+        content: newContent,
+        branch: 'main',
+        sha
+      })
+    });
+    if (!putRes.ok) {
+      const t = await putRes.text();
+      throw new Error(`Uložení songs.json selhalo: ${putRes.status}: ${t}`);
+    }
+  }
 
   /* ====================== ÚPRAVY / DELETE – LOGIKA ====================== */
 
-  // Malé helpery pro lokální status v sekci Edit
   const editStatusEl = document.getElementById('editStatus');
   function estatus(msg, ok=false){
     editStatusEl.textContent = msg;
     editStatusEl.className = 'note' + (ok ? ' ok' : '');
   }
 
-  // Elements
   const editSearchEl = document.getElementById('editSearch');
   const editResultsEl = document.getElementById('editResults');
   const eTitleEl  = document.getElementById('eTitle');
@@ -500,13 +591,12 @@
   const deleteEditBtn= document.getElementById('deleteEditBtn');
   const reloadIndexBtn = document.getElementById('reloadIndex');
 
-  // Mirror-based marks pro EDIT
   const editMarksEl  = document.getElementById('editMarks');
   const editMarksContentEl = document.getElementById('editMarksContent');
   const editMirrorEl = document.getElementById('editMirror');
 
-  let SONG_INDEX_DATA = [];  // obsah data/songs.json
-  let EDIT_SELECTED = null;  // vybraný záznam
+  let SONG_INDEX_DATA = [];
+  let EDIT_SELECTED = null;
   let editMarksEnabled = true;
   let rowLimitEdit = Number(localStorage.getItem('row_limit') || '30');
 
@@ -516,6 +606,14 @@
       if(!res.ok) throw new Error('Nelze načíst data/songs.json');
       SONG_INDEX_DATA = await res.json();
       estatus('Seznam písní načten.', true);
+
+      // NOVÉ: předvyplň datalisty názvy zpěvníků + prázdný řádek
+      const allBookNames = [];
+      SONG_INDEX_DATA.forEach(s => {
+        if (s && s.books) allBookNames.push(...Object.keys(s.books));
+      });
+      fillBooks(booksWrap, booksNamesDL, allBookNames, {});
+      fillBooks(eBooksWrap, eBooksNamesDL, allBookNames, {});
     }catch(e){
       console.error(e);
       estatus('Chyba při načítání seznamu písní: ' + e.message);
@@ -595,18 +693,32 @@
 
       rebuildEditMarks();
       estatus('Soubor načten.', true);
+
+      // NOVÉ: doplň "books" do edit formuláře
+      const allBookNames = [];
+      SONG_INDEX_DATA.forEach(s => {
+        if (s && s.books) allBookNames.push(...Object.keys(s.books));
+      });
+      fillBooks(eBooksWrap, eBooksNamesDL, allBookNames, item.books || {});
     }catch(e){
       console.error(e);
       estatus('Chyba: ' + e.message);
     }
   }
 
+  // NOVĚ upraveno: buildChordProFromEditor přidává {book: …}
   function buildChordProFromEditor(){
     const lines = [];
     if (eTitleEl.value.trim())  lines.push(`{title: ${eTitleEl.value.trim()}}`);
     if (eArtistEl.value.trim()) lines.push(`{artist: ${eArtistEl.value.trim()}}`);
     if (eKeyEl.value.trim())    lines.push(`{key: ${eKeyEl.value.trim()}}`);
     lines.push('');
+
+    const eBooksObj = readBooks(eBooksWrap);
+    for (const [bk, num] of Object.entries(eBooksObj)) {
+      lines.push(`{book: ${bk} = ${num}}`);
+    }
+
     let body = editBodyEl.value.replace(/\r/g,'');
     lines.push(body);
     return lines.join('\n');
@@ -651,6 +763,20 @@
         const t = await putRes.text();
         throw new Error(`GitHub API (save) ${putRes.status}: ${t}`);
       }
+
+      // NOVÉ: po uložení aktualizuj songs.json
+      const eBooksObj = readBooks(eBooksWrap);
+      const editedId = (editPathEl.value || '').split('/').pop().replace(/\.pro$/i,'');
+      await patchSongsJson({
+        token,
+        id: editedId,
+        filePath: editPathEl.value,
+        title: eTitleEl.value.trim(),
+        author: eArtistEl.value.trim(),
+        number: eNumberEl.value,
+        books: eBooksObj
+      });
+
       estatus('Hotovo! Změny uloženy.', true);
     }catch(e){
       console.error(e);
@@ -766,7 +892,6 @@
   ['input','change','keyup'].forEach(ev => editBodyEl.addEventListener(ev, rebuildEditMarks));
   window.addEventListener('resize', rebuildEditMarks);
 
-  // Dráty UI
   let _searchTO=null;
   editSearchEl.addEventListener('input', ()=>{
     clearTimeout(_searchTO);
@@ -787,6 +912,71 @@
 
   // inicializačně načti index
   loadSongsIndex();
+
+  // Uložit novou píseň do GitHubu
+  qs('#saveBtn').onclick = async () => {
+    try {
+      const { user, repo } = detectRepo();
+      if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
+
+      const token = (qs('#token').value || '').trim();
+      if (!token) return status('Vlož prosím PAT token.', false);
+      if (!titleEl.value.trim()) return status('Doplň název písně.', false);
+
+      let body = bodyEl.value.replace(/\r/g, '');
+      const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
+      const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
+      if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
+      body = body.replace(/\r/g, '');
+
+      const lines = [];
+      lines.push(`{title: ${titleEl.value.trim()}}`);
+      if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
+      if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
+      lines.push('');
+
+      // NOVÉ: přečti a zapiš zpěvníky do .pro
+      const booksObj = readBooks(booksWrap);
+      for (const [bk, num] of Object.entries(booksObj)) {
+        lines.push(`{book: ${bk} = ${num}}`);
+      }
+
+      lines.push(body);
+      const content = lines.join('\n');
+
+      const filename = filenameEl.value || 'pisen.pro';
+      const path = `songs/${filename}`;
+
+      status('Ukládám…');
+      const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
+        body: JSON.stringify({
+          message: `feat(song): add ${titleEl.value.trim()}`,
+          content: b64utf8(content),
+          branch: 'main'
+        })
+      });
+      if (!res.ok) { const t = await res.text(); throw new Error(`GitHub API ${res.status}: ${t}`); }
+
+      // NOVÉ: aktualizuj data/songs.json
+      const filenameNoExt = filename.replace(/\.pro$/i, '');
+      await patchSongsJson({
+        token,
+        id: filenameNoExt,
+        filePath: path,
+        title: titleEl.value.trim(),
+        author: artistEl.value.trim(),
+        number: numberEl.value,
+        books: booksObj
+      });
+
+      status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
+    } catch (e) {
+      console.error(e);
+      status('Chyba: ' + e.message);
+    }
+  };
   </script>
 
   <script>
