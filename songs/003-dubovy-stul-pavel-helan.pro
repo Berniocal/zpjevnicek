@@ -1,5 +1,6 @@
 {title: Dubový stůl}
 {artist: Pavel Helan}
+{book: Zpjěvníček 1 = 3}
 
 Jako [Hmi]dubový stůl 
 nechci, [Hmi/A]aby ses hnul.
