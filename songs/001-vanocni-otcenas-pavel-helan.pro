@@ -2,6 +2,9 @@
 {artist: Pavel Helan}
 {key: D}
 
+{book: Zpěvníček 2 = 14}
+{book: Já písnička 5 = 203}
+
 [G]Tvůj syn se narodil ve frontě u kasy
 [C]koupil si štěrchátko a lak na řasy
 [G]oslikovi seno a volovi [C]zvonec
