@@ -82,12 +82,15 @@
     }
   },
   {
-    "id": "009-kazdy-rano-chinaski",
+    "id": "songs/009-kazdy-rano-chinaski.pro",
     "number": 9,
     "title": "Každý ráno",
     "author": "Chinaski",
     "file": "songs/009-kazdy-rano-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 9
+    }
   },
   {
     "id": "010-cudzinka-v-tvojej-zemi-xindlx",
