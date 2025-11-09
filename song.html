@@ -27,7 +27,8 @@
     /* >>> ZDE MĚŇ OKRAJE TEXTU PÍSNĚ <<< */
     --song-pad-top: 15px;        /* horní vnitřní okraj */
     --song-pad-bottom: 24px;    /* spodní vnitřní okraj (poslední řádky + safe-area) */
-    --song-pad-x: 6px;          /* levý (a případně pravý) vnitřní okraj */
+    --song-pad-x: 6px;  /* levý (a případně pravý) vnitřní okraj */
+    --song-pad-right: 6px;    /* PRAVÝ okraj textu písně */
 
     --scrollbarW: 3px;
   }
@@ -46,12 +47,15 @@
     padding:12px 12px 8px; border-bottom:1px solid #192544; transition: transform .2s ease, opacity .2s ease; }
   body.chrome-hidden #chrome{ transform: translateY(-110%); opacity:0; height:0; padding:0; margin:0; border:0; overflow:hidden; }
 
-  #view{
-    height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
-    /* padding: TOP  RIGHT  BOTTOM(+safe-area)   LEFT */
-    padding: var(--song-pad-top) 0 calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px) var(--song-pad-x);
-    scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
-  }
+ #view{
+  height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
+  /*             TOP                         RIGHT (nově)                         BOTTOM                                  LEFT */
+  padding: var(--song-pad-top)
+           var(--song-pad-right, var(--song-pad-x))
+           calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px)
+           var(--song-pad-x);
+  scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
+}
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
   #view::-webkit-scrollbar-track{ background:transparent; }
   #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px; }
