@@ -1,20 +1,19 @@
 [
   {
-    "id": "001-vanocni-otcenas-pavel-helan",
+    "id": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "number": 1,
     "title": "Vánoční Otčenáš",
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "type": "chordpro",
     "books": {
-  "Zpěvníček 2": 14,
-  "Já písnička 5": 203
-}
+      "Zpjěvníček 1": 1
+    }
   },
   {
     "id": "002-ibuh-pavel-helan",
     "number": 2,
-    "title": "IBůh",
+    "title": "IBÅ¯h",
     "author": "Pavel Helan",
     "file": "songs/002-ibuh-pavel-helan.pro",
     "type": "chordpro"
@@ -22,7 +21,7 @@
   {
     "id": "003-dubovy-stul-pavel-helan",
     "number": 3,
-    "title": "Dubový stůl",
+    "title": "DubovÃ½ stÅ¯l",
     "author": "Pavel Helan",
     "file": "songs/003-dubovy-stul-pavel-helan.pro",
     "type": "chordpro"
@@ -31,14 +30,14 @@
     "id": "004-buchet-je-spousta-pohadkova",
     "number": 4,
     "title": "Buchet je spousta",
-    "author": "Pohádková",
+    "author": "PohÃ¡dkovÃ¡",
     "file": "songs/004-buchet-je-spousta-pohadkova.pro",
     "type": "chordpro"
   },
   {
     "id": "005-1-signalni-chinaski",
     "number": 5,
-    "title": "1. Signální",
+    "title": "1. SignÃ¡lnÃ­",
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
     "type": "chordpro"
@@ -47,14 +46,14 @@
     "id": "006-cesta-krystof",
     "number": 6,
     "title": "Cesta",
-    "author": "Kryštof",
+    "author": "KryÅ¡tof",
     "file": "songs/006-cesta-krystof.pro",
     "type": "chordpro"
   },
   {
     "id": "007-vinari-chinaski",
     "number": 7,
-    "title": "Vinaři",
+    "title": "VinaÅi",
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
     "type": "chordpro"
@@ -70,7 +69,7 @@
   {
     "id": "009-kazdy-rano-chinaski",
     "number": 9,
-    "title": "Každý ráno",
+    "title": "KaÅ¾dÃ½ rÃ¡no",
     "author": "Chinaski",
     "file": "songs/009-kazdy-rano-chinaski.pro",
     "type": "chordpro"
@@ -86,7 +85,7 @@
   {
     "id": "011-srouby-a-matice-mandrage",
     "number": 11,
-    "title": "Šrouby a matice",
+    "title": "Å rouby a matice",
     "author": "Mandrage",
     "file": "songs/011-srouby-a-matice-mandrage.pro",
     "type": "chordpro"
@@ -102,7 +101,7 @@
   {
     "id": "013-magdalena-jelen",
     "number": 13,
-    "title": "Magdaléna",
+    "title": "MagdalÃ©na",
     "author": "Jelen",
     "file": "songs/013-magdalena-jelen.pro",
     "type": "chordpro"
@@ -110,7 +109,7 @@
   {
     "id": "014-chci-ti-rict-mig-21",
     "number": 14,
-    "title": "Chci ti říct",
+    "title": "Chci ti ÅÃ­ct",
     "author": "MIG 21",
     "file": "songs/014-chci-ti-rict-mig-21.pro",
     "type": "chordpro"
@@ -118,15 +117,15 @@
   {
     "id": "015-kridla-z-mydla-krystof",
     "number": 15,
-    "title": "Křídla z mýdla",
-    "author": "Kryštof",
+    "title": "KÅÃ­dla z mÃ½dla",
+    "author": "KryÅ¡tof",
     "file": "songs/015-kridla-z-mydla-krystof.pro",
     "type": "chordpro"
   },
   {
     "id": "016-tancime-spolu-jelen",
     "number": 16,
-    "title": "Tančíme spolu",
+    "title": "TanÄÃ­me spolu",
     "author": "Jelen",
     "file": "songs/016-tancime-spolu-jelen.pro",
     "type": "chordpro"
@@ -134,7 +133,7 @@
   {
     "id": "017-malovani-divokej-bill",
     "number": 17,
-    "title": "Malování",
+    "title": "MalovÃ¡nÃ­",
     "author": "Divokej Bill",
     "file": "songs/017-malovani-divokej-bill.pro",
     "type": "chordpro"
@@ -142,15 +141,15 @@
   {
     "id": "018-ta-nase-hospoda-uhlir-a-sverak",
     "number": 18,
-    "title": "Ta naše hospoda",
-    "author": "Svěrák a Uhlíř",
+    "title": "Ta naÅ¡e hospoda",
+    "author": "SvÄrÃ¡k a UhlÃ­Å",
     "file": "songs/018-ta-nase-hospoda-uhlir-a-sverak.pro",
     "type": "chordpro"
   },
   {
     "id": "019-saro-traband",
     "number": 19,
-    "title": "Sáro",
+    "title": "SÃ¡ro",
     "author": "Traband",
     "file": "songs/019-saro-traband.pro",
     "type": "chordpro"
@@ -158,31 +157,31 @@
   {
     "id": "020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir",
     "number": 20,
-    "title": "Nám se stalo něco překrásného",
-    "author": "Svěrák a Uhlíř",
+    "title": "NÃ¡m se stalo nÄco pÅekrÃ¡snÃ©ho",
+    "author": "SvÄrÃ¡k a UhlÃ­Å",
     "file": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
     "type": "chordpro"
   },
   {
     "id": "021-hruska-cechomor",
     "number": 21,
-    "title": "Hruška",
-    "author": "Čechomor",
+    "title": "HruÅ¡ka",
+    "author": "Äechomor",
     "file": "songs/021-hruska-cechomor.pro",
     "type": "chordpro"
   },
   {
     "id": "022-zamilovany-princ-tomas-klus",
     "number": 22,
-    "title": "Zamilovaný princ",
-    "author": "Tomáš Klus",
+    "title": "ZamilovanÃ½ princ",
+    "author": "TomÃ¡Å¡ Klus",
     "file": "songs/022-zamilovany-princ-tomas-klus.pro",
     "type": "chordpro"
   },
   {
     "id": "023-nad-stadem-koni-buty",
     "number": 23,
-    "title": "Nad stádem koní",
+    "title": "Nad stÃ¡dem konÃ­",
     "author": "Buty",
     "file": "songs/023-nad-stadem-koni-buty.pro",
     "type": "chordpro"
@@ -190,15 +189,15 @@
   {
     "id": "024-kdyz-si-te-divko-predstavim-sverak-a-uhlir",
     "number": 24,
-    "title": "Když si tě dívko představím",
-    "author": "Svěrák a Uhlíř",
+    "title": "KdyÅ¾ si tÄ dÃ­vko pÅedstavÃ­m",
+    "author": "SvÄrÃ¡k a UhlÃ­Å",
     "file": "songs/024-kdyz-si-te-divko-predstavim-sverak-a-uhlir.pro",
     "type": "chordpro"
   },
   {
     "id": "025-svaz-ceskejch-bohemu-wohnout",
     "number": 25,
-    "title": "Svaz českejch bohémů",
+    "title": "Svaz Äeskejch bohÃ©mÅ¯",
     "author": "Wohnout",
     "file": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
     "type": "chordpro"
@@ -206,7 +205,7 @@
   {
     "id": "026-boky-jako-skrin-ewa-farna",
     "number": 26,
-    "title": "Boky jako skříň",
+    "title": "Boky jako skÅÃ­Å",
     "author": "Ewa Farna",
     "file": "songs/026-boky-jako-skrin-ewa-farna.pro",
     "type": "chordpro"
@@ -214,7 +213,7 @@
   {
     "id": "027-toulava-sebastian",
     "number": 27,
-    "title": "Toulavá",
+    "title": "ToulavÃ¡",
     "author": "Sebastian",
     "file": "songs/027-toulava-sebastian.pro",
     "type": "chordpro"
@@ -231,15 +230,15 @@
     "id": "029-jdevozem-tomas-klus",
     "number": 29,
     "title": "JdeVoZem",
-    "author": "Tomáš Klus",
+    "author": "TomÃ¡Å¡ Klus",
     "file": "songs/029-jdevozem-tomas-klus.pro",
     "type": "chordpro"
   },
   {
     "id": "030-laska-a-pravda-pohadkova",
     "number": 30,
-    "title": "Láska a pravda",
-    "author": "Pohádková",
+    "title": "LÃ¡ska a pravda",
+    "author": "PohÃ¡dkovÃ¡",
     "file": "songs/030-laska-a-pravda-pohadkova.pro",
     "type": "chordpro"
   },
@@ -247,30 +246,30 @@
     "id": "031-a-pak-tomas-klus",
     "number": 31,
     "title": "A pak",
-    "author": "Tomáš Klus",
+    "author": "TomÃ¡Å¡ Klus",
     "file": "songs/031-a-pak-tomas-klus.pro",
     "type": "chordpro"
   },
   {
     "id": "032-promeny-cechomor",
     "number": 32,
-    "title": "Proměny",
-    "author": "Čechomor",
+    "title": "PromÄny",
+    "author": "Äechomor",
     "file": "songs/032-promeny-cechomor.pro",
     "type": "chordpro"
   },
   {
     "id": "033-tak-nejak-malo-tancim-krystof",
     "number": 33,
-    "title": "Tak nějak málo tančím",
-    "author": "Kryštof",
+    "title": "Tak nÄjak mÃ¡lo tanÄÃ­m",
+    "author": "KryÅ¡tof",
     "file": "songs/033-tak-nejak-malo-tancim-krystof.pro",
     "type": "chordpro"
   },
   {
     "id": "034-svarak-harlej",
     "number": 34,
-    "title": "Svařák",
+    "title": "SvaÅÃ¡k",
     "author": "Harlej",
     "file": "songs/034-svarak-harlej.pro",
     "type": "chordpro"
@@ -279,7 +278,7 @@
     "id": "035-mezi-horami-cechomor",
     "number": 35,
     "title": "Mezi horami",
-    "author": "Čechomor",
+    "author": "Äechomor",
     "file": "songs/035-mezi-horami-cechomor.pro",
     "type": "chordpro"
   },
@@ -287,14 +286,14 @@
     "id": "036-gorale-cechomor",
     "number": 36,
     "title": "Gorale",
-    "author": "Čechomor",
+    "author": "Äechomor",
     "file": "songs/036-gorale-cechomor.pro",
     "type": "chordpro"
   },
   {
     "id": "037-zivotni-support-lesbiens",
     "number": 37,
-    "title": "Životní",
+    "title": "Å½ivotnÃ­",
     "author": "Support Lesbiens",
     "file": "songs/037-zivotni-support-lesbiens.pro",
     "type": "chordpro"
@@ -302,7 +301,7 @@
   {
     "id": "038-andel-mirai",
     "number": 38,
-    "title": "Anděl",
+    "title": "AndÄl",
     "author": "Mirai",
     "file": "songs/038-andel-mirai.pro",
     "type": "chordpro"
@@ -310,23 +309,23 @@
   {
     "id": "039-pulnocni-vaclav-neckar",
     "number": 39,
-    "title": "Půlnoční",
-    "author": "Václav Neckář",
+    "title": "PÅ¯lnoÄnÃ­",
+    "author": "VÃ¡clav NeckÃ¡Å",
     "file": "songs/039-pulnocni-vaclav-neckar.pro",
     "type": "chordpro"
   },
   {
     "id": "040-budu-ti-vypravet-michal-hruza",
     "number": 40,
-    "title": "Budu ti vyprávět",
-    "author": "Michal Hrůza",
+    "title": "Budu ti vyprÃ¡vÄt",
+    "author": "Michal HrÅ¯za",
     "file": "songs/040-budu-ti-vypravet-michal-hruza.pro",
     "type": "chordpro"
   },
   {
     "id": "041-cekam-na-signal-nightwork",
     "number": 41,
-    "title": "Čekám na signál",
+    "title": "ÄekÃ¡m na signÃ¡l",
     "author": "Nightwork",
     "file": "songs/041-cekam-na-signal-nightwork.pro",
     "type": "chordpro"
@@ -335,22 +334,22 @@
     "id": "042-pod-dubem-za-dubem-sverak-a-uhlir",
     "number": 42,
     "title": "Pod dubem za dubem",
-    "author": "Svěrák a Uhlíř",
+    "author": "SvÄrÃ¡k a UhlÃ­Å",
     "file": "songs/042-pod-dubem-za-dubem-sverak-a-uhlir.pro",
     "type": "chordpro"
   },
   {
     "id": "043-ty-a-ja-krystof",
     "number": 43,
-    "title": "Ty a já",
-    "author": "Kryštof",
+    "title": "Ty a jÃ¡",
+    "author": "KryÅ¡tof",
     "file": "songs/043-ty-a-ja-krystof.pro",
     "type": "chordpro"
   },
   {
     "id": "044-vrchlabi-chinaski",
     "number": 44,
-    "title": "Vrchlabí",
+    "title": "VrchlabÃ­",
     "author": "Chinaski",
     "file": "songs/044-vrchlabi-chinaski.pro",
     "type": "chordpro"
@@ -366,7 +365,7 @@
   {
     "id": "046-kdyz-nemuzes-tak-pridej-mirai",
     "number": 46,
-    "title": "Když nemůžeš tak přidej",
+    "title": "KdyÅ¾ nemÅ¯Å¾eÅ¡ tak pÅidej",
     "author": "Mirai",
     "file": "songs/046-kdyz-nemuzes-tak-pridej-mirai.pro",
     "type": "chordpro"
@@ -374,7 +373,7 @@
   {
     "id": "047-az-na-to-prijde-sebastian",
     "number": 47,
-    "title": "Až na to přijde",
+    "title": "AÅ¾ na to pÅijde",
     "author": "Sebastian",
     "file": "songs/047-az-na-to-prijde-sebastian.pro",
     "type": "chordpro"
@@ -382,15 +381,15 @@
   {
     "id": "048-dobre-rano-tomas-klus",
     "number": 48,
-    "title": "Dobré ráno",
-    "author": "Tomáš Klus",
+    "title": "DobrÃ© rÃ¡no",
+    "author": "TomÃ¡Å¡ Klus",
     "file": "songs/048-dobre-rano-tomas-klus.pro",
     "type": "chordpro"
   },
   {
     "id": "049-mars-a-venuse-jelen",
     "number": 49,
-    "title": "Mars a Venuše",
+    "title": "Mars a VenuÅ¡e",
     "author": "Jelen",
     "file": "songs/049-mars-a-venuse-jelen.pro",
     "type": "chordpro"
@@ -398,7 +397,7 @@
   {
     "id": "050-pisnicka-pavel-calta",
     "number": 50,
-    "title": "Písnička",
+    "title": "PÃ­sniÄka",
     "author": "Pavel Calta",
     "file": "songs/050-pisnicka-pavel-calta.pro",
     "type": "chordpro"
@@ -414,7 +413,7 @@
   {
     "id": "052-slovensky-klin-chinaski",
     "number": 52,
-    "title": "Slovenský klín",
+    "title": "SlovenskÃ½ klÃ­n",
     "author": "Chinaski",
     "file": "songs/052-slovensky-klin-chinaski.pro",
     "type": "chordpro"
@@ -422,8 +421,8 @@
   {
     "id": "053-i-cesta-muze-byt-cil-mnaga-a-zdorp",
     "number": 53,
-    "title": "I cesta může být cíl",
-    "author": "Mňága a žďorp",
+    "title": "I cesta mÅ¯Å¾e bÃ½t cÃ­l",
+    "author": "MÅÃ¡ga a Å¾Äorp",
     "file": "songs/053-i-cesta-muze-byt-cil-mnaga-a-zdorp.pro",
     "type": "chordpro"
   },
@@ -438,7 +437,7 @@
   {
     "id": "055-dlouhej-kour-chinaski",
     "number": 55,
-    "title": "Dlouhej kouř",
+    "title": "Dlouhej kouÅ",
     "author": "Chinaski",
     "file": "songs/055-dlouhej-kour-chinaski.pro",
     "type": "chordpro"
@@ -462,7 +461,7 @@
   {
     "id": "058-zejtra-mam-ready-kirken",
     "number": 58,
-    "title": "Zejtra mám",
+    "title": "Zejtra mÃ¡m",
     "author": "Ready Kirken",
     "file": "songs/058-zejtra-mam-ready-kirken.pro",
     "type": "chordpro"
@@ -478,7 +477,7 @@
   {
     "id": "060-lhuta-zarucni-slza",
     "number": 60,
-    "title": "Lhůta záruční",
+    "title": "LhÅ¯ta zÃ¡ruÄnÃ­",
     "author": "Slza",
     "file": "songs/060-lhuta-zarucni-slza.pro",
     "type": "chordpro"
@@ -486,7 +485,7 @@
   {
     "id": "061-zafukane-fleret",
     "number": 61,
-    "title": "Zafúkané",
+    "title": "ZafÃºkanÃ©",
     "author": "Fleret",
     "file": "songs/061-zafukane-fleret.pro",
     "type": "chordpro"
@@ -494,8 +493,8 @@
   {
     "id": "062-s-tebou-me-bavi-svet-filmova",
     "number": 62,
-    "title": "S tebou mě baví svět",
-    "author": "Filmová",
+    "title": "S tebou mÄ bavÃ­ svÄt",
+    "author": "FilmovÃ¡",
     "file": "songs/062-s-tebou-me-bavi-svet-filmova.pro",
     "type": "chordpro"
   },
