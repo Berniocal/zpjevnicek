@@ -1,5 +1,6 @@
 {title: 1. Signální}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 5}
 
 Až si [G]zejtra ráno 
 [C]řeknu zase [Em]jednou provždy dost
