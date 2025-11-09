@@ -1,992 +1,253 @@
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Správa písní</title>
-  <link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
-  <link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
-  <meta name="theme-color" content="#0f1729" />
-  <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
-  <style>
-    .grid{display:grid;gap:10px}
-    .two{grid-template-columns:1fr 1fr}
-    .full{grid-column:1 / -1;}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Správa písní</title>
+<link rel="stylesheet" href="/zpjevnicek/assets/style.css" />
+<link rel="manifest" href="/zpjevnicek/manifest.webmanifest" />
+<meta name="theme-color" content="#0f1729" />
+<link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
 
-    /* ---------- Editor s podtržením dlouhých řádků (mirror-based) ---------- */
-    .editor,
-    .editor textarea,
-    .editor .marks,
-    .editor .mirror{
-      --ed-font: ui-monospace, SFMono-Regular, Menlo, monospace;
-      --ed-size: 16px;
-      --ed-line: 24px;
-      --ed-pad: 8px;
-      font-family: var(--ed-font);
-      font-size: var(--ed-size);
-      line-height: var(--ed-line);
-      box-sizing: border-box;
-      tab-size: 4;
-    }
-    .editor{
-      position:relative;
-      overflow:hidden; /* ořez zvýraznění do oblasti editoru */
-    }
-    .editor textarea{
-      width:100%;
-      min-height:520px;
-      resize:vertical;
-      background:transparent;  /* nech průhledné – je vidět zvýraznění */
-      color:#fff;
-      position:relative;
-      z-index:1;
-      padding: var(--ed-pad);
-    }
-    .marks{
-      position:absolute; inset:0;
-      z-index:2;
-      pointer-events:none;
-      overflow:hidden; /* ořez i pro vnitřní marky */
-      padding: var(--ed-pad);
-    }
-    .marks-content{
-      position:relative;                 /* rodič pro absolutní .mark */
-      min-height:100%;                   /* přepsáno na skutečnou výšku v JS */
-      will-change: transform;
-    }
-    .mirror{
-      position:absolute; inset:0;
-      padding: var(--ed-pad);
-      white-space:pre-wrap;
-      overflow-wrap:anywhere;
-      visibility:hidden; /* jen pro měření */
-      z-index:-1;
-    }
-    .mark{
-      position:absolute; left:0; right:0;
-      height:2px;
-      background:#ef4444;
-      border-radius:1px;
-    }
-
-    /* Ovládací prvky vedle sebe hezky drží */
-    #toggleMarks{ align-self:end; justify-self:end; padding:6px 10px; font-size:14px; }
-    .limitCtl{ display:flex; gap:6px; align-items:center; justify-content:flex-end; }
-    #limitVal{ width:84px; }
-
-    /* ---------- Collapsibles ---------- */
-    details.accordion{
-      border:1px solid #1f2b46; border-radius:10px; padding:0; margin-top:14px; background:var(--card);
-    }
-    details.accordion > summary{
-      list-style:none; cursor:pointer; padding:12px 14px; font-weight:600;
-      display:flex; align-items:center; gap:8px; user-select:none;
-    }
-    details.accordion > summary::before{
-      content: '▸'; transition: transform .15s ease; display:inline-block;
-    }
-    details.accordion[open] > summary::before{ transform: rotate(90deg); }
-    details.accordion .accordion-body{ padding: 0 14px 14px; }
-    details.accordion .accordion-body > .card{ margin-top:12px; }
-    details.accordion .accordion-body > .card:first-child{ margin-top:0; }
-  </style>
+<style>
+.grid{display:grid;gap:10px}
+.two{grid-template-columns:1fr 1fr}
+.full{grid-column:1 / -1;}
+.editor,.editor textarea,.editor .marks,.editor .mirror{
+  --ed-font: ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ed-size:16px;--ed-line:24px;--ed-pad:8px;
+  font-family:var(--ed-font);font-size:var(--ed-size);line-height:var(--ed-line);
+  box-sizing:border-box;tab-size:4;
+}
+.editor{position:relative;overflow:hidden}
+.editor textarea{width:100%;min-height:520px;resize:vertical;background:transparent;color:#fff;position:relative;z-index:1;padding:var(--ed-pad)}
+.marks{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;padding:var(--ed-pad)}
+.marks-content{position:relative;min-height:100%;will-change:transform}
+.mirror{position:absolute;inset:0;padding:var(--ed-pad);white-space:pre-wrap;overflow-wrap:anywhere;visibility:hidden;z-index:-1}
+.mark{position:absolute;left:0;right:0;height:2px;background:#ef4444;border-radius:1px}
+#toggleMarks{align-self:end;justify-self:end;padding:6px 10px;font-size:14px}
+.limitCtl{display:flex;gap:6px;align-items:center;justify-content:flex-end}
+#limitVal{width:84px}
+details.accordion{border:1px solid #1f2b46;border-radius:10px;padding:0;margin-top:14px;background:var(--card)}
+details.accordion>summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:600;display:flex;align-items:center;gap:8px;user-select:none}
+details.accordion>summary::before{content:'▸';transition:transform .15s ease;display:inline-block}
+details.accordion[open]>summary::before{transform:rotate(90deg)}
+details.accordion .accordion-body{padding:0 14px 14px}
+details.accordion .accordion-body>.card{margin-top:12px}
+details.accordion .accordion-body>.card:first-child{margin-top:0}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="header"><h1 style="margin:0">Správa písní</h1><a href="index.html">← Zpět</a></div>
+<div class="container">
+  <div class="header"><h1 style="margin:0">Správa písní</h1><a href="index.html">← Zpět</a></div>
 
-    <!-- ========== SEKCE 1: VLOŽIT NOVOU PÍSEŇ (COLLAPSIBLE) ========== -->
-    <details class="accordion">
-      <summary>Vložit novou píseň</summary>
-      <div class="accordion-body">
-
-        <div class="card">
-          <div class="grid two">
-            <label>Token (PAT)
-              <input id="token" placeholder="ghp_… nebo github_pat_…" />
-              <div class="note">Scopes: <code>Repository contents → Read and write</code> pro vybraný repozitář.</div>
-            </label>
-            <div>
-              <button id="saveToken">Uložit token do prohlížeče</button>
-              <button id="clearToken">Smazat token</button>
-            </div>
-          </div>
-          <hr class="sep"/>
-          <div class="grid two">
-            <label>Název písně
-              <input id="title" placeholder="Greensleeves" />
-            </label>
-            <label>Autor
-              <input id="artist" placeholder="Traditional" />
-            </label>
-          </div>
-          <div class="grid two">
-            <label>Číslo (volitelné pro řazení)
-              <input id="number" type="number" min="1" step="1" placeholder="1" />
-            </label>
-            <label>Tonina (volitelně – meta)
-              <input id="key" placeholder="Am" />
-            </label>
-            <label>Formát vstupu
-              <select id="fmt">
-                <option value="auto" selected>Auto</option>
-                <option value="chordpro">ChordPro</option>
-                <option value="ug">Ultimate Guitar</option>
-              </select>
-            </label>
-
-            <!-- NOVÉ: Zpěvníky (create) -->
-            <div class="full">
-              <label>Zpěvníky (název + číslo)
-                <div id="booksWrap" class="grid" style="gap:6px"></div>
-              </label>
-              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
-                <button id="addBookRow" type="button">+ Přidat řádek</button>
-              </div>
-              <datalist id="booksNames"></datalist>
-            </div>
-          </div>
-
-          <label class="full">Text (ChordPro)
-            <div class="editor">
-              <div id="marks" class="marks"><div id="marksContent" class="marks-content"></div></div>
-              <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
-              <div id="mirror" class="mirror" aria-hidden="true"></div>
-            </div>
+  <!-- ========== SEKCE 1: VLOŽIT NOVOU PÍSEŇ ========== -->
+  <details class="accordion" open>
+    <summary>Vložit novou píseň</summary>
+    <div class="accordion-body">
+      <div class="card">
+        <div class="grid two">
+          <label>Token (PAT)
+            <input id="token" placeholder="ghp_… nebo github_pat_…" />
+            <div class="note">Scopes: <code>Repository contents → Read and write</code></div>
           </label>
-
-          <div class="grid two">
-            <label>Název souboru (automaticky)
-              <input id="filename" readonly />
-              <div class="note">Uloží se do <code>/songs</code> jako <code>NNN-nazev-autor.pro</code>.</div>
-            </label>
-            <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
-              <button id="saveBtn">💾 Uložit do GitHubu</button>
-            </div>
+          <div>
+            <button id="saveToken">Uložit token</button>
+            <button id="clearToken">Smazat token</button>
           </div>
-          <div id="status" class="note" style="margin-top:8px"></div>
         </div>
 
-      </div>
-    </details>
+        <hr class="sep"/>
 
-    <!-- ========== SEKCE 2: UPRAVIT / SMAZAT PÍSEŇ (COLLAPSIBLE) ========== -->
-    <details class="accordion">
-      <summary>Upravit existující píseň</summary>
-      <div class="accordion-body">
+        <div class="grid two">
+          <label>Název písně <input id="title" placeholder="Greensleeves"></label>
+          <label>Autor <input id="artist" placeholder="Traditional"></label>
+        </div>
 
-        <div class="card">
-          <h2 style="margin:0 0 8px">Upravit existující píseň</h2>
-          <div class="grid two">
-            <label>Vyhledat (název nebo číslo)
-              <input id="editSearch" placeholder="např. 'Greensleeves' nebo 12" />
-            </label>
-            <div style="align-self:end;justify-self:end">
-              <button id="reloadIndex">↻ Načíst seznam písní</button>
-            </div>
-          </div>
-
-          <div id="editResults" class="list" style="margin-top:8px"></div>
-
-          <hr class="sep"/>
-
-          <div class="grid two">
-            <label>Název písně
-              <input id="eTitle" />
-            </label>
-            <label>Autor
-              <input id="eArtist" />
-            </label>
-          </div>
-          <div class="grid two">
-            <label>Číslo (volitelné)
-              <input id="eNumber" type="number" min="1" step="1" />
-            </label>
-            <label>Tonina (meta)
-              <input id="eKey" placeholder="Am" />
-            </label>
-
-            <!-- NOVÉ: Zpěvníky (edit) -->
-            <div class="full">
-              <label>Zpěvníky (název + číslo)
-                <div id="eBooksWrap" class="grid" style="gap:6px"></div>
-              </label>
-              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
-                <button id="eAddBookRow" type="button">+ Přidat řádek</button>
-              </div>
-              <datalist id="eBooksNames"></datalist>
-            </div>
-          </div>
-
-          <label class="full">Text (ChordPro)
-            <div class="editor">
-              <div id="editMarks" class="marks"><div id="editMarksContent" class="marks-content"></div></div>
-              <textarea id="editBody" placeholder="[Am]Alas my love…"></textarea>
-              <div id="editMirror" class="mirror" aria-hidden="true"></div>
-            </div>
+        <div class="grid two">
+          <label>Číslo (volitelné) <input id="number" type="number" min="1"></label>
+          <label>Tonina <input id="key" placeholder="Am"></label>
+          <label>Formát vstupu
+            <select id="fmt">
+              <option value="auto" selected>Auto</option>
+              <option value="chordpro">ChordPro</option>
+              <option value="ug">Ultimate Guitar</option>
+            </select>
           </label>
-
-          <div class="grid two">
-            <label>Cesta v repozitáři
-              <input id="editPath" readonly />
-              <div class="note">Soubor se nepřejmenovává (zůstává původní). Pro přejmenování ulož novou píseň a starou případně smaž.</div>
-            </label>
-            <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
-              <button id="saveEditBtn">💾 Uložit změny</button>
-              <button id="deleteEditBtn" class="danger">🗑 Smazat píseň</button>
-            </div>
+          <div class="limitCtl">
+            <button id="toggleMarks">⚙ Upozornění: zapnuto</button>
+            <input id="limitVal" type="number" min="10" max="200" step="1" />
+            <button id="applyLimit">Nastavit limit</button>
           </div>
-
-          <div id="editStatus" class="note" style="margin-top:8px"></div>
         </div>
 
+        <!-- 📚 Zpěvníky -->
+        <div id="bookList" class="full">
+          <label>Zpěvníky (volitelné)</label>
+          <div id="bookRows"></div>
+          <button id="addBookBtn" type="button" style="margin-top:6px;">+ Přidat zpěvník</button>
+        </div>
+
+        <label class="full">Text (ChordPro)
+          <div class="editor">
+            <div id="marks" class="marks"><div id="marksContent" class="marks-content"></div></div>
+            <textarea id="body" placeholder="[Am]Alas my love…"></textarea>
+            <div id="mirror" class="mirror" aria-hidden="true"></div>
+          </div>
+        </label>
+
+        <div class="grid two">
+          <label>Název souboru (automaticky)
+            <input id="filename" readonly>
+            <div class="note">Uloží se do <code>/songs</code>.</div>
+          </label>
+          <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+            <button id="saveBtn">💾 Uložit do GitHubu</button>
+          </div>
+        </div>
+        <div id="status" class="note" style="margin-top:8px"></div>
       </div>
-    </details>
-  </div>
+    </div>
+  </details>
 
-  <script>
-  const qs = s=>document.querySelector(s);
-  const statusEl = qs('#status');
-  const titleEl = qs('#title');
-  const artistEl = qs('#artist');
-  const numberEl = qs('#number');
-  const keyEl = qs('#key');
-  const bodyEl = qs('#body');
-  const filenameEl = qs('#filename');
+  <!-- ========== SEKCE 2: UPRAVIT / SMAZAT ========== -->
+  <details class="accordion">
+    <summary>Upravit existující píseň</summary>
+    <div class="accordion-body">
+      <div class="card">
+        <div class="grid two">
+          <label>Vyhledat <input id="editSearch" placeholder="např. 'Greensleeves' nebo 12"></label>
+          <div style="align-self:end;justify-self:end"><button id="reloadIndex">↻ Načíst seznam</button></div>
+        </div>
+        <div id="editResults" class="list" style="margin-top:8px"></div>
 
-  const marksEl  = document.getElementById('marks');
-  const marksContentEl = document.getElementById('marksContent'); 
-  const mirrorEl = document.getElementById('mirror');
-  const toggleMarksBtn = document.getElementById('toggleMarks');
-  const limitInput = document.getElementById('limitVal');
-  const applyLimitBtn = document.getElementById('applyLimit');
+        <hr class="sep"/>
+        <div class="grid two">
+          <label>Název písně <input id="eTitle"></label>
+          <label>Autor <input id="eArtist"></label>
+        </div>
+        <div class="grid two">
+          <label>Číslo <input id="eNumber" type="number"></label>
+          <label>Tonina <input id="eKey"></label>
+        </div>
 
-  // NOVÉ: háčky pro Zpěvníky (UI)
-  const booksWrap = document.getElementById('booksWrap');
-  const addBookRowBtn = document.getElementById('addBookRow');
-  const booksNamesDL = document.getElementById('booksNames');
+        <!-- 📚 Zpěvníky edit -->
+        <div id="eBookList" class="full">
+          <label>Zpěvníky (volitelné)</label>
+          <div id="eBookRows"></div>
+          <button id="addEBookBtn" type="button" style="margin-top:6px;">+ Přidat zpěvník</button>
+        </div>
 
-  const eBooksWrap = document.getElementById('eBooksWrap');
-  const eAddBookRowBtn = document.getElementById('eAddBookRow');
-  const eBooksNamesDL = document.getElementById('eBooksNames');
-
-  // ⬇ limit znaků – načte se z localStorage, jinak 30
-  let rowLimit = Number(localStorage.getItem('row_limit') || '30');
-  limitInput.value = rowLimit;
-
-  const CHORD_BRACKETS_RE = /\[[^\]]*]/g;
-  let marksEnabled = true;
-
-  function slug(s){ return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
-  function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
-  function status(msg, ok=false){ statusEl.textContent = msg; statusEl.className = 'note' + (ok?' ok':''); }
-
-  function computeFilename(){
-    const n = numberEl.value ? String(numberEl.value).padStart(3,'0')+'-' : '';
-    const t = slug(titleEl.value||'pisen');
-    const a = slug(artistEl.value||'');
-    filenameEl.value = `${n}${t}${a?'-'+a:''}.pro`;
-  }
-  ['input','change'].forEach(ev=>{
-    titleEl.addEventListener(ev, computeFilename);
-    artistEl.addEventListener(ev, computeFilename);
-    numberEl.addEventListener(ev, computeFilename);
-  });
-  computeFilename();
-
-  // token storage
-  const tokenEl = qs('#token');
-  const saved = localStorage.getItem('gh_pat');
-  if(saved) tokenEl.value = saved;
-  qs('#saveToken').onclick = ()=>{ localStorage.setItem('gh_pat', tokenEl.value.trim()); status('Token uložen.', true); };
-  qs('#clearToken').onclick = ()=>{ localStorage.removeItem('gh_pat'); tokenEl.value=''; status('Token smazán.', true); };
-
-  function detectRepo(){
-    const host = location.host;
-    const parts = location.pathname.split('/').filter(Boolean);
-    const repo = parts.length? parts[0] : '';
-    const user = host.includes('github.io') ? host.split('.')[0] : '';
-    return {user, repo};
-  }
-
-  // === NOVÉ: Helpery pro "Zpěvníky (books)" ===
-  function makeBookRow(container, datalistId, name = '', num = '') {
-    const row = document.createElement('div');
-    row.style.display = 'grid';
-    row.style.gridTemplateColumns = '1fr 120px 36px';
-    row.style.gap = '6px';
-    row.innerHTML = `
-      <input class="bk-name" list="${datalistId}" placeholder="např. Zpěvníček 2" />
-      <input class="bk-num" type="number" min="1" step="1" placeholder="číslo" />
-      <button type="button" class="ghost bk-del" title="Smazat řádek">✕</button>
-    `;
-    container.appendChild(row);
-
-    const nameEl = row.querySelector('.bk-name');
-    const numEl  = row.querySelector('.bk-num');
-    nameEl.value = name || '';
-    numEl.value  = (num !== undefined && num !== null && num !== '') ? String(num) : '';
-
-    row.querySelector('.bk-del').onclick = () => row.remove();
-  }
-
-  function readBooks(container) {
-    const obj = {};
-    if (!container) return obj;
-    container.querySelectorAll('.bk-name').forEach((nameEl, i) => {
-      const n = (nameEl.value || '').trim();
-      const numEl = container.querySelectorAll('.bk-num')[i];
-      const v = (numEl?.value || '').trim();
-      if (n && v && !isNaN(+v)) obj[n] = +v;
-    });
-    return obj;
-  }
-
-  function fillBooks(container, datalistEl, allNames = [], dataObj = {}) {
-    datalistEl.innerHTML = '';
-    [...new Set(allNames)].sort().forEach(n => {
-      const opt = document.createElement('option');
-      opt.value = n;
-      datalistEl.appendChild(opt);
-    });
-
-    container.innerHTML = '';
-    const entries = Object.entries(dataObj);
-    if (entries.length) {
-      entries.forEach(([name, num]) => makeBookRow(container, datalistEl.id, name, num));
-    } else {
-      makeBookRow(container, datalistEl.id);
-    }
-  }
-
-  if (addBookRowBtn) addBookRowBtn.onclick = () => makeBookRow(booksWrap, 'booksNames');
-  if (eAddBookRowBtn) eAddBookRowBtn.onclick = () => makeBookRow(eBooksWrap, 'eBooksNames');
-
-  /* ---------- zvýraznění dlouhých řádků ---------- */
-  function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&gt;','>':'&gt;'}[m])); }
-
-  function rebuildMarks(){
-    if (!marksEnabled) {
-      marksContentEl.innerHTML = '';
-      marksContentEl.style.height = '0px';
-      marksEl.style.display = 'none';
-      return;
-    }
-    marksEl.style.display = '';
-
-    const text = bodyEl.value.replace(/\r/g,'');
-    const lines = text.split('\n');
-
-    // mirror na měření
-    mirrorEl.innerHTML = '';
-    for (let i=0;i<lines.length;i++){
-      const span = document.createElement('span');
-      span.className = 'line';
-      span.innerHTML = lines[i].length ? escapeHtml(lines[i]) : ' ';
-      mirrorEl.appendChild(span);
-      if (i < lines.length-1) mirrorEl.appendChild(document.createElement('br'));
-    }
-
-    // které zdrojové řádky překračují limit (bez akordů)?
-    const overIdx = new Set();
-    lines.forEach((L, i)=>{
-      const visible = L.replace(CHORD_BRACKETS_RE, '');
-      if (visible.length > rowLimit) overIdx.add(i);
-    });
-
-    // vytvoř marky pro celý obsah
-    marksContentEl.innerHTML = '';
-    marksContentEl.style.height = mirrorEl.scrollHeight + 'px';
-
-    const spans = mirrorEl.querySelectorAll('.line');
-    spans.forEach((span, i)=>{
-      if (!overIdx.has(i)) return;
-      const top = span.offsetTop + span.offsetHeight - 2; // 2px podtržení
-      const mark = document.createElement('div');
-      mark.className = 'mark';
-      mark.style.top = top + 'px';
-      marksContentEl.appendChild(mark);
-    });
-  }
-
-  bodyEl.addEventListener('scroll', ()=>{
-    marksContentEl.style.transform  = `translate(${-bodyEl.scrollLeft}px, ${-bodyEl.scrollTop}px)`;
-    mirrorEl.scrollTop = bodyEl.scrollTop;
-    mirrorEl.scrollLeft = bodyEl.scrollLeft;
-  });
-  ['input','change','keyup'].forEach(ev => bodyEl.addEventListener(ev, rebuildMarks));
-  window.addEventListener('resize', rebuildMarks);
-  rebuildMarks();
-
-  // zap/vyp upozornění
-  toggleMarksBtn.addEventListener('click', ()=>{
-    marksEnabled = !marksEnabled;
-    toggleMarksBtn.textContent = marksEnabled ? '⚙ Upozornění: zapnuto' : '⚙ Upozornění: vypnuto';
-    rebuildMarks();
-  });
-
-  // nastavení limitu
-  applyLimitBtn.addEventListener('click', ()=>{
-    const v = Number(limitInput.value);
-    if (!Number.isFinite(v) || v < 1) return;
-    rowLimit = v;
-    localStorage.setItem('row_limit', String(rowLimit));
-    rebuildMarks();
-  });
-
-  /* ---------- UG → ChordPro (beze změn) ---------- */
-  const CHORD_RE =
-    /^(?:[A-H](?:#|b)?)(?:(?:maj|min|dim|aug|sus[24]?|add\d+|m|mi|moll|dur)(?:\d+)?)?(?:\d+)?(?:\/[A-H](?:#|b)?)?$/i;
-
-  function isChordishToken(tok) {
-    if (!tok) return false;
-    if (CHORD_RE.test(tok)) return true;
-    if (/^[A-H]$/i.test(tok)) return true;
-    if (/^\d{1,2}$/.test(tok)) return true;
-    if (/^(N\.C\.|NC|x)$/i.test(tok)) return true;
-    return false;
-  }
-  function looksLikeTab(line) {
-    const t = line.trim();
-    if (/^[eBGDAE]\|[-x\ds\s|]+$/.test(t)) return true;
-    if (/-{3,}/.test(t)) return true;
-    return false;
-  }
-  function isChordLine(line) {
-    if (!line || !line.trim()) return false;
-    if (looksLikeTab(line)) return false;
-    const hasLongSpaces = / {2,}/.test(line);
-    const rawParts = line.trim().split(/\s+/);
-    let chordy = 0, ostatni = 0, totalLen = 0;
-    for (const p of rawParts) {
-      const clean = p.replace(/[|()·•.\u00B7]+/g, '').replace(/^-+|-+$/g, '');
-      if (!clean) continue;
-      totalLen += clean.length;
-      if (isChordishToken(clean)) chordy++;
-      else ostatni++;
-    }
-    if (chordy === 0) return false;
-    const ratioOK = (ostatni === 0) || (chordy/(chordy+ostatni) >= 0.8);
-    const avgLen = totalLen / Math.max(1,(chordy+ostatni));
-    return ratioOK && (hasLongSpaces || avgLen <= 3);
-  }
-  function mergeChordAndLyrics(chordsLine, lyricLine){
-    const pos = []; let i = 0;
-    while (i < chordsLine.length){
-      while (i < chordsLine.length && chordsLine[i] === ' ') i++;
-      if (i >= chordsLine.length) break;
-      const start = i;
-      while (i < chordsLine.length && chordsLine[i] !== ' ') i++;
-      const token = chordsLine.slice(start, i).replace(/[|()\-·•.]+/g, '');
-      if (CHORD_RE.test(token)) pos.push({col:start, chord:token});
-    }
-    if (!pos.length) return lyricLine;
-    let out = lyricLine;
-    pos.sort((a,b)=>b.col-a.col).forEach(p=>{
-      const idx = Math.min(Math.max(p.col, 0), out.length);
-      out = out.slice(0, idx) + `[${p.chord}]` + out.slice(idx);
-    });
-    return out;
-  }
-  function ugToChordPro(text){
-    let t = text.replace(/\r/g,'');
-    t = t.replace(/\[ch\]\s*([^\[]+?)\s*\[\/ch\]/gi, (_m, g1) => `[${g1.trim()}]`);
-    const lines = t.split('\n');
-    const out = [];
-    for (let i = 0; i < lines.length; i++){
-      const L = lines[i];
-      const sec = L.match(/^\s*(?:\[(verse|chorus|bridge|intro|outro|solo)\]|\((verse|chorus|bridge|intro|outro|solo)\))\s*$/i);
-      if (sec) { out.push(`{comment: ${ (sec[1]||sec[2]).toLowerCase() }}`); continue; }
-      if (isChordLine(L) && i+1 < lines.length){
-        out.push( mergeChordAndLyrics(L, lines[i+1] || '') ); i++; continue;
-      }
-      out.push(L);
-    }
-    const compact=[]; let prevEmpty=false;
-    for (const r of out){ const empty=!r.trim(); if (empty && prevEmpty) continue; compact.push(r); prevEmpty=empty; }
-    return compact.join('\n');
-  }
-
-  // === NOVÉ: update data/songs.json přes GitHub API
-  async function patchSongsJson({ token, id, filePath, title, author, number, books }) {
-    const { user, repo } = detectRepo();
-    if (!user || !repo) throw new Error('Nelze odvodit user/repo.');
-
-    const metaRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent('data/songs.json')}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    if (!metaRes.ok) {
-      const t = await metaRes.text();
-      throw new Error(`Načtení songs.json selhalo: ${metaRes.status}: ${t}`);
-    }
-    const metaJson = await metaRes.json();
-    const sha = metaJson.sha;
-
-    const contentJson = JSON.parse(atob(metaJson.content.replace(/\n/g, '')));
-
-    let changed = false;
-    const wantId = id;
-    const wantFile = filePath;
-    const entry = contentJson.find(x => x.id === wantId) || contentJson.find(x => x.file === wantFile);
-
-    if (entry) {
-      if (title !== undefined)  { entry.title = title; changed = true; }
-      if (author !== undefined) { entry.author = author; changed = true; }
-      if (number !== undefined && number !== '') { entry.number = Number(number); changed = true; }
-      if (books && Object.keys(books).length) { entry.books = books; changed = true; }
-      if (!entry.file && wantFile) { entry.file = wantFile; changed = true; }
-      if (!entry.id && wantId) { entry.id = wantId; changed = true; }
-      if (!entry.type) { entry.type = 'chordpro'; changed = true; }
-    } else {
-      contentJson.push({
-        id: wantId,
-        number: (number !== '' && number !== undefined) ? Number(number) : undefined,
-        title: title || '',
-        author: author || '',
-        file: wantFile,
-        type: 'chordpro',
-        ...(books && Object.keys(books).length ? { books } : {})
-      });
-      changed = true;
-    }
-
-    if (!changed) return;
-
-    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(contentJson, null, 2))));
-    const putRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent('data/songs.json')}`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
-      body: JSON.stringify({
-        message: `chore(index): update songs.json for ${title || wantId}`,
-        content: newContent,
-        branch: 'main',
-        sha
-      })
-    });
-    if (!putRes.ok) {
-      const t = await putRes.text();
-      throw new Error(`Uložení songs.json selhalo: ${putRes.status}: ${t}`);
-    }
-  }
-
-  /* ====================== ÚPRAVY / DELETE – LOGIKA ====================== */
-
-  const editStatusEl = document.getElementById('editStatus');
-  function estatus(msg, ok=false){
-    editStatusEl.textContent = msg;
-    editStatusEl.className = 'note' + (ok ? ' ok' : '');
-  }
-
-  const editSearchEl = document.getElementById('editSearch');
-  const editResultsEl = document.getElementById('editResults');
-  const eTitleEl  = document.getElementById('eTitle');
-  const eArtistEl = document.getElementById('eArtist');
-  const eNumberEl = document.getElementById('eNumber');
-  const eKeyEl    = document.getElementById('eKey');
-  const editBodyEl   = document.getElementById('editBody');
-  const editPathEl   = document.getElementById('editPath');
-  const saveEditBtn  = document.getElementById('saveEditBtn');
-  const deleteEditBtn= document.getElementById('deleteEditBtn');
-  const reloadIndexBtn = document.getElementById('reloadIndex');
-
-  const editMarksEl  = document.getElementById('editMarks');
-  const editMarksContentEl = document.getElementById('editMarksContent');
-  const editMirrorEl = document.getElementById('editMirror');
-
-  let SONG_INDEX_DATA = [];
-  let EDIT_SELECTED = null;
-  let editMarksEnabled = true;
-  let rowLimitEdit = Number(localStorage.getItem('row_limit') || '30');
-
-  async function loadSongsIndex(){
-    try{
-      const res = await fetch('data/songs.json', { cache: 'no-store' });
-      if(!res.ok) throw new Error('Nelze načíst data/songs.json');
-      SONG_INDEX_DATA = await res.json();
-      estatus('Seznam písní načten.', true);
-
-      // NOVÉ: předvyplň datalisty názvy zpěvníků + prázdný řádek
-      const allBookNames = [];
-      SONG_INDEX_DATA.forEach(s => {
-        if (s && s.books) allBookNames.push(...Object.keys(s.books));
-      });
-      fillBooks(booksWrap, booksNamesDL, allBookNames, {});
-      fillBooks(eBooksWrap, eBooksNamesDL, allBookNames, {});
-    }catch(e){
-      console.error(e);
-      estatus('Chyba při načítání seznamu písní: ' + e.message);
-    }
-  }
-
-  function searchSongs(q){
-    if(!SONG_INDEX_DATA || !SONG_INDEX_DATA.length) return [];
-    const s = (q||'').toLowerCase().trim();
-    if(!s) return [];
-    const asNum = Number(s);
-    return SONG_INDEX_DATA.filter(item=>{
-      const titleHit = (item.title||'').toLowerCase().includes(s);
-      const numberHit = Number.isFinite(asNum) && (item.number|0) === asNum;
-      return titleHit || numberHit;
-    }).slice(0, 20);
-  }
-
-  function renderEditResults(list){
-    if(!list.length){ editResultsEl.innerHTML = '<div class="note">Nenalezeno.</div>'; return; }
-    editResultsEl.innerHTML = list.map(it=>{
-      const num = (it.number!=null && it.number!=='') ? `${it.number} · ` : '';
-      const author = it.author ? ` — <span class="muted">${it.author}</span>` : '';
-      return `
-        <div class="item" style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1f2b46">
-          <div>
-            <div><b>${num}${it.title}</b>${author}</div>
-            <div class="note" style="font-size:12px">${it.file || ''}</div>
+        <label class="full">Text (ChordPro)
+          <div class="editor">
+            <div id="editMarks" class="marks"><div id="editMarksContent" class="marks-content"></div></div>
+            <textarea id="editBody"></textarea>
+            <div id="editMirror" class="mirror" aria-hidden="true"></div>
           </div>
-          <div>
-            <button class="ghost" data-load="${encodeURIComponent(it.id)}">Načíst</button>
+        </label>
+
+        <div class="grid two">
+          <label>Cesta v repozitáři <input id="editPath" readonly></label>
+          <div style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+            <button id="saveEditBtn">💾 Uložit změny</button>
+            <button id="deleteEditBtn" class="danger">🗑 Smazat píseň</button>
           </div>
         </div>
-      `;
-    }).join('');
-    editResultsEl.querySelectorAll('button[data-load]').forEach(btn=>{
-      btn.onclick = ()=>{
-        const id = decodeURIComponent(btn.getAttribute('data-load'));
-        const found = SONG_INDEX_DATA.find(s=>s.id === id);
-        if(found) loadSongForEdit(found);
-      };
-    });
-  }
+        <div id="editStatus" class="note" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </details>
+</div>
 
-  function parseChordProMetaAndBody(text){
-    const lines = text.replace(/\r/g,'').split('\n');
-    const meta = {};
-    const body = [];
-    for(const L of lines){
-      const m = L.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-      if(m){ meta[m[1].toLowerCase()] = m[2]; }
-      else { body.push(L); }
-    }
-    while(body.length && !body[0].trim()) body.shift();
-    while(body.length && !body[body.length-1].trim()) body.pop();
-    return { meta, body: body.join('\n') };
-  }
+<script>
+const qs = s=>document.querySelector(s);
+const statusEl = qs('#status');
+const titleEl = qs('#title'), artistEl = qs('#artist'), numberEl = qs('#number'), keyEl = qs('#key');
+const bodyEl = qs('#body'), filenameEl = qs('#filename');
+const marksEl = document.getElementById('marks'), marksContentEl = document.getElementById('marksContent'), mirrorEl = document.getElementById('mirror');
+const toggleMarksBtn = document.getElementById('toggleMarks');
+const limitInput = document.getElementById('limitVal'), applyLimitBtn = document.getElementById('applyLimit');
+let rowLimit = Number(localStorage.getItem('row_limit') || '30'); limitInput.value = rowLimit;
+const CHORD_BRACKETS_RE = /\[[^\]]*]/g; let marksEnabled = true;
 
-  async function loadSongForEdit(item){
-    try{
-      EDIT_SELECTED = item;
-      estatus('Načítám soubor…');
-      const res = await fetch(item.file, { cache: 'no-store' });
-      if(!res.ok) throw new Error('Soubor nelze načíst: ' + item.file);
-      const txt = await res.text();
+function slug(s){return (s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+function b64utf8(str){return btoa(unescape(encodeURIComponent(str)));}
+function status(msg,ok=false){statusEl.textContent=msg;statusEl.className='note'+(ok?' ok':'');}
+function computeFilename(){
+  const n = numberEl.value ? String(numberEl.value).padStart(3,'0')+'-' : '';
+  const t = slug(titleEl.value||'pisen');
+  const a = slug(artistEl.value||'');
+  filenameEl.value = `${n}${t}${a?'-'+a:''}.pro`;
+}
+['input','change'].forEach(ev=>{titleEl.addEventListener(ev,computeFilename);artistEl.addEventListener(ev,computeFilename);numberEl.addEventListener(ev,computeFilename);});
+computeFilename();
 
-      const { meta, body } = parseChordProMetaAndBody(txt);
+// token storage
+const tokenEl=qs('#token');
+const saved=localStorage.getItem('gh_pat');
+if(saved)tokenEl.value=saved;
+qs('#saveToken').onclick=()=>{localStorage.setItem('gh_pat',tokenEl.value.trim());status('Token uložen.',true);};
+qs('#clearToken').onclick=()=>{localStorage.removeItem('gh_pat');tokenEl.value='';status('Token smazán.',true);};
 
-      eTitleEl.value  = meta.title  || item.title  || '';
-      eArtistEl.value = meta.artist || item.author || '';
-      eNumberEl.value = Number.isFinite(+item.number) ? String(item.number) : (meta.number||'');
-      eKeyEl.value    = meta.key || '';
+function detectRepo(){
+  const host=location.host;
+  const parts=location.pathname.split('/').filter(Boolean);
+  const repo=parts.length?parts[0]:'';
+  const user=host.includes('github.io')?host.split('.')[0]:'';
+  return {user,repo};
+}
 
-      editBodyEl.value = body;
-      const path = (item.file && item.file.startsWith('songs/')) ? item.file : `songs/${(item.file||'').split('/').pop()}`;
-      editPathEl.value = path;
+/* ---------- zvýraznění dlouhých řádků ---------- */
+function escapeHtml(s){return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function rebuildMarks(){
+  if(!marksEnabled){marksContentEl.innerHTML='';marksContentEl.style.height='0';marksEl.style.display='none';return;}
+  marksEl.style.display='';
+  const text=bodyEl.value.replace(/\r/g,'');const lines=text.split('\n');
+  mirrorEl.innerHTML='';
+  for(let i=0;i<lines.length;i++){const span=document.createElement('span');span.className='line';span.innerHTML=lines[i].length?escapeHtml(lines[i]):' ';mirrorEl.appendChild(span);if(i<lines.length-1)mirrorEl.appendChild(document.createElement('br'));}
+  const overIdx=new Set();lines.forEach((L,i)=>{const visible=L.replace(CHORD_BRACKETS_RE,'');if(visible.length>rowLimit)overIdx.add(i);});
+  marksContentEl.innerHTML='';marksContentEl.style.height=mirrorEl.scrollHeight+'px';
+  const spans=mirrorEl.querySelectorAll('.line');spans.forEach((span,i)=>{if(!overIdx.has(i))return;const top=span.offsetTop+span.offsetHeight-2;const mark=document.createElement('div');mark.className='mark';mark.style.top=top+'px';marksContentEl.appendChild(mark);});
+}
+bodyEl.addEventListener('scroll',()=>{marksContentEl.style.transform=`translate(${-bodyEl.scrollLeft}px,${-bodyEl.scrollTop}px)`;mirrorEl.scrollTop=bodyEl.scrollTop;mirrorEl.scrollLeft=bodyEl.scrollLeft;});
+['input','change','keyup'].forEach(ev=>bodyEl.addEventListener(ev,rebuildMarks));
+window.addEventListener('resize',rebuildMarks);rebuildMarks();
+toggleMarksBtn.addEventListener('click',()=>{marksEnabled=!marksEnabled;toggleMarksBtn.textContent=marksEnabled?'⚙ Upozornění: zapnuto':'⚙ Upozornění: vypnuto';rebuildMarks();});
+applyLimitBtn.addEventListener('click',()=>{const v=Number(limitInput.value);if(!Number.isFinite(v)||v<1)return;rowLimit=v;localStorage.setItem('row_limit',String(rowLimit));rebuildMarks();});
 
-      rebuildEditMarks();
-      estatus('Soubor načten.', true);
-
-      // NOVÉ: doplň "books" do edit formuláře
-      const allBookNames = [];
-      SONG_INDEX_DATA.forEach(s => {
-        if (s && s.books) allBookNames.push(...Object.keys(s.books));
-      });
-      fillBooks(eBooksWrap, eBooksNamesDL, allBookNames, item.books || {});
-    }catch(e){
-      console.error(e);
-      estatus('Chyba: ' + e.message);
-    }
-  }
-
-  // NOVĚ upraveno: buildChordProFromEditor přidává {book: …}
-  function buildChordProFromEditor(){
-    const lines = [];
-    if (eTitleEl.value.trim())  lines.push(`{title: ${eTitleEl.value.trim()}}`);
-    if (eArtistEl.value.trim()) lines.push(`{artist: ${eArtistEl.value.trim()}}`);
-    if (eKeyEl.value.trim())    lines.push(`{key: ${eKeyEl.value.trim()}}`);
-    lines.push('');
-
-    const eBooksObj = readBooks(eBooksWrap);
-    for (const [bk, num] of Object.entries(eBooksObj)) {
-      lines.push(`{book: ${bk} = ${num}}`);
-    }
-
-    let body = editBodyEl.value.replace(/\r/g,'');
-    lines.push(body);
-    return lines.join('\n');
-  }
-
-  async function saveEditedSong(){
-    try{
-      if(!EDIT_SELECTED) return estatus('Nejprve vyber a načti píseň ze seznamu.');
-      const { user, repo } = detectRepo();
-      if (!user || !repo) return estatus('Nepodařilo se odvodit user/repo z URL.', false);
-
-      const token = (document.querySelector('#token')?.value || localStorage.getItem('gh_pat') || '').trim();
-      if (!token) return estatus('Chybí PAT token (zadej nahoře).', false);
-
-      const path = editPathEl.value.trim();
-      if (!path) return estatus('Chybí cesta k souboru.', false);
-
-      estatus('Zjišťuji sha…');
-      const metaRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-      });
-      if(!metaRes.ok){
-        const t = await metaRes.text();
-        throw new Error(`GitHub API (get sha) ${metaRes.status}: ${t}`);
-      }
-      const metaJson = await metaRes.json();
-      const sha = metaJson.sha;
-
-      const content = buildChordProFromEditor();
-      estatus('Ukládám změny…');
-      const putRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({
-          message: `chore(song): edit ${eTitleEl.value.trim() || EDIT_SELECTED.title || path}`,
-          content: b64utf8(content),
-          branch: 'main',
-          sha
-        })
-      });
-      if(!putRes.ok){
-        const t = await putRes.text();
-        throw new Error(`GitHub API (save) ${putRes.status}: ${t}`);
-      }
-
-      // NOVÉ: po uložení aktualizuj songs.json
-      const eBooksObj = readBooks(eBooksWrap);
-      const editedId = (editPathEl.value || '').split('/').pop().replace(/\.pro$/i,'');
-      await patchSongsJson({
-        token,
-        id: editedId,
-        filePath: editPathEl.value,
-        title: eTitleEl.value.trim(),
-        author: eArtistEl.value.trim(),
-        number: eNumberEl.value,
-        books: eBooksObj
-      });
-
-      estatus('Hotovo! Změny uloženy.', true);
-    }catch(e){
-      console.error(e);
-      estatus('Chyba: ' + e.message);
-    }
-  }
-
-  async function deleteEditedSong(){
-    try{
-      if(!EDIT_SELECTED) return estatus('Nejprve vyber a načti píseň ze seznamu.');
-      const { user, repo } = detectRepo();
-      if (!user || !repo) return estatus('Nepodařilo se odvodit user/repo z URL.', false);
-
-      const token = (document.querySelector('#token')?.value || localStorage.getItem('gh_pat') || '').trim();
-      if (!token) return estatus('Chybí PAT token (zadej nahoře).', false);
-
-      const path = editPathEl.value.trim();
-      if (!path) return estatus('Chybí cesta k souboru.', false);
-
-      const titleForConfirm = eTitleEl.value.trim() || EDIT_SELECTED.title || path;
-      if (!confirm(`Opravdu smazat píseň: "${titleForConfirm}"?\nTento krok vytvoří commit smazání v repozitáři.`)){
-        return;
-      }
-
-      estatus('Zjišťuji sha pro smazání…');
-      const metaRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-      });
-      if(!metaRes.ok){
-        const t = await metaRes.text();
-        throw new Error(`GitHub API (get sha) ${metaRes.status}: ${t}`);
-      }
-      const metaJson = await metaRes.json();
-      const sha = metaJson.sha;
-
-      estatus('Mažu soubor…');
-      const delRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({
-          message: `chore(song): delete ${titleForConfirm}`,
-          sha,
-          branch: 'main'
-        })
-      });
-      if(!delRes.ok){
-        const t = await delRes.text();
-        throw new Error(`GitHub API (delete) ${delRes.status}: ${t}`);
-      }
-
-      EDIT_SELECTED = null;
-      eTitleEl.value=''; eArtistEl.value=''; eNumberEl.value=''; eKeyEl.value='';
-      editBodyEl.value=''; editPathEl.value='';
-      rebuildEditMarks();
-
-      estatus('Soubor byl smazán.', true);
-
-      await loadSongsIndex();
-      const q = editSearchEl.value;
-      renderEditResults(searchSongs(q));
-    }catch(e){
-      console.error(e);
-      estatus('Chyba: ' + e.message);
-    }
-  }
-
-  function rebuildEditMarks(){
-    if (!editMarksEnabled){
-      editMarksContentEl.innerHTML = '';
-      editMarksContentEl.style.height = '0px';
-      editMarksEl.style.display = 'none';
-      return;
-    }
-    editMarksEl.style.display = '';
-
-    const text = editBodyEl.value.replace(/\r/g,'');
-    const lines = text.split('\n');
-
-    editMirrorEl.innerHTML = '';
-    for (let i=0;i<lines.length;i++){
-      const span = document.createElement('span');
-      span.className = 'line';
-      span.innerHTML = lines[i].length ? escapeHtml(lines[i]) : ' ';
-      editMirrorEl.appendChild(span);
-      if (i < lines.length-1) editMirrorEl.appendChild(document.createElement('br'));
-    }
-
-    const overIdx = new Set();
-    lines.forEach((L, i)=>{
-      const visible = L.replace(CHORD_BRACKETS_RE, '');
-      if (visible.length > rowLimitEdit) overIdx.add(i);
-    });
-
-    editMarksContentEl.innerHTML = '';
-    editMarksContentEl.style.height = editMirrorEl.scrollHeight + 'px';
-
-    const spans = editMirrorEl.querySelectorAll('.line');
-    spans.forEach((span, i)=>{
-      if (!overIdx.has(i)) return;
-      const top = span.offsetTop + span.offsetHeight - 2;
-      const mark = document.createElement('div');
-      mark.className = 'mark';
-      mark.style.top = top + 'px';
-      editMarksContentEl.appendChild(mark);
-    });
-  }
-
-  editBodyEl.addEventListener('scroll', ()=>{
-    editMarksContentEl.style.transform = `translate(${-editBodyEl.scrollLeft}px, ${-editBodyEl.scrollTop}px)`;
-    editMirrorEl.scrollTop  = editBodyEl.scrollTop;
-    editMirrorEl.scrollLeft = editBodyEl.scrollLeft;
+/* ---------- ZPĚVNÍKY ---------- */
+function createBookRow(container,name='',num=''){
+  const wrap=document.createElement('div');
+  wrap.style.display='flex';wrap.style.gap='6px';wrap.style.marginTop='6px';
+  const nameInput=document.createElement('input');nameInput.placeholder='Název zpěvníku';nameInput.value=name;nameInput.style.flex='2';
+  const numInput=document.createElement('input');numInput.type='number';numInput.placeholder='Číslo';numInput.value=num;numInput.style.width='90px';
+  const delBtn=document.createElement('button');delBtn.textContent='🗑';delBtn.onclick=()=>wrap.remove();
+  wrap.append(nameInput,numInput,delBtn);container.appendChild(wrap);
+}
+const bookRows=document.getElementById('bookRows');const addBookBtn=document.getElementById('addBookBtn');
+if(bookRows&&addBookBtn)addBookBtn.onclick=()=>createBookRow(bookRows);
+const eBookRows=document.getElementById('eBookRows');const addEBookBtn=document.getElementById('addEBookBtn');
+if(eBookRows&&addEBookBtn)addEBookBtn.onclick=()=>createBookRow(eBookRows);
+function collectBooks(container){
+  const obj={};if(!container)return obj;
+  container.querySelectorAll('div').forEach(row=>{
+    const [name,num]=row.querySelectorAll('input');
+    const n=name?.value.trim();const v=num?.value.trim();
+    if(n)obj[n]=v?Number(v):null;
   });
-  ['input','change','keyup'].forEach(ev => editBodyEl.addEventListener(ev, rebuildEditMarks));
-  window.addEventListener('resize', rebuildEditMarks);
+  return obj;
+}
+</script>
 
-  let _searchTO=null;
-  editSearchEl.addEventListener('input', ()=>{
-    clearTimeout(_searchTO);
-    _searchTO = setTimeout(()=>{
-      const q = editSearchEl.value;
-      const res = searchSongs(q);
-      renderEditResults(res);
-    }, 120);
+<script>
+if('serviceWorker'in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/zpjevnicek/sw.js',{scope:'/zpjevnicek/'}).then(r=>console.log('SW scope',r.scope)).catch(console.error);
   });
-
-  reloadIndexBtn.onclick = ()=> loadSongsIndex().then(()=>{
-    const q = editSearchEl.value;
-    renderEditResults(searchSongs(q));
-  });
-
-  saveEditBtn.onclick = saveEditedSong;
-  deleteEditBtn.onclick = deleteEditedSong;
-
-  // inicializačně načti index
-  loadSongsIndex();
-
-  // Uložit novou píseň do GitHubu
-  qs('#saveBtn').onclick = async () => {
-    try {
-      const { user, repo } = detectRepo();
-      if (!user || !repo) return status('Nepodařilo se odvodit user/repo z URL. Ulož soubor ručně přes GitHub UI.', false);
-
-      const token = (qs('#token').value || '').trim();
-      if (!token) return status('Vlož prosím PAT token.', false);
-      if (!titleEl.value.trim()) return status('Doplň název písně.', false);
-
-      let body = bodyEl.value.replace(/\r/g, '');
-      const fmtSel = (document.getElementById('fmt')?.value) || 'auto';
-      const looksUG = /\[ch\]/i.test(body) || body.split('\n').some(isChordLine);
-      if (fmtSel === 'ug' || (fmtSel === 'auto' && looksUG)) body = ugToChordPro(body);
-      body = body.replace(/\r/g, '');
-
-      const lines = [];
-      lines.push(`{title: ${titleEl.value.trim()}}`);
-      if (artistEl.value.trim()) lines.push(`{artist: ${artistEl.value.trim()}}`);
-      if (keyEl.value.trim())    lines.push(`{key: ${keyEl.value.trim()}}`);
-      lines.push('');
-
-      // NOVÉ: přečti a zapiš zpěvníky do .pro
-      const booksObj = readBooks(booksWrap);
-      for (const [bk, num] of Object.entries(booksObj)) {
-        lines.push(`{book: ${bk} = ${num}}`);
-      }
-
-      lines.push(body);
-      const content = lines.join('\n');
-
-      const filename = filenameEl.value || 'pisen.pro';
-      const path = `songs/${filename}`;
-
-      status('Ukládám…');
-      const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(path)}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({
-          message: `feat(song): add ${titleEl.value.trim()}`,
-          content: b64utf8(content),
-          branch: 'main'
-        })
-      });
-      if (!res.ok) { const t = await res.text(); throw new Error(`GitHub API ${res.status}: ${t}`); }
-
-      // NOVÉ: aktualizuj data/songs.json
-      const filenameNoExt = filename.replace(/\.pro$/i, '');
-      await patchSongsJson({
-        token,
-        id: filenameNoExt,
-        filePath: path,
-        title: titleEl.value.trim(),
-        author: artistEl.value.trim(),
-        number: numberEl.value,
-        books: booksObj
-      });
-
-      status('Hotovo! Soubor uložen do /songs. Za chvíli se aktualizuje seznam (GitHub Action).', true);
-    } catch (e) {
-      console.error(e);
-      status('Chyba: ' + e.message);
-    }
-  };
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/zpjevnicek/sw.js', { scope: '/zpjevnicek/' })
-          .then(r => console.log('Zpjěvníček SW scope:', r.scope))
-          .catch(console.error);
-      });
-    }
-  </script>
+}
+</script>
 </body>
 </html>
