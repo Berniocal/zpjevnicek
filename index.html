@@ -250,20 +250,24 @@ function buildBookSelect(){
     }
   });
   const prev = localStorage.getItem(BOOK_KEY) || '';
-  const options = [
-    `<option value="">Všechno</option>`,
-    ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
-      `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
-    )
-  ];
-  bookSel.innerHTML = options.join('');
+const options = [
+  `<option value="" disabled hidden>Zpěvníky</option>`,  // zobrazí se jako výchozí popisek
+  `<option value="__all__"${prev===''?' selected':''}>Všechno</option>`,
+  ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
+    `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
+  )
+];
+bookSel.innerHTML = options.join('');
+
 }
 
 /* ------- hlavní seznam ------- */
 function renderMain(){
   const term = q.value.trim().toLowerCase();
   const srt  = sort.value;
-  const selectedBook = bookSel ? bookSel.value : '';
+ let selectedBook = bookSel ? bookSel.value : '';
+if (selectedBook === '__all__') selectedBook = ''; // „Všechno“ znamená žádný filtr
+
 
   let data = songs.filter(s =>
     s.title.toLowerCase().includes(term) ||
