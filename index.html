@@ -37,15 +37,8 @@
   .item .meta .title{ display:block; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .item > .badge{ max-width:40%; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-  .controls{ margin:8px 0 10px; display:flex; gap:10px; position:relative; }
-  .controls input{ flex:1; }
-
-  /* Panel „Zpěvníky“ */
-  #booksPanel{
-    position:absolute; z-index:10; display:none;
-    background:var(--card); border:1px solid #1f2b46; border-radius:10px; padding:10px;
-    box-shadow:0 10px 24px rgba(0,0,0,.35); min-width:220px;
-  }
+  .controls{ margin:8px 0 10px; display:flex; gap:10px; flex-wrap:wrap; }
+  .controls input{ flex:1; min-width:220px; }
 
   /* Views */
   .view{ display:none; }
@@ -91,13 +84,12 @@
         <option value="author">Řadit podle autora</option>
       </select>
 
-      <!-- NOVÉ: tlačítko Zpěvníky -->
-      <button id="btnBooks" type="button">Zpěvníky ▾</button>
+      <!-- NOVÉ: výběr zpěvníku (nativní select) -->
+      <select id="book">
+        <option value="">Všechno</option>
+      </select>
 
       <button id="btnPlaylists">Playlisty</button>
-
-      <!-- NOVÉ: panel pro výběr zpěvníků -->
-      <div id="booksPanel"></div>
     </div>
 
     <!-- view: hlavní seznam -->
@@ -147,6 +139,7 @@
 const list = document.getElementById('list');
 const q = document.getElementById('q');
 const sort = document.getElementById('sort');
+const bookSel = document.getElementById('book');
 const empty = document.getElementById('empty');
 const V_MAIN = document.getElementById('vMain');
 const V_PL = document.getElementById('vPl');
@@ -154,13 +147,11 @@ const V_DETAIL = document.getElementById('vPlDetail');
 const HEADER = document.querySelector('.header');
 const CTRLS  = document.querySelector('.controls');
 
+const BOOK_KEY = 'zpj_book';
+
 let songs = [];
 let playlists = [];   // [{id, name, items:[songId,...]}]
 let CUR_PL = null;
-
-/* --- ZPĚVNÍKY: stav --- */
-let CURRENT_BOOK = '';                 // '' = Všechno
-const BOOK_KEY = 'zpj_book';
 
 /* ------- utils ------- */
 function show(v){
@@ -174,10 +165,9 @@ function show(v){
 function savePlaylists(){ localStorage.setItem('zpj_playlists', JSON.stringify(playlists)); }
 function loadPlaylists(){ playlists = JSON.parse(localStorage.getItem('zpj_playlists')||'[]'); }
 function byId(id){ return songs.find(s=>s.id===id); }
-
-/* Base64 pro UTF-8 */
-function b64encodeUtf8(str){ return btoa(unescape(encodeURIComponent(str))); }
-function b64decodeUtf8(b64){ return decodeURIComponent(escape(atob(b64))); }
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
 /* ------- směrování podle hash ------- */
 function openPlaylistById(id){
@@ -195,6 +185,8 @@ function handleHash(){
 window.addEventListener('hashchange', handleHash);
 
 /* --- Import z hash #import=... --- */
+function b64encodeUtf8(str){ return btoa(unescape(encodeURIComponent(str))); }
+function b64decodeUtf8(b64){ return decodeURIComponent(escape(atob(b64))); }
 function tryImportFromHash(){
   const h = (location.hash || '');
   if (!h.startsWith('#import=')) return false;
@@ -218,97 +210,26 @@ function tryImportFromHash(){
   }
 }
 
-/* ------- ZPĚVNÍKY: pomocné funkce ------- */
-function collectBooksFromSongs(){
-  const map = {};
-  for (const s of songs){
-    if (!s.books) continue;
-    for (const [bookId, num] of Object.entries(s.books)){
-      if (num == null) continue;
-      if (!map[bookId]) map[bookId] = { title: bookId, count: 0 };
-      map[bookId].count++;
-    }
-  }
-  return map;
-}
-
-function renderBooksPanel(){
-  const panel = document.getElementById('booksPanel');
-  if (!panel) return;
-
-  const books = collectBooksFromSongs();
-  const entries = Object.entries(books).sort((a,b)=> a[1].title.localeCompare(b[1].title));
-
-  const rows = [
-    `<label style="display:flex;gap:8px;align-items:center;margin:4px 0;cursor:pointer">
-       <input type="radio" name="bookSel" value="" ${CURRENT_BOOK===''?'checked':''}>
-       <span>Všechno</span>
-     </label>`
-  ].concat(entries.map(([id,info])=>`
-    <label style="display:flex;gap:8px;align-items:center;margin:4px 0;cursor:pointer">
-      <input type="radio" name="bookSel" value="${id}" ${CURRENT_BOOK===id?'checked':''}>
-      <span>${info.title} <small style="color:#9fb0c7">(${info.count})</small></span>
-    </label>
-  `));
-
-  panel.innerHTML = rows.join('');
-  panel.querySelectorAll('input[name="bookSel"]').forEach(r=>{
-    r.addEventListener('change', ()=>{
-      setBook(r.value || '');
-      panel.style.display = 'none';
-    });
-  });
-}
-
-function updateBooksButtonLabel(){
-  const btnBooks = document.getElementById('btnBooks');
-  if (!btnBooks) return;
-  if (!CURRENT_BOOK){
-    btnBooks.textContent = 'Zpěvníky ▾';
-  } else {
-    const bmap = collectBooksFromSongs();
-    const label = bmap[CURRENT_BOOK]?.title || CURRENT_BOOK;
-    btnBooks.textContent = `${label} ▾`;
-  }
-}
-
-function setBook(bookId){
-  CURRENT_BOOK = bookId || '';
-  localStorage.setItem(BOOK_KEY, CURRENT_BOOK);
-  updateBooksButtonLabel();
-  renderMain();
-}
-
 /* ------- načtení písní ------- */
 async function load(){
   try{
     const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
     songs = await res.json();
   }catch(e){ songs = []; }
-
-  // ZPĚVNÍKY: načti uloženou volbu a připrav panel
-  CURRENT_BOOK = localStorage.getItem(BOOK_KEY) || '';
-
   renderMain();
   loadPlaylists();
   renderPlaylistList();
+  buildBookSelect();          // naplň select se zpěvníky
 
-  // připrav panel + tlačítko
-  const btnBooks = document.getElementById('btnBooks');
-  const booksPanel = document.getElementById('booksPanel');
-  updateBooksButtonLabel();
-  renderBooksPanel();
-
-  if (btnBooks && booksPanel){
-    btnBooks.addEventListener('click', ()=>{
-      const r = btnBooks.getBoundingClientRect();
-      booksPanel.style.left = `${Math.round(r.left)}px`;
-      booksPanel.style.top  = `${Math.round(r.bottom + window.scrollY + 6)}px`;
-      booksPanel.style.display = (booksPanel.style.display==='none'||!booksPanel.style.display)?'block':'none';
-    });
-    document.addEventListener('click', (e)=>{
-      if (e.target===btnBooks || booksPanel.contains(e.target)) return;
-      booksPanel.style.display = 'none';
+  // obsluha změny výběru zpěvníků
+  if (bookSel){
+    const stored = localStorage.getItem(BOOK_KEY);
+    if (stored && Array.from(bookSel.options).some(o=>o.value===stored)){
+      bookSel.value = stored;
+    }
+    bookSel.addEventListener('change', ()=>{
+      localStorage.setItem(BOOK_KEY, bookSel.value);
+      renderMain();
     });
   }
 
@@ -319,46 +240,72 @@ async function load(){
   handleHash();
 }
 
+/* ------- naplnění selectu „Zpěvníky“ ------- */
+function buildBookSelect(){
+  if (!bookSel) return;
+  const set = new Set();
+  songs.forEach(s => {
+    if (s && s.books && typeof s.books === 'object'){
+      Object.keys(s.books).forEach(name => set.add(name));
+    }
+  });
+  const prev = localStorage.getItem(BOOK_KEY) || '';
+  const options = [
+    `<option value="">Všechno</option>`,
+    ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
+      `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
+    )
+  ];
+  bookSel.innerHTML = options.join('');
+}
+
 /* ------- hlavní seznam ------- */
 function renderMain(){
   const term = q.value.trim().toLowerCase();
-  const srt = sort.value;
+  const srt  = sort.value;
+  const selectedBook = bookSel ? bookSel.value : '';
+
   let data = songs.filter(s =>
     s.title.toLowerCase().includes(term) ||
     (s.author||'').toLowerCase().includes(term) ||
-    String(s.number||'').includes(term)
+    String(s.number||'').includes(term) ||
+    (selectedBook && s.books && String(s.books[selectedBook]||'').includes(term))
   );
 
-  // ZPĚVNÍKY: filtr
-  if (CURRENT_BOOK){
-    data = data.filter(s => s.books && s.books[CURRENT_BOOK] != null);
+  if (selectedBook){
+    data = data.filter(s => s.books && Object.prototype.hasOwnProperty.call(s.books, selectedBook));
+    data.sort((a,b)=>{
+      const an = a.books?.[selectedBook] ?? 1e9;
+      const bn = b.books?.[selectedBook] ?? 1e9;
+      if (an !== bn) return an - bn;
+      return (a.title).localeCompare(b.title);
+    });
+  } else {
+    data.sort((a,b)=>{
+      if(srt==='number') return (a.number??99999)-(b.number??99999) || a.title.localeCompare(b.title);
+      if(srt==='author') return (a.author||'').localeCompare(b.author||'') || a.title.localeCompare(b.title);
+      return a.title.localeCompare(b.title);
+    });
   }
 
-  // ZPĚVNÍKY: řazení podle čísla ve zpěvníku
-  data.sort((a,b)=>{
-    if (CURRENT_BOOK){
-      const an = (a.books && a.books[CURRENT_BOOK] != null) ? a.books[CURRENT_BOOK] : 999999;
-      const bn = (b.books && b.books[CURRENT_BOOK] != null) ? b.books[CURRENT_BOOK] : 999999;
-      return (an - bn) || a.title.localeCompare(b.title);
-    }
-    if(srt==='number') return (a.number??999999)-(b.number??999999) || a.title.localeCompare(b.title);
-    if(srt==='author') return (a.author||'').localeCompare(b.author||'') || a.title.localeCompare(b.title);
-    return a.title.localeCompare(b.title);
-  });
-
   list.innerHTML = data.map(s => {
-    const badgeNum = CURRENT_BOOK
-      ? (s.books && s.books[CURRENT_BOOK] != null ? s.books[CURRENT_BOOK] : '–')
+    const badgeNum = selectedBook
+      ? (s.books?.[selectedBook] ?? '–')
       : (s.number ?? '–');
     return `
-    <li class="item">
-      <div class="meta">
-        <span class="badge">${badgeNum}</span>
-        <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
-      </div>
-      <div class="badge">${s.author || ''}</div>
-    </li>`;
+      <li class="item">
+        <div class="meta">
+          <span class="badge">${badgeNum}</span>
+          <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}">${s.title}</a>
+        </div>
+        <div class="badge">${s.author || ''}</div>
+      </li>`;
   }).join('');
+
+  // drž text „Všechno“ pro první volbu
+  if (bookSel && bookSel.options.length && bookSel.options[0].value===''){
+    bookSel.options[0].textContent = 'Všechno';
+  }
 
   empty.style.display = data.length ? 'none' : 'block';
 }
@@ -426,7 +373,7 @@ function renderPlaylistDetail(){
     };
   });
 
-  // share button handler (potřebuje znát aktuální CUR_PL)
+  // share button handler
   document.getElementById('plShare').onclick = ()=> sharePlaylistLink(CUR_PL.id);
 }
 
@@ -474,7 +421,7 @@ function renderAddResults(term){
       if (!CUR_PL.items.includes(id)) {
         CUR_PL.items.push(id);
         savePlaylists();
-        renderPlaylistDetail();          // aktualizuj seznam pod dialogem
+        renderPlaylistDetail();
       }
       btn.textContent = 'Přidáno';
       btn.disabled = true;
@@ -489,7 +436,6 @@ async function sharePlaylistLink(id){
   const payload = b64encodeUtf8(JSON.stringify(pl));
   const url = `${location.origin}/zpjevnicek/#import=${encodeURIComponent(payload)}`;
 
-  // zkus systémové sdílení
   try{
     if (navigator.share && /https?:/.test(location.protocol)) {
       await navigator.share({ title: `Playlist: ${pl.name}`, text: `Otevři ve Zpjěvníčku:`, url });
@@ -497,7 +443,6 @@ async function sharePlaylistLink(id){
     }
   }catch(_){}
 
-  // fallback: schránka / prompt
   try{
     await navigator.clipboard.writeText(url);
     alert('Odkaz na playlist byl zkopírován do schránky.');
