@@ -16,70 +16,52 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/003-dubovy-stul-pavel-helan.pro",
+    "id": "003-dubovy-stul-pavel-helan",
     "number": 3,
     "title": "Dubový stůl",
     "author": "Pavel Helan",
     "file": "songs/003-dubovy-stul-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 3
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/004-buchet-je-spousta-pohadkova.pro",
+    "id": "004-buchet-je-spousta-pohadkova",
     "number": 4,
     "title": "Buchet je spousta",
     "author": "Pohádková",
     "file": "songs/004-buchet-je-spousta-pohadkova.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 4
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/005-1-signalni-chinaski.pro",
+    "id": "005-1-signalni-chinaski",
     "number": 5,
     "title": "1. Signální",
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 5
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/006-cesta-krystof.pro",
+    "id": "006-cesta-krystof",
     "number": 6,
     "title": "Cesta",
     "author": "Kryštof",
     "file": "songs/006-cesta-krystof.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 6
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/007-vinari-chinaski.pro",
+    "id": "007-vinari-chinaski",
     "number": 7,
     "title": "Vinaři",
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 7
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/008-hlavolam-chinaski.pro",
+    "id": "008-hlavolam-chinaski",
     "number": 8,
     "title": "Hlavolam",
     "author": "Chinaski",
     "file": "songs/008-hlavolam-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 8
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/009-kazdy-rano-chinaski.pro",
