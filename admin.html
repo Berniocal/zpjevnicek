@@ -905,6 +905,11 @@ deleteEditBtn.onclick = deleteEditedSong;
 
 /* ------------------- Načíst index při startu ------------------- */
 loadSongsIndex();
+function b64utf8_decode(b64){
+  const bin = atob(b64.replace(/\n/g,''));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
+}
 
 /* ------------------- songs.json – update helper ------------------- */
 async function tryUpdateSongsJson(ctx, patch){
@@ -919,7 +924,7 @@ async function tryUpdateSongsJson(ctx, patch){
     }
     const json = await getRes.json();
     const sha = json.sha;
-    const raw = atob(json.content.replace(/\n/g,''));
+   const raw = b64utf8_decode(json.content);
     let arr = [];
     try{ arr = JSON.parse(raw); }catch(_){ arr = []; }
 
