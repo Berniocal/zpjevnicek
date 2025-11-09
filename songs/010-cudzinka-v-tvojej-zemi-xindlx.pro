@@ -1,5 +1,6 @@
 {title: Cudzinka v tvojej zemi}
 {artist: XindlX}
+{book: Zpjěvníček 1 = 10}
 
 Ještě vče[Hm]ra mluvili jsme stejnou řeč[A]í
 i přes pár [G]cizích slov tvý dopi[Em]sy
