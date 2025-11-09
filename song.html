@@ -84,10 +84,19 @@
   padding-left: 0 !important;
 }
 
-/* 2) Nahoře opravdu žádný padding – ať je lišta viditelná nebo skrytá */
-body:not(.chrome-hidden) #view,
+/* Když je lišta vidět, posuň obsah pod její výšku + případný horní padding */
+body:not(.chrome-hidden) #view{
+  padding-top: calc(var(--chromeH) + var(--song-pad-top)) !important;
+}
+
+/* Když je lišta skrytá, respektuj safe-area (notchy) nebo nastavený horní padding */
 body.chrome-hidden #view{
-  padding-top: 0 !important;
+  padding-top: max(env(safe-area-inset-top, 0px), var(--song-pad-top)) !important;
+}
+
+/* Necháme nulový levý okraj – přebijeme případný padding z externího CSS */
+.container{
+  padding-left: 0 !important;
 }
 
 </style>
