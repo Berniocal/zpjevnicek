@@ -499,9 +499,10 @@ document.getElementById('saveBtn').onclick = async () => {
 
     const sbArr = collectSongbooks(sbNewList);
     setSongbookHint(sbNewHint, sbArr);
-    for (const sb of sbArr){
-      lines.push(`{songbook: ${sb.name}|${sb.number}}`);
-    }
+for (const sb of sbArr){
+  lines.push(`{book: ${sb.name} = ${sb.number}}`);
+}
+
 
     lines.push('');
     lines.push(textBody);
@@ -572,16 +573,24 @@ async function loadSongsIndex(){
     SONG_INDEX_DATA = await res.json();
 
     // sběr seznamu zpěvníků (pokud už jsou v JSONu)
-    const acc = [];
-    for (const it of SONG_INDEX_DATA){
-      if (Array.isArray(it.songbooks)){
-        for (const sb of it.songbooks){
-          if (sb && sb.name) acc.push({name: sb.name, number: sb.number});
-        }
-      }
+const acc = [];
+for (const it of SONG_INDEX_DATA){
+  // nový formát: books jako objekt { "Název": číslo, ... }
+  if (it && it.books && typeof it.books === 'object'){
+    for (const k of Object.keys(it.books)){
+      acc.push({ name: k, number: it.books[k] });
     }
-    ALL_SONGBOOKS = acc;
-    fillDatalist();
+  }
+  // zpětná kompatibilita: staré pole songbooks
+  if (Array.isArray(it.songbooks)){
+    for (const sb of it.songbooks){
+      if (sb && sb.name) acc.push({name: sb.name, number: sb.number});
+    }
+  }
+}
+ALL_SONGBOOKS = acc;
+fillDatalist();
+
 
     estatus('Seznam písní načten.', true);
   }catch(e){
@@ -629,14 +638,22 @@ function parseChordProMetaAndBody(text){
   const lines = text.replace(/\r/g,'').split('\n');
   const meta = {};
   const body = [];
-  const songbooks = [];
+  const songbooks = []; // interně stále používáme pole {name, number}
+
   for(const L of lines){
     const m = L.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
     if (m){
       const key = m[1].toLowerCase();
       const val = m[2];
-      if (key==='songbook'){
-        // formát: Název|číslo
+
+      if (key === 'book') {
+        // nový formát: {book: Název = Číslo}
+        const parts = val.split('=');
+        const name = (parts[0]||'').trim();
+        const num  = Number((parts[1]||'').trim());
+        if (name && Number.isFinite(num)) songbooks.push({name, number:num});
+      } else if (key === 'songbook') {
+        // zpětná kompatibilita: {songbook: Název|Číslo}
         const tt = val.split('|');
         const name = (tt[0]||'').trim();
         const num  = Number((tt[1]||'').trim());
@@ -652,6 +669,7 @@ function parseChordProMetaAndBody(text){
   while(body.length && !body[body.length-1].trim()) body.pop();
   return { meta, body: body.join('\n'), songbooks };
 }
+
 async function loadSongForEdit(item){
   try{
     EDIT_SELECTED = item;
@@ -669,7 +687,14 @@ async function loadSongForEdit(item){
 
     // zpěvníky – předvyplnit (z .pro má přednost)
     sbEditList.innerHTML = '';
-    const sbSrc = (songbooks && songbooks.length) ? songbooks : (Array.isArray(item.songbooks) ? item.songbooks : []);
+   let sbSrc = (songbooks && songbooks.length) ? songbooks : [];
+if (!sbSrc.length && item && item.books && typeof item.books === 'object'){
+  sbSrc = Object.keys(item.books).map(name => ({ name, number: item.books[name] }));
+}
+if (!sbSrc.length && Array.isArray(item.songbooks)){
+  sbSrc = item.songbooks;
+}
+
     if (sbSrc.length){
       for (const s of sbSrc) renderSongbookRow(sbEditList, s.name, s.number);
     } else {
@@ -696,9 +721,10 @@ function buildChordProFromEditor(){
 
   const sbArr = collectSongbooks(sbEditList);
   setSongbookHint(sbEditHint, sbArr);
-  for (const sb of sbArr){
-    lines.push(`{songbook: ${sb.name}|${sb.number}}`);
-  }
+ for (const sb of sbArr){
+  lines.push(`{book: ${sb.name} = ${sb.number}}`);
+}
+
 
   lines.push('');
   let body = editBodyEl.value.replace(/\r/g,'');
@@ -897,23 +923,42 @@ async function tryUpdateSongsJson(ctx, patch){
     let arr = [];
     try{ arr = JSON.parse(raw); }catch(_){ arr = []; }
 
-    // najít položku dle 'file'
     const idx = arr.findIndex(x => x && x.file === patch.file);
-    const base = {
-      id: patch.file, file: patch.file,
-      title: patch.title || (arr[idx]?.title) || '',
-      author: patch.author || (arr[idx]?.author) || '',
-      number: (patch.number!=null) ? patch.number : (arr[idx]?.number ?? null)
-    };
-    if (idx>=0){
+
+    // připrav "books" jako objekt z interního pole {name, number}
+    let booksObj = undefined;
+    if (Array.isArray(patch.songbooks)){
+      booksObj = {};
+      for (const s of patch.songbooks){
+        if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
+      }
+    }
+
+    if (idx >= 0){
       const prev = arr[idx];
       arr[idx] = {
         ...prev,
-        ...base,
-        songbooks: (Array.isArray(patch.songbooks) ? patch.songbooks : prev.songbooks)
+        id: patch.file,
+        file: patch.file,
+        title: patch.title || prev.title || '',
+        author: patch.author || prev.author || '',
+        number: (patch.number!=null) ? patch.number : (prev.number ?? null),
+        type: prev.type || 'chordpro',
+        // nový formát:
+        books: (booksObj !== undefined) ? booksObj : (prev.books || prev.book || {})
       };
+      // pro jistotu odstraníme staré pole:
+      delete arr[idx].songbooks;
     } else {
-      arr.push({...base, songbooks: (Array.isArray(patch.songbooks)?patch.songbooks:[])});
+      arr.push({
+        id: patch.file,
+        file: patch.file,
+        title: patch.title || '',
+        author: patch.author || '',
+        number: (patch.number!=null) ? patch.number : null,
+        type: 'chordpro',
+        books: booksObj || {}
+      });
     }
 
     const newContent = JSON.stringify(arr, null, 2);
@@ -935,6 +980,7 @@ async function tryUpdateSongsJson(ctx, patch){
     console.warn('songs.json update vynechán:', e.message);
   }
 }
+
 </script>
 
 <script>
