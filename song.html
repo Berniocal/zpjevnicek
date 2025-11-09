@@ -18,17 +18,17 @@
   :root{
     --cpfs: calc(20px * var(--song-scale, 1));
     --chromeH:0px;
-    --chordColor:#22c55e;
-    --chordScale:1.05;
+    --chordColor:#22c55e;   /* výchozí barva akordů */
+    --chordScale:1.05;      /* výchozí měřítko akordů vůči textu */
     --cp-line:1.25;
     --cp-pad:1.05em;
     --cp-pad-nochords:0.20em;
 
-    /* >>> ZDE MĚŇ OKRAJE TEXTU PÍSNĚ <<< */
-    --song-pad-top: 15px;        /* horní vnitřní okraj */
-    --song-pad-bottom: 24px;    /* spodní vnitřní okraj (poslední řádky + safe-area) */
-    --song-pad-x: 6px;  /* levý (a případně pravý) vnitřní okraj */
-    --song-pad-right: 6px;    /* PRAVÝ okraj textu písně */
+    /* >>> OKRAJE TEXTU PÍSNĚ <<< */
+    --song-pad-top: 15px;
+    --song-pad-bottom: 24px;
+    --song-pad-x: 6px;
+    --song-pad-right: 6px;
 
     --scrollbarW: 3px;
   }
@@ -47,7 +47,7 @@
     padding:12px 12px 8px; border-bottom:1px solid #192544; transition: transform .2s ease, opacity .2s ease; }
   body.chrome-hidden #chrome{ transform: translateY(-110%); opacity:0; height:0; padding:0; margin:0; border:0; overflow:hidden; }
 
- #view{
+#view{
   height:100vh; max-height:100vh; overflow:auto; background:transparent; border:0; border-radius:0; box-shadow:none;
   /*             TOP                         RIGHT (nově)                         BOTTOM                                  LEFT */
   padding: var(--song-pad-top)
@@ -56,11 +56,11 @@
            var(--song-pad-x);
   scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
 }
+
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
   #view::-webkit-scrollbar-track{ background:transparent; }
   #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px; }
 
-  /* horní lišta → text pod ní; bez lišty → respektuj safe-area */
   body:not(.chrome-hidden) #view{ padding-top: calc(var(--chromeH) + var(--song-pad-top)) !important; }
   body.chrome-hidden #view{ padding-top: max(env(safe-area-inset-top, 0px), var(--song-pad-top)) !important; }
   body.chrome-hidden .sheet{ margin-top:0 !important; padding-top:0 !important; }
@@ -69,24 +69,24 @@
   button.ghost{ background:transparent; border:1px solid #2c3b60; border-radius:8px; padding:4px 8px; color:var(--ink); cursor:pointer; }
   button.ghost:hover{ background:#17213a; }
 
-  .title-row{
-    display:flex; align-items:center; gap:8px; margin:8px 0;
-  }
-  #btnSettings{
-    background:transparent; border:1px solid #2c3b60; color:var(--ink); border-radius:8px; padding:4px 8px; cursor:pointer;
-  }
+  .title-row{ display:flex; align-items:center; gap:8px; margin:8px 0; }
+  #btnSettings{ background:transparent; border:1px solid #2c3b60; color:var(--ink); border-radius:8px; padding:4px 8px; cursor:pointer; }
   #btnSettings:hover{ background:#17213a; }
 
-  /* jednoduchý „dropdown“ panel nastavení */
+  /* „dropdown“ panel nastavení */
   #settingsPanel{
     position:absolute; right:12px; top:58px; z-index:6;
     background:var(--card); border:1px solid #223055; border-radius:10px; padding:10px 12px; box-shadow:0 10px 24px rgba(0,0,0,.35);
-    display:none; min-width:280px;
+    display:none; min-width:300px;
   }
   #settingsPanel .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0; }
   #settingsPanel label{ color:var(--ink); font-size:14px; }
-  #settingsPanel input[type="number"]{ width:88px; padding:4px 6px; border-radius:8px; border:1px solid #2c3b60; background:transparent; color:var(--ink); }
+  #settingsPanel input[type="number"]{ width:100px; padding:4px 6px; border-radius:8px; border:1px solid #2c3b60; background:transparent; color:var(--ink); }
+  #settingsPanel input[type="color"]{ width:40px; height:28px; padding:0; border:1px solid #2c3b60; border-radius:6px; background:transparent; }
   #settingsPanel .hint{ font-size:12px; color:#9fb0c7; margin-top:4px; }
+  #settingsActions{ display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+  #settingsSave{ border:1px solid #2c3b60; background:transparent; color:var(--ink); border-radius:8px; padding:6px 10px; cursor:pointer; }
+  #settingsSave:hover{ background:#17213a; }
 
   .auto-scroll{
     position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:999px;
@@ -95,7 +95,6 @@
   }
   .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
 
-  /* obal stránky bez zbytečného vnitřního odsazení */
   .container{ padding-right:0 !important; padding-left:0 !important; padding-top:0 !important; }
 </style>
 </head>
@@ -110,22 +109,36 @@
 
         <div class="title-row">
           <h2 id="title" style="margin:0">Načítám…</h2>
-          <button id="btnSettings" title="Nastavení posuvu">⚙️</button>
+          <button id="btnSettings" title="Nastavení posuvu a akordů">⚙️</button>
         </div>
         <div class="badge" id="meta"></div>
 
-        <!-- panel nastavení posuvu -->
+        <!-- panel nastavení -->
         <div id="settingsPanel" role="dialog" aria-modal="false" aria-labelledby="settingsTitle">
-          <div style="font-weight:600;margin-bottom:6px" id="settingsTitle">Nastavení posuvu</div>
+          <div style="font-weight:600;margin-bottom:6px" id="settingsTitle">Nastavení</div>
+
           <div class="row">
-            <label for="speedInput">Rychlost (px/s)</label>
-            <input id="speedInput" type="number" min="5" max="200" step="1">
+            <label for="speedInput">Rychlost posuvu (px/s)</label>
+            <input id="speedInput" type="number" min="5" max="300" step="1">
           </div>
           <div class="row">
             <label for="delayInput">Zpoždění startu (s)</label>
-            <input id="delayInput" type="number" min="0" max="10" step="0.1">
+            <input id="delayInput" type="number" min="0" max="30" step="0.1">
           </div>
-          <div class="hint">Stisk tlačítka posuvu: vyčká uvedený čas, pak pojede nastavenou rychlostí. Další stisk posuv vypne.</div>
+
+          <div class="row">
+            <label for="chordColorInput">Barva akordů</label>
+            <input id="chordColorInput" type="color">
+          </div>
+          <div class="row">
+            <label for="chordScaleInput">Poměr velikosti akordů</label>
+            <input id="chordScaleInput" type="number" min="0.5" max="2.5" step="0.05">
+          </div>
+
+          <div class="hint">Uložit uloží hodnoty do zařízení a ihned je použije.</div>
+          <div id="settingsActions">
+            <button id="settingsSave">Uložit</button>
+          </div>
         </div>
 
         <div id="controls-score" class="player" style="display:none">
@@ -165,7 +178,7 @@
 <script>
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
-const plId = params.get('pl') || ''; // pokud přišel z playlistu
+const plId = params.get('pl') || '';
 
 let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
@@ -173,15 +186,28 @@ let justSwipedTs = 0;
 let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
 if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
 
-/* --- Auto scroll (nová logika: 1 rychlost + zpoždění + toggle) --- */
+/* --- Klíče nastavení --- */
 const AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
 const AUTO_SPEED_KEY='zpj_autoSpeed';
 const AUTO_DELAY_KEY='zpj_autoDelay';
-let AUTO_SPEED = parseFloat(localStorage.getItem(AUTO_SPEED_KEY));
-if (isNaN(AUTO_SPEED)) AUTO_SPEED = 40; // px/s výchozí
-let AUTO_DELAY = parseFloat(localStorage.getItem(AUTO_DELAY_KEY));
-if (isNaN(AUTO_DELAY)) AUTO_DELAY = 0.5; // s výchozí
+const CHORD_COLOR_KEY='zpj_chordColor';
+const CHORD_SCALE_KEY='zpj_chordScale';
 
+/* --- Defaulty (požadováno) --- */
+let AUTO_SPEED = parseFloat(localStorage.getItem(AUTO_SPEED_KEY));
+if (isNaN(AUTO_SPEED)) AUTO_SPEED = 10;   // px/s
+let AUTO_DELAY = parseFloat(localStorage.getItem(AUTO_DELAY_KEY));
+if (isNaN(AUTO_DELAY)) AUTO_DELAY = 10;   // s
+
+let CHORD_COLOR = localStorage.getItem(CHORD_COLOR_KEY) || getComputedStyle(document.documentElement).getPropertyValue('--chordColor').trim() || '#22c55e';
+let CHORD_SCALE = parseFloat(localStorage.getItem(CHORD_SCALE_KEY));
+if (isNaN(CHORD_SCALE)) CHORD_SCALE = 1.05; // poměr
+
+/* aplikuj barvu/scale hned na start */
+document.documentElement.style.setProperty('--chordColor', CHORD_COLOR);
+document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
+
+/* --- Auto scroll --- */
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
 
@@ -191,12 +217,12 @@ function updateAutoBtnVisibility(){
   if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
   if (floater) floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
 }
-function setAutoIcon(state){ // 'idle' | 'waiting' | 'running'
+function setAutoIcon(state){
   const btn = document.getElementById('autoScroll');
   if (!btn) return;
-  if (state === 'running') btn.textContent = '■';        // stop icon
-  else if (state === 'waiting') btn.textContent = '…';   // čekání
-  else btn.textContent = '∨';                            // start icon
+  if (state === 'running') btn.textContent = '■';
+  else if (state === 'waiting') btn.textContent = '…';
+  else btn.textContent = '∨';
 }
 function stopAutoScroll(){
   autoRunning = false;
@@ -386,7 +412,6 @@ function setScale(s){ const c=Math.min(3,Math.max(0.5,s)); document.documentElem
 /* --- načtení + render --- */
 async function load(){
   const data = await fetch('data/songs.json', {cache:'no-store'}).then(r=>r.json()).catch(()=>[]);
-  // zdroj seznamu pro swipe: playlist vs hlavní list
   if (plId){
     const pls = JSON.parse(localStorage.getItem('zpj_playlists')||'[]');
     const pl = pls.find(p=>p.id===plId);
@@ -401,7 +426,7 @@ async function load(){
   document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
   document.getElementById('meta').textContent = song.author || '';
 
-  // back link podle kontextu
+  // back link
   const backLink = document.getElementById('backLink');
   if (plId){
     backLink.textContent = '← Zpět na playlist';
@@ -445,7 +470,7 @@ async function load(){
     at.renderFinished.on(()=> updateChromeHeight());
   }
 
-  // plovoucí tlačítko autoposuvu (toggle)
+  // autoposuv – toggle
   const tgl = document.getElementById('toggleAutoBtn');
   if (tgl) tgl.onclick = ()=>{ const v = !(localStorage.getItem('autoBtnVisible') === '0'); localStorage.setItem('autoBtnVisible', v ? '0' : '1'); updateAutoBtnVisibility(); };
   const autoBtn=document.getElementById('autoScroll');
@@ -453,13 +478,17 @@ async function load(){
   updateAutoBtnVisibility();
   setAutoIcon('idle');
 
-  // nastavení panel
+  // nastavení panel – naplň aktuálními hodnotami
   const btnSettings = document.getElementById('btnSettings');
   const panel = document.getElementById('settingsPanel');
   const speedInput = document.getElementById('speedInput');
   const delayInput = document.getElementById('delayInput');
+  const chordColorInput = document.getElementById('chordColorInput');
+  const chordScaleInput = document.getElementById('chordScaleInput');
   if (speedInput) speedInput.value = String(AUTO_SPEED);
   if (delayInput) delayInput.value = String(AUTO_DELAY);
+  if (chordColorInput) chordColorInput.value = CHORD_COLOR;
+  if (chordScaleInput) chordScaleInput.value = String(CHORD_SCALE);
 
   if (btnSettings && panel){
     btnSettings.addEventListener('click', ()=>{
@@ -472,18 +501,31 @@ async function load(){
       }
     });
   }
-  if (speedInput){
-    speedInput.addEventListener('input', ()=>{
-      const v = Math.max(5, Math.min(200, Number(speedInput.value)||40));
-      AUTO_SPEED = v; localStorage.setItem(AUTO_SPEED_KEY, String(v));
-    });
-  }
-  if (delayInput){
-    delayInput.addEventListener('input', ()=>{
-      const v = Math.max(0, Math.min(10, Number(delayInput.value)||0));
-      AUTO_DELAY = v; localStorage.setItem(AUTO_DELAY_KEY, String(v));
-    });
-  }
+
+  // ULOŽIT – zapiš vše, použij a zavři panel
+  document.getElementById('settingsSave')?.addEventListener('click', ()=>{
+    // rychlost
+    const sp = Math.max(5, Math.min(300, Number(speedInput.value)||10));
+    AUTO_SPEED = sp; localStorage.setItem(AUTO_SPEED_KEY, String(sp));
+    // zpoždění
+    const dl = Math.max(0, Math.min(30, Number(delayInput.value)||10));
+    AUTO_DELAY = dl; localStorage.setItem(AUTO_DELAY_KEY, String(dl));
+    // barva akordů
+    const col = chordColorInput.value || '#22c55e';
+    CHORD_COLOR = col;
+    document.documentElement.style.setProperty('--chordColor', col);
+    localStorage.setItem(CHORD_COLOR_KEY, col);
+    // měřítko akordů
+    let scl = parseFloat(chordScaleInput.value);
+    if (isNaN(scl)) scl = 1.05;
+    scl = Math.max(0.5, Math.min(2.5, scl));
+    CHORD_SCALE = scl;
+    document.documentElement.style.setProperty('--chordScale', String(scl));
+    localStorage.setItem(CHORD_SCALE_KEY, String(scl));
+
+    relayoutChords();
+    panel.style.display = 'none';
+  });
 
   wireDoubleToggle();
   wireSwipeNavigation();
@@ -519,20 +561,15 @@ if ('serviceWorker' in navigator) {
   if (!isNaN(val) && val > 0) document.documentElement.style.setProperty('--song-scale', String(val));
 })();
 
-load();
-
-/* --- hardwarové tlačítko zpět (Android, PWA) --- */
+/* --- HW tlačítko zpět --- */
 window.addEventListener('popstate', (e) => {
   e.preventDefault();
   const backLink = document.getElementById('backLink');
-  if (backLink) {
-    backLink.click();   // přesměruje přesně jako odkaz „← Zpět“
-  } else {
-    location.href = plId
-      ? '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId)
-      : '/zpjevnicek/';
-  }
+  if (backLink) backLink.click();
+  else location.href = plId ? '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId) : '/zpjevnicek/';
 });
+
+load();
 </script>
 </body>
 </html>
