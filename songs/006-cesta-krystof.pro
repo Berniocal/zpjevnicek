@@ -1,6 +1,7 @@
 {title: Cesta}
 {artist: Kryštof}
 {key: C}
+{book: Zpjěvníček 1 = 6}
 
 1. Tou [C]cestou, tím směrem
 prý bych se d[G]ávno měl dát.
