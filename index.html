@@ -215,19 +215,7 @@ async function load(){
   try{
     const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
     songs = await res.json();
-  // filtruj podle aktuálně vybraného zpěvníku
-const currentBook = localStorage.getItem('zpj_book') || '';
-let list = songs;
 
-// pokud je vybraný konkrétní zpěvník, omez seznam jen na něj
-if (currentBook && currentBook !== '__all__' && currentBook !== '') {
-  list = songs.filter(s => s.books && Object.prototype.hasOwnProperty.call(s.books, currentBook));
-  // seřaď podle čísla v daném zpěvníku
-  list.sort((a,b) => (a.books?.[currentBook] ?? 1e9) - (b.books?.[currentBook] ?? 1e9));
-} else {
-  // jinak nech výchozí řazení podle title
-  list.sort((a,b) => a.title.localeCompare(b.title));
-}
 
   }catch(e){ songs = []; }
   renderMain();
@@ -303,6 +291,9 @@ function renderMain(){
   }
 
   list.innerHTML = data.map(s => {
+      const badgeNum = selectedBook
+    ? (s.books?.[selectedBook] ?? '–')
+    : (s.number ?? '–');
 const href = selectedBook
   ? `/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}&book=${encodeURIComponent(selectedBook)}`
   : `/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}`;
