@@ -1,6 +1,7 @@
 {title: Vinaři}
 {artist: Chinaski}
 {key: D}
+{book: Zpjěvníček 1 = 7}
 
 1. [D]Zase je pátek a [A]mám toho dost!
 Tak beru [C]kramle, za zády [G]Černý most.
