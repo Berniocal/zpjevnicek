@@ -137,6 +137,7 @@
 
           <div class="hint">Uložit uloží hodnoty do zařízení a ihned je použije.</div>
           <div id="settingsActions">
+            <button id="settingsReset" type="button">Původní nastavení</button>
             <button id="settingsSave">Uložit</button>
           </div>
         </div>
@@ -192,6 +193,10 @@ const AUTO_SPEED_KEY='zpj_autoSpeed';
 const AUTO_DELAY_KEY='zpj_autoDelay';
 const CHORD_COLOR_KEY='zpj_chordColor';
 const CHORD_SCALE_KEY='zpj_chordScale';
+const DEF_AUTO_SPEED = 10;      // px/s
+const DEF_AUTO_DELAY = 10;      // s
+const DEF_CHORD_COLOR = '#22c55e';
+const DEF_CHORD_SCALE = 1.05;
 
 /* --- Defaulty (požadováno) --- */
 let AUTO_SPEED = parseFloat(localStorage.getItem(AUTO_SPEED_KEY));
@@ -526,6 +531,33 @@ async function load(){
     relayoutChords();
     panel.style.display = 'none';
   });
+// Reset na výchozí nastavení (ponechá panel otevřený)
+document.getElementById('settingsReset')?.addEventListener('click', () => {
+  // 1) Zapiš výchozí hodnoty do inputů
+  if (speedInput)       speedInput.value       = String(DEF_AUTO_SPEED);
+  if (delayInput)       delayInput.value       = String(DEF_AUTO_DELAY);
+  if (chordColorInput)  chordColorInput.value  = DEF_CHORD_COLOR;
+  if (chordScaleInput)  chordScaleInput.value  = String(DEF_CHORD_SCALE);
+
+  // 2) Aplikuj a ulož (stejně jako „Uložit“, jen panel nezavíráme)
+  AUTO_SPEED = DEF_AUTO_SPEED;
+  localStorage.setItem(AUTO_SPEED_KEY, String(DEF_AUTO_SPEED));
+
+  AUTO_DELAY = DEF_AUTO_DELAY;
+  localStorage.setItem(AUTO_DELAY_KEY, String(DEF_AUTO_DELAY));
+
+  CHORD_COLOR = DEF_CHORD_COLOR;
+  document.documentElement.style.setProperty('--chordColor', DEF_CHORD_COLOR);
+  localStorage.setItem(CHORD_COLOR_KEY, DEF_CHORD_COLOR);
+
+  CHORD_SCALE = DEF_CHORD_SCALE;
+  document.documentElement.style.setProperty('--chordScale', String(DEF_CHORD_SCALE));
+  localStorage.setItem(CHORD_SCALE_KEY, String(DEF_CHORD_SCALE));
+
+  relayoutChords();
+  panel.style.display = 'none';
+
+});
 
   wireDoubleToggle();
   wireSwipeNavigation();
