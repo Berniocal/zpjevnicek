@@ -6,6 +6,10 @@
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "type": "chordpro"
+  "books": {
+    "Zpěvníček 2": 14,
+    "Já písnička 5": 203
+  }
   },
   {
     "id": "002-ibuh-pavel-helan",
