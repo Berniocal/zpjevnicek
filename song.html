@@ -102,15 +102,15 @@
   <div class="container">
     <div class="sheet">
       <div id="chrome">
-        <div class="chrome-row">
-          <a id="backLink" href="#">← Zpět</a>
-          <button id="toggleChrome" class="ghost" title="Skrýt / zobrazit lištu">▾</button>
-        </div>
+<div class="chrome-row">
+  <a id="backLink" href="#">← Zpět</a>
+  <button id="btnSettings" class="ghost" title="Nastavení posuvu a akordů">⚙️</button>
+</div>
 
-        <div class="title-row">
-          <h2 id="title" style="margin:0">Načítám…</h2>
-          <button id="btnSettings" title="Nastavení posuvu a akordů">⚙️</button>
-        </div>
+<div class="title-row">
+  <h2 id="title" style="margin:0">Načítám…</h2>
+</div>
+
         <div class="badge" id="meta"></div>
 
         <!-- panel nastavení -->
@@ -562,9 +562,6 @@ document.getElementById('settingsReset')?.addEventListener('click', () => {
   wireDoubleToggle();
   wireSwipeNavigation();
   updateChromeHeight();
-
-  const toggleBtn=document.getElementById('toggleChrome');
-  if (toggleBtn) toggleBtn.onclick = ()=> setChromeHidden(!document.body.classList.contains('chrome-hidden'));
 }
 function applyChordVisibility(){
   const cp=document.querySelector('#view .cp'); if(!cp) return;
