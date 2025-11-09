@@ -1,6 +1,7 @@
 {title: Hlavolam}
 {artist: Chinaski}
 {key: C}
+{book: Zpjěvníček 1 = 8}
 
 [G]Tisíce [Am]nocí, tisíc [C]slov a dní.
 [G]Hlavolam [Am]první a [C]poslední.
