@@ -163,6 +163,8 @@ const empty = document.getElementById('empty');
 const V_MAIN = document.getElementById('vMain');
 const V_PL = document.getElementById('vPl');
 const V_DETAIL = document.getElementById('vPlDetail');
+const HEADER = document.querySelector('.header');
+const CTRLS  = document.querySelector('.controls');
 
 let songs = [];
 let playlists = [];   // [{id, name, items:[songId,...]}]
@@ -170,9 +172,15 @@ let CUR_PL = null;
 
 /* ------- utils ------- */
 function show(v){
-  for (const el of [V_MAIN,V_PL,V_DETAIL]) el.classList.remove('active');
+  for (const el of [V_MAIN, V_PL, V_DETAIL]) el.classList.remove('active');
   v.classList.add('active');
+
+  // hlavička + ovladače jen na hlavní stránce
+  const onMain = (v === V_MAIN);
+  if (HEADER) HEADER.style.display = onMain ? '' : 'none';
+  if (CTRLS)  CTRLS.style.display  = onMain ? '' : 'none';
 }
+
 function savePlaylists(){ localStorage.setItem('zpj_playlists', JSON.stringify(playlists)); }
 function loadPlaylists(){ playlists = JSON.parse(localStorage.getItem('zpj_playlists')||'[]'); }
 function byId(id){ return songs.find(s=>s.id===id); }
