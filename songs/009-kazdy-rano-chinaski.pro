@@ -1,5 +1,6 @@
 {title: Každý ráno}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 9}
 
 [G]Každý ráno když si [D]vzpomenu,
 [F]vzpomenu si [C]na to 
