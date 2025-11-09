@@ -307,31 +307,37 @@ function openPlaylist(id){
 function renderPlaylistDetail(){
   document.getElementById('plTitle').textContent = CUR_PL?.name || 'Playlist';
   const ul = document.getElementById('plDetailList');
-  ul.innerHTML = (CUR_PL.items||[]).map((sid,idx)=>{
-    const s = byId(sid) || { title:'(chybí)', author:'', number:'–' };
-    return `<li class="pl-song" draggable="true" data-idx="${idx}">
-      <span class="grip">≡</span>
-      <a class="title" href="/zpjevnicek/song.html?id=${encodeURIComponent(sid)}&pl=${encodeURIComponent(CUR_PL.id)}">${s.number??'–'} · ${s.title}</a>
+ul.innerHTML = data.map(s=>{
+  const already = (CUR_PL?.items||[]).includes(s.id);
+  return `<li style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #1f2b46">
+    <span class="badge" style="width:38px;height:38px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center">${s.number??'–'}</span>
+    <div style="flex:1;min-width:0">
+      <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title}</div>
       <small>${s.author||''}</small>
-      <button data-rm="${idx}" title="Odebrat">✖</button>
-    </li>`;
-  }).join('');
+    </div>
+    <button data-add="${s.id}" ${already?'disabled':''}>${already?'Přidáno':'Přidat'}</button>
+  </li>`;
+}).join('');
+
 
   // drag & drop
   let dragIdx = -1;
-  ul.querySelectorAll('.pl-song').forEach(li=>{
-    li.addEventListener('dragstart', ()=>{ dragIdx = +li.dataset.idx; li.classList.add('drag'); });
-    li.addEventListener('dragend', ()=> li.classList.remove('drag'));
-    li.addEventListener('dragover', (e)=> e.preventDefault());
-    li.addEventListener('drop', (e)=>{
-      e.preventDefault();
-      const to = +li.dataset.idx;
-      if(dragIdx===to) return;
-      const x = CUR_PL.items.splice(dragIdx,1)[0];
-      CUR_PL.items.splice(to,0,x);
-      savePlaylists(); renderPlaylistDetail();
-    });
-  });
+ul.querySelectorAll('[data-add]').forEach(btn=>{
+  btn.onclick = ()=>{
+    const id = btn.dataset.add;
+    if(!CUR_PL) return;
+    if (!CUR_PL.items.includes(id)) {
+      CUR_PL.items.push(id);
+      savePlaylists();
+      renderPlaylistDetail();            // aktualizuj seznam pod dialogem
+    }
+    // feedback v dialogu
+    btn.textContent = 'Přidáno';
+    btn.disabled = true;
+    document.getElementById('addQuery')?.focus(); // zůstaň v režimu přidávání
+  };
+});
+
 
   // odebrat
   ul.querySelectorAll('[data-rm]').forEach(btn=>{
