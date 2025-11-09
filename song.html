@@ -74,6 +74,18 @@
 
   /* obal stránky bez zbytečného vnitřního odsazení */
   .container{ padding-right:0 !important; }
+
+/* 1) Vypnout padding z externího CSS na kontejneru */
+.container{
+  padding-left: 0 !important;
+}
+
+/* 2) Nahoře opravdu žádný padding – ať je lišta viditelná nebo skrytá */
+body:not(.chrome-hidden) #view,
+body.chrome-hidden #view{
+  padding-top: 0 !important;
+}
+
 </style>
 </head>
 <body>
