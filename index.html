@@ -216,10 +216,11 @@ async function load(){
     const res = await fetch('/zpjevnicek/data/songs.json', { cache: 'no-store' });
     songs = await res.json();
   }catch(e){ songs = []; }
-  renderMain();
-  loadPlaylists();
-  renderPlaylistList();
-  buildBookSelect();          // naplň select se zpěvníky
+await indexBooksIfNeeded(); // ← nejdřív do s => s.books
+buildBookSelect();          // teď už máme seznam zpěvníků
+renderMain();
+loadPlaylists();
+renderPlaylistList();
 
   // obsluha změny výběru zpěvníků
   if (bookSel){
@@ -238,6 +239,38 @@ async function load(){
 
   // 2) vyhodnoť hash (hlavní / playlists / pl:<id>)
   handleHash();
+}
+const BOOKS_CACHE_KEY = 'zpj_books_cache_v1';
+
+function parseBooksFromText(txt){
+  const map = {};
+  const re = /^\{book:\s*([^=]+?)\s*=\s*([0-9]+)\s*\}\s*$/gmi;
+  let m;
+  while ((m = re.exec(txt)) !== null) {
+    const name = m[1].trim();
+    const num  = parseInt(m[2], 10);
+    if (name && !isNaN(num)) map[name] = num;
+  }
+  return map;
+}
+
+async function indexBooksIfNeeded(){
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem(BOOKS_CACHE_KEY) || '{}'); } catch(_) {}
+
+  // co není v cache a má cestu k souboru – načti
+  for (const s of songs) {
+    if (!s || !s.file || cache[s.id]) continue;
+    try{
+      const txt = await fetch(s.file, { cache: 'no-store' }).then(r=>r.text());
+      const books = parseBooksFromText(txt);
+      if (Object.keys(books).length) cache[s.id] = books;
+    }catch(_){}
+  }
+
+  // propsat do songs a uložit
+  songs.forEach(s => { if (cache[s.id]) s.books = cache[s.id]; });
+  localStorage.setItem(BOOKS_CACHE_KEY, JSON.stringify(cache));
 }
 
 /* ------- naplnění selectu „Zpěvníky“ ------- */
