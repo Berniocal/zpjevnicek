@@ -38,12 +38,15 @@
     }
   },
   {
-    "id": "005-1-signalni-chinaski",
+    "id": "songs/005-1-signalni-chinaski.pro",
     "number": 5,
     "title": "1. Signální",
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 5
+    }
   },
   {
     "id": "006-cesta-krystof",
