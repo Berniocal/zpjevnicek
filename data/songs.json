@@ -60,12 +60,15 @@
     }
   },
   {
-    "id": "007-vinari-chinaski",
+    "id": "songs/007-vinari-chinaski.pro",
     "number": 7,
     "title": "Vinaři",
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 7
+    }
   },
   {
     "id": "008-hlavolam-chinaski",
