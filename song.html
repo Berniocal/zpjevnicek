@@ -25,9 +25,9 @@
     --cp-pad-nochords:0.20em;
 
     /* >>> ZDE MĚŇ OKRAJE TEXTU PÍSNĚ <<< */
-    --song-pad-top: 15px;        /* horní vnitřní okraj */
+    --song-pad-top: 0px;        /* horní vnitřní okraj */
     --song-pad-bottom: 24px;    /* spodní vnitřní okraj (poslední řádky + safe-area) */
-    --song-pad-x: 6px;          /* levý (a případně pravý) vnitřní okraj */
+    --song-pad-x: 0px;          /* levý (a případně pravý) vnitřní okraj */
 
     --scrollbarW: 3px;
   }
@@ -56,14 +56,33 @@
   #view::-webkit-scrollbar-track{ background:transparent; }
   #view::-webkit-scrollbar-thumb{ background:#2c3b60; border-radius:2px; }
 
-  /* když je horní lišta viditelná, text se posune pod ni */
-  body:not(.chrome-hidden) #view{ padding-top: var(--chromeH); }
-  body.chrome-hidden #view{ padding-top: env(safe-area-inset-top, 0px); }
+  /* horní lišta → text pod ní; bez lišty → respektuj safe-area */
+  body:not(.chrome-hidden) #view{ padding-top: calc(var(--chromeH) + var(--song-pad-top)) !important; }
+  body.chrome-hidden #view{ padding-top: max(env(safe-area-inset-top, 0px), var(--song-pad-top)) !important; }
   body.chrome-hidden .sheet{ margin-top:0 !important; padding-top:0 !important; }
 
   .chrome-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
   button.ghost{ background:transparent; border:1px solid #2c3b60; border-radius:8px; padding:4px 8px; color:var(--ink); cursor:pointer; }
   button.ghost:hover{ background:#17213a; }
+
+  .title-row{
+    display:flex; align-items:center; gap:8px; margin:8px 0;
+  }
+  #btnSettings{
+    background:transparent; border:1px solid #2c3b60; color:var(--ink); border-radius:8px; padding:4px 8px; cursor:pointer;
+  }
+  #btnSettings:hover{ background:#17213a; }
+
+  /* jednoduchý „dropdown“ panel nastavení */
+  #settingsPanel{
+    position:absolute; right:12px; top:58px; z-index:6;
+    background:var(--card); border:1px solid #223055; border-radius:10px; padding:10px 12px; box-shadow:0 10px 24px rgba(0,0,0,.35);
+    display:none; min-width:280px;
+  }
+  #settingsPanel .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0; }
+  #settingsPanel label{ color:var(--ink); font-size:14px; }
+  #settingsPanel input[type="number"]{ width:88px; padding:4px 6px; border-radius:8px; border:1px solid #2c3b60; background:transparent; color:var(--ink); }
+  #settingsPanel .hint{ font-size:12px; color:#9fb0c7; margin-top:4px; }
 
   .auto-scroll{
     position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:999px;
@@ -73,32 +92,7 @@
   .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
 
   /* obal stránky bez zbytečného vnitřního odsazení */
-  .container{ padding-right:0 !important; }
-
-.container{
-  padding-top: 0 !important;
-}
-
-/* 1) Vypnout padding z externího CSS na kontejneru */
-.container{
-  padding-left: 0 !important;
-}
-
-/* Když je lišta vidět, posuň obsah pod její výšku + případný horní padding */
-body:not(.chrome-hidden) #view{
-  padding-top: calc(var(--chromeH) + var(--song-pad-top)) !important;
-}
-
-/* Když je lišta skrytá, respektuj safe-area (notchy) nebo nastavený horní padding */
-body.chrome-hidden #view{
-  padding-top: max(env(safe-area-inset-top, 0px), var(--song-pad-top)) !important;
-}
-
-/* Necháme nulový levý okraj – přebijeme případný padding z externího CSS */
-.container{
-  padding-left: 0 !important;
-}
-
+  .container{ padding-right:0 !important; padding-left:0 !important; }
 </style>
 </head>
 <body>
@@ -109,8 +103,26 @@ body.chrome-hidden #view{
           <a id="backLink" href="#">← Zpět</a>
           <button id="toggleChrome" class="ghost" title="Skrýt / zobrazit lištu">▾</button>
         </div>
-        <h2 id="title" style="margin:8px 0">Načítám…</h2>
+
+        <div class="title-row">
+          <h2 id="title" style="margin:0">Načítám…</h2>
+          <button id="btnSettings" title="Nastavení posuvu">⚙️</button>
+        </div>
         <div class="badge" id="meta"></div>
+
+        <!-- panel nastavení posuvu -->
+        <div id="settingsPanel" role="dialog" aria-modal="false" aria-labelledby="settingsTitle">
+          <div style="font-weight:600;margin-bottom:6px" id="settingsTitle">Nastavení posuvu</div>
+          <div class="row">
+            <label for="speedInput">Rychlost (px/s)</label>
+            <input id="speedInput" type="number" min="5" max="200" step="1">
+          </div>
+          <div class="row">
+            <label for="delayInput">Zpoždění startu (s)</label>
+            <input id="delayInput" type="number" min="0" max="10" step="0.1">
+          </div>
+          <div class="hint">Stisk tlačítka posuvu: vyčká uvedený čas, pak pojede nastavenou rychlostí. Další stisk posuv vypne.</div>
+        </div>
 
         <div id="controls-score" class="player" style="display:none">
           <button id="play">Přehrát</button>
@@ -157,9 +169,17 @@ let justSwipedTs = 0;
 let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
 if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
 
-/* --- Auto scroll --- */
-let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
-let autoMode = 0, _autoRaf=0, _lastTs=0;
+/* --- Auto scroll (nová logika: 1 rychlost + zpoždění + toggle) --- */
+const AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
+const AUTO_SPEED_KEY='zpj_autoSpeed';
+const AUTO_DELAY_KEY='zpj_autoDelay';
+let AUTO_SPEED = parseFloat(localStorage.getItem(AUTO_SPEED_KEY));
+if (isNaN(AUTO_SPEED)) AUTO_SPEED = 40; // px/s výchozí
+let AUTO_DELAY = parseFloat(localStorage.getItem(AUTO_DELAY_KEY));
+if (isNaN(AUTO_DELAY)) AUTO_DELAY = 0.5; // s výchozí
+
+let autoRunning = false;
+let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
 
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
@@ -167,20 +187,58 @@ function updateAutoBtnVisibility(){
   if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
   if (floater) floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
 }
-function stopAutoScroll(){ autoMode=0; if(_autoRaf) cancelAnimationFrame(_autoRaf); _autoRaf=0; _lastTs=0; }
-function runAutoScroll(){
-  if (_autoRaf) cancelAnimationFrame(_autoRaf);
-  _lastTs = 0; const view=document.getElementById('view'); const speeds={1:20,2:45};
-  function tick(ts){
-    if (autoMode===0) return;
-    if (!_lastTs) _lastTs=ts; const dt=(ts-_lastTs)/1000; _lastTs=ts;
-    const spd = speeds[autoMode]||0; if(spd>0){
-      const max=view.scrollHeight-view.clientHeight;
-      if(view.scrollTop>=max-1){ stopAutoScroll(); } else { view.scrollTop=Math.min(max, view.scrollTop+spd*dt); }
-    }
-    if (autoMode!==0) _autoRaf=requestAnimationFrame(tick);
+function setAutoIcon(state){ // 'idle' | 'waiting' | 'running'
+  const btn = document.getElementById('autoScroll');
+  if (!btn) return;
+  if (state === 'running') btn.textContent = '■';        // stop icon
+  else if (state === 'waiting') btn.textContent = '…';   // čekání
+  else btn.textContent = '∨';                            // start icon
+}
+function stopAutoScroll(){
+  autoRunning = false;
+  if(_autoRaf) cancelAnimationFrame(_autoRaf);
+  _autoRaf = 0; _lastTs = 0;
+  if(_autoDelayTO){ clearTimeout(_autoDelayTO); _autoDelayTO = 0; }
+  setAutoIcon('idle');
+}
+function startAutoScroll(){
+  if (autoRunning || _autoDelayTO) { return; }
+  const view=document.getElementById('view');
+  if (!view) return;
+
+  if (AUTO_DELAY > 0){
+    setAutoIcon('waiting');
+    _autoDelayTO = setTimeout(()=>{
+      _autoDelayTO = 0;
+      autoRunning = true;
+      _lastTs = 0;
+      setAutoIcon('running');
+      tickStart();
+    }, AUTO_DELAY*1000);
+  } else {
+    autoRunning = true;
+    _lastTs = 0;
+    setAutoIcon('running');
+    tickStart();
   }
-  _autoRaf=requestAnimationFrame(tick);
+
+  function tickStart(){
+    function tick(ts){
+      if (!autoRunning){ return; }
+      if (!_lastTs) _lastTs = ts;
+      const dt = (ts - _lastTs) / 1000; _lastTs = ts;
+
+      const max = view.scrollHeight - view.clientHeight;
+      if (view.scrollTop >= max - 1){
+        stopAutoScroll();
+      } else {
+        const next = Math.min(max, view.scrollTop + AUTO_SPEED * dt);
+        view.scrollTop = next;
+        _autoRaf = requestAnimationFrame(tick);
+      }
+    }
+    _autoRaf = requestAnimationFrame(tick);
+  }
 }
 
 /* --- CZ noty + transpozice --- */
@@ -383,12 +441,45 @@ async function load(){
     at.renderFinished.on(()=> updateChromeHeight());
   }
 
-  // plovoucí tlačítko autoposuvu
+  // plovoucí tlačítko autoposuvu (toggle)
   const tgl = document.getElementById('toggleAutoBtn');
-  if (tgl) tgl.onclick = ()=>{ AUTO_BTN_VISIBLE = !AUTO_BTN_VISIBLE; localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE ? '1' : '0'); updateAutoBtnVisibility(); };
+  if (tgl) tgl.onclick = ()=>{ const v = !(localStorage.getItem('autoBtnVisible') === '0'); localStorage.setItem('autoBtnVisible', v ? '0' : '1'); updateAutoBtnVisibility(); };
   const autoBtn=document.getElementById('autoScroll');
-  if (autoBtn) autoBtn.onclick=()=>{ autoMode=(autoMode+1)%3; if(autoMode===0) stopAutoScroll(); else runAutoScroll(); };
+  if (autoBtn) autoBtn.onclick=()=>{ if (autoRunning || _autoDelayTO) stopAutoScroll(); else startAutoScroll(); };
   updateAutoBtnVisibility();
+  setAutoIcon('idle');
+
+  // nastavení panel
+  const btnSettings = document.getElementById('btnSettings');
+  const panel = document.getElementById('settingsPanel');
+  const speedInput = document.getElementById('speedInput');
+  const delayInput = document.getElementById('delayInput');
+  if (speedInput) speedInput.value = String(AUTO_SPEED);
+  if (delayInput) delayInput.value = String(AUTO_DELAY);
+
+  if (btnSettings && panel){
+    btnSettings.addEventListener('click', ()=>{
+      panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
+    });
+    // klik mimo panel → zavřít
+    document.addEventListener('click', (e)=>{
+      if (!panel.contains(e.target) && e.target !== btnSettings){
+        panel.style.display = 'none';
+      }
+    });
+  }
+  if (speedInput){
+    speedInput.addEventListener('input', ()=>{
+      const v = Math.max(5, Math.min(200, Number(speedInput.value)||40));
+      AUTO_SPEED = v; localStorage.setItem(AUTO_SPEED_KEY, String(v));
+    });
+  }
+  if (delayInput){
+    delayInput.addEventListener('input', ()=>{
+      const v = Math.max(0, Math.min(10, Number(delayInput.value)||0));
+      AUTO_DELAY = v; localStorage.setItem(AUTO_DELAY_KEY, String(v));
+    });
+  }
 
   wireDoubleToggle();
   wireSwipeNavigation();
@@ -433,7 +524,6 @@ window.addEventListener('popstate', (e) => {
   if (backLink) {
     backLink.click();   // přesměruje přesně jako odkaz „← Zpět“
   } else {
-    // pojistka – pokud z nějakého důvodu není odkaz, vrať se na seznam
     location.href = plId
       ? '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId)
       : '/zpjevnicek/';
