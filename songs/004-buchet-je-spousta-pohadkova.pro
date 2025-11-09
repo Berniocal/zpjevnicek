@@ -1,6 +1,7 @@
 {title: Buchet je spousta}
 {artist: Pohádková}
 {key: D}
+{book: Zpjěvníček 1 = 4}
 
 [D]Z pekárny světa [G]kraj za láskou [A]svou,
 [D]nejednu [G]překonal jsem [Hm]vůli [A]zlou,
