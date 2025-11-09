@@ -61,6 +61,20 @@
   }
   dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
   dialog::backdrop{ background:rgba(0,0,0,.4); }
+
+  .select-wrap{ position: relative; display:inline-block; }
+.select-wrap select{ 
+  position: relative; z-index:2; 
+  color: transparent;               /* text selectu skryjeme */
+  text-shadow: 0 0 0 var(--ink);    /* kurzor a šipka zůstanou OK */
+}
+.select-wrap .select-label{
+  position:absolute; inset:0 auto 0 10px; 
+  display:flex; align-items:center;
+  pointer-events:none;              /* klik prochází na select */
+  color: var(--ink);
+  white-space:nowrap;
+}
 </style>
 </head>
 <body>
@@ -85,9 +99,13 @@
       </select>
 
       <!-- NOVÉ: výběr zpěvníku (nativní select) -->
-      <select id="book">
-        <option value="">Všechno</option>
-      </select>
+<span class="select-wrap">
+  <select id="book">
+    <!-- buildBookSelect() sem doplní položky; „Všechno“ bude mít value="__all__" -->
+  </select>
+  <span id="bookLabel" class="select-label">Zpěvníky</span>
+</span>
+
 
       <button id="btnPlaylists">Playlisty</button>
     </div>
@@ -218,21 +236,30 @@ async function load(){
   }catch(e){ songs = []; }
 await indexBooksIfNeeded(); // ← nejdřív do s => s.books
 buildBookSelect();          // teď už máme seznam zpěvníků
+updateBookLabel();
 renderMain();
 loadPlaylists();
 renderPlaylistList();
 
   // obsluha změny výběru zpěvníků
-  if (bookSel){
-    const stored = localStorage.getItem(BOOK_KEY);
-    if (stored && Array.from(bookSel.options).some(o=>o.value===stored)){
-      bookSel.value = stored;
-    }
-    bookSel.addEventListener('change', ()=>{
-      localStorage.setItem(BOOK_KEY, bookSel.value);
-      renderMain();
-    });
+if (bookSel){
+  const stored = localStorage.getItem(BOOK_KEY) || '__all__';
+  if ([...bookSel.options].some(o => o.value === stored)) {
+    bookSel.value = stored;
+  } else {
+    bookSel.value = '__all__';
   }
+  updateBookLabel(); // po dosazení uložené hodnoty přepiš štítek
+
+  bookSel.addEventListener('change', ()=>{
+    const v = bookSel.value || '__all__';
+    localStorage.setItem(BOOK_KEY, v);
+    renderMain();
+    // po přerenderování znovu uprav štítek (a vrať placeholder, pokud je __all__)
+    updateBookLabel();
+  });
+}
+
 
   // 1) import přes odkaz
   if (tryImportFromHash()) return;
@@ -282,17 +309,33 @@ function buildBookSelect(){
       Object.keys(s.books).forEach(name => set.add(name));
     }
   });
-  const prev = localStorage.getItem(BOOK_KEY) || '';
-const options = [
-  `<option value="" disabled hidden>Zpěvníky</option>`,  // zobrazí se jako výchozí popisek
-  `<option value="__all__"${prev===''?' selected':''}>Všechno</option>`,
-  ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
-    `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
-  )
-];
-bookSel.innerHTML = options.join('');
 
+  const prev = localStorage.getItem(BOOK_KEY) || '__all__'; // default = všechno
+
+  const options = [
+    `<option value="" disabled hidden ${prev==='__all__' ? 'selected' : ''}>Zpěvníky</option>`, // placeholder pro ZAVŘENÝ stav
+    `<option value="__all__"${prev==='__all__' ? ' selected' : ''}>Všechno</option>`,
+    ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
+      `<option value="${escapeHtml(name)}"${prev===name ? ' selected' : ''}>${escapeHtml(name)}</option>`
+    )
+  ];
+  bookSel.innerHTML = options.join('');
 }
+function updateBookLabel(){
+  const lab = document.getElementById('bookLabel');
+  if (!bookSel || !lab) return;
+  const v = bookSel.value || '__all__';
+  if (v === '__all__') {
+    lab.textContent = 'Zpěvníky';   // zavřený stav = „Zpěvníky“
+    // zajistíme, že v zavřeném stavu je vizuálně placeholder, ale v rozevřeném listu je zaškrtnuto „Všechno“
+    bookSel.selectedIndex = 0;      // 0 = náš hidden placeholder
+  } else {
+    // napiš název vybrané položky
+    const opt = bookSel.options[bookSel.selectedIndex];
+    lab.textContent = opt ? opt.textContent : v;
+  }
+}
+
 
 /* ------- hlavní seznam ------- */
 function renderMain(){
