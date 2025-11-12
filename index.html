@@ -147,7 +147,6 @@ const V_DETAIL = document.getElementById('vPlDetail');
 const HEADER = document.querySelector('.header');
 const CTRLS  = document.querySelector('.controls');
 
-const BOOK_KEY = 'zpj_book';
 
 let songs = [];
 let playlists = [];   // [{id, name, items:[songId,...]}]
@@ -222,18 +221,13 @@ async function load(){
   loadPlaylists();
   renderPlaylistList();
   buildBookSelect();          // naplň select se zpěvníky
-
-  // obsluha změny výběru zpěvníků
-  if (bookSel){
-    const stored = localStorage.getItem(BOOK_KEY);
-    if (stored && Array.from(bookSel.options).some(o=>o.value===stored)){
-      bookSel.value = stored;
-    }
-    bookSel.addEventListener('change', ()=>{
-      localStorage.setItem(BOOK_KEY, bookSel.value);
-      renderMain();
-    });
+  // vždy po načtení nastav „Všechny“
+  if (bookSel) {
+    bookSel.value = '';
+    bookSel.addEventListener('change', renderMain);
   }
+
+
 
   // 1) import přes odkaz
   if (tryImportFromHash()) return;
@@ -251,15 +245,15 @@ function buildBookSelect(){
       Object.keys(s.books).forEach(name => set.add(name));
     }
   });
-  const prev = localStorage.getItem(BOOK_KEY) || '';
   const options = [
-  `<option value="">Všechny</option>`,
-    ...Array.from(set).sort((a,b)=>a.localeCompare(b)).map(name =>
-      `<option value="${escapeHtml(name)}"${prev===name?' selected':''}>${escapeHtml(name)}</option>`
+    `<option value="">Všechny</option>`,
+    ...Array.from(set).sort((a,b)=>a.localeCompare(b, 'cs')).map(name =>
+      `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
     )
   ];
   bookSel.innerHTML = options.join('');
 }
+
 
 /* ------- hlavní seznam ------- */
 function renderMain(){
