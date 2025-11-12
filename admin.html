@@ -941,6 +941,22 @@ async function tryUpdateSongsJson(ctx, patch){
 
     if (idx >= 0){
       const prev = arr[idx];
+
+      // připrav "books" jako objekt z interního pole {name, number}
+      let booksObj = undefined;
+      if (Array.isArray(patch.songbooks)){
+        booksObj = {};
+        for (const s of patch.songbooks){
+          if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
+        }
+      }
+
+      // SLUČOVÁNÍ: nesmaž dřívější zařazení – spoj staré a nové
+      const mergedBooks =
+        (booksObj !== undefined)
+          ? { ...(prev.books || {}), ...booksObj }
+          : (prev.books || {});
+
       arr[idx] = {
         ...prev,
         id: patch.file,
@@ -949,12 +965,29 @@ async function tryUpdateSongsJson(ctx, patch){
         author: patch.author || prev.author || '',
         number: (patch.number!=null) ? patch.number : (prev.number ?? null),
         type: prev.type || 'chordpro',
-        // nový formát:
-        books: (booksObj !== undefined) ? booksObj : (prev.books || prev.book || {})
+        books: mergedBooks
       };
-      // pro jistotu odstraníme staré pole:
-      delete arr[idx].songbooks;
+      delete arr[idx].songbooks; // uklid starého formátu
     } else {
+      // nový záznam – ulož vše, co máme
+      let booksObj = {};
+      if (Array.isArray(patch.songbooks)){
+        for (const s of patch.songbooks){
+          if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
+        }
+      }
+      arr.push({
+        id: patch.file,
+        file: patch.file,
+        title: patch.title || '',
+        author: patch.author || '',
+        number: (patch.number!=null) ? patch.number : null,
+        type: 'chordpro',
+        books: booksObj
+      });
+    }
+
+    else {
       arr.push({
         id: patch.file,
         file: patch.file,
