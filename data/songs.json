@@ -55,12 +55,15 @@
     }
   },
   {
-    "id": "006-cesta-krystof",
+    "id": "songs/006-cesta-krystof.pro",
     "number": 6,
     "title": "Cesta",
     "author": "Kryštof",
     "file": "songs/006-cesta-krystof.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 6
+    }
   },
   {
     "id": "007-vinari-chinaski",
