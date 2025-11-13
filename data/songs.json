@@ -540,5 +540,16 @@
     "author": "Divokej Bill",
     "file": "songs/064-do-roka-a-do-dne-divokej-bill.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "songs/065-pijte-vodu-jaromir-nohavica.pro",
+    "file": "songs/065-pijte-vodu-jaromir-nohavica.pro",
+    "title": "Pijte vodu",
+    "author": "Jaromír Nohavica",
+    "number": 65,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 65
+    }
   }
 ]
