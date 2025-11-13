@@ -987,17 +987,6 @@ async function tryUpdateSongsJson(ctx, patch){
       });
     }
 
-    else {
-      arr.push({
-        id: patch.file,
-        file: patch.file,
-        title: patch.title || '',
-        author: patch.author || '',
-        number: (patch.number!=null) ? patch.number : null,
-        type: 'chordpro',
-        books: booksObj || {}
-      });
-    }
 
     const newContent = JSON.stringify(arr, null, 2);
     const putRes = await fetch(`https://api.github.com/repos/${ctx.user}/${ctx.repo}/contents/${encodeURIComponent(path)}`, {
