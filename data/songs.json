@@ -551,5 +551,16 @@
     "books": {
       "Zpjěvníček 1": 65
     }
+  },
+  {
+    "id": "songs/066-duse-z-gumy-chinaski.pro",
+    "file": "songs/066-duse-z-gumy-chinaski.pro",
+    "title": "Duše z gumy",
+    "author": "Chinaski",
+    "number": 66,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 66
+    }
   }
 ]
