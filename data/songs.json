@@ -562,5 +562,16 @@
     "books": {
       "Zpjěvníček 1": 66
     }
+  },
+  {
+    "id": "songs/067-nikdy-nebylo-nic-sto-zvirat.pro",
+    "file": "songs/067-nikdy-nebylo-nic-sto-zvirat.pro",
+    "title": "Nikdy nebylo nic",
+    "author": "Sto zvířat",
+    "number": 67,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 67
+    }
   }
 ]
