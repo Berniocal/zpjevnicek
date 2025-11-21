@@ -573,5 +573,16 @@
     "books": {
       "Zpjěvníček 1": 67
     }
+  },
+  {
+    "id": "songs/068-zanedbany-sex-elan.pro",
+    "file": "songs/068-zanedbany-sex-elan.pro",
+    "title": "Zanedbaný sex",
+    "author": "Elán",
+    "number": 68,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 68
+    }
   }
 ]
