@@ -601,5 +601,14 @@
     "author": "Kabát",
     "file": "songs/075-pohoda-kabat.pro",
     "type": "chordpro"
+  },
+  {
+    "id": "songs/076-na-tebe-zavisly-desmod.pro",
+    "file": "songs/076-na-tebe-zavisly-desmod.pro",
+    "title": "Na Tebe závislý",
+    "author": "Desmod",
+    "number": 76,
+    "type": "chordpro",
+    "books": {}
   }
 ]
