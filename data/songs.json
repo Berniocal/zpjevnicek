@@ -628,5 +628,14 @@
     "number": 78,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/079-jednim-tahem-vaclav-neckar.pro",
+    "file": "songs/079-jednim-tahem-vaclav-neckar.pro",
+    "title": "Jedním tahem",
+    "author": "Václav Neckář",
+    "number": 79,
+    "type": "chordpro",
+    "books": {}
   }
 ]
