@@ -1,5 +1,6 @@
 {title: Ďábel a syn}
 {artist: Kabát}
+{book: Zpjěvníček 1 = 74}
 
 [Dmi]Sedím a koukám, jak [C]zvrácenej podzim
 [Ami]stromům svlíká jejich [G]šat 
