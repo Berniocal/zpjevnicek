@@ -1,5 +1,6 @@
 {title: Chci tančit}
 {artist: Mirai}
+{book: Zpjěvníček 1 = 73}
 
 [E]Život plyne [E]dál. 
 [A]Nechci promarnit ho [A]v jistotách
