@@ -589,10 +589,12 @@
     "id": "songs/069-dribna-paralela-chinski.pro",
     "file": "songs/069-dribna-paralela-chinski.pro",
     "title": "Dribná paralela",
-    "author": "Chinski",
+    "author": "Chinaski",
     "number": 69,
     "type": "chordpro",
-    "books": {}
+    "books": {
+      "Zpjěvníček 1": 69
+    }
   },
   {
     "id": "songs/070-mach-a-sebestova-pohadkova.pro",
