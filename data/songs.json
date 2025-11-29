@@ -603,7 +603,9 @@
     "author": "Pohádková",
     "number": 70,
     "type": "chordpro",
-    "books": {}
+    "books": {
+      "Zpjěvníček 1": 70
+    }
   },
   {
     "id": "songs/071-zadarmo-chinaski.pro",
