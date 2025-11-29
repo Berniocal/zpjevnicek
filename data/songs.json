@@ -620,5 +620,14 @@
     "number": 72,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/073-chci-tancit-mirai.pro",
+    "file": "songs/073-chci-tancit-mirai.pro",
+    "title": "Chci tančit",
+    "author": "Mirai",
+    "number": 73,
+    "type": "chordpro",
+    "books": {}
   }
 ]
