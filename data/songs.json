@@ -611,5 +611,14 @@
     "number": 71,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/072-princezna-ze-mlejna-pohadkova.pro",
+    "file": "songs/072-princezna-ze-mlejna-pohadkova.pro",
+    "title": "Princezna ze mlejna",
+    "author": "Pohádková",
+    "number": 72,
+    "type": "chordpro",
+    "books": {}
   }
 ]
