@@ -638,5 +638,16 @@
     "number": 74,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/075-pohoda-kabat.pro",
+    "file": "songs/075-pohoda-kabat.pro",
+    "title": "Pohoda",
+    "author": "Kabát",
+    "number": 75,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 75
+    }
   }
 ]
