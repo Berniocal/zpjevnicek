@@ -1,5 +1,6 @@
 {title: Zadarmo}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 71}
 
 Vzal si dva [D]leasingy, dvě hypo[D]téky. 
 Měl z toho [G]nervy, tak začal brát [G]léky
