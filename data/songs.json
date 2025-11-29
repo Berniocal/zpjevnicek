@@ -610,5 +610,14 @@
     "number": 76,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/077-rano-ine-kafe.pro",
+    "file": "songs/077-rano-ine-kafe.pro",
+    "title": "Ráno",
+    "author": "Ine kafe",
+    "number": 77,
+    "type": "chordpro",
+    "books": {}
   }
 ]
