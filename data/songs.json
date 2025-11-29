@@ -602,5 +602,14 @@
     "number": 70,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/071-zadarmo-chinaski.pro",
+    "file": "songs/071-zadarmo-chinaski.pro",
+    "title": "Zadarmo",
+    "author": "Chinaski",
+    "number": 71,
+    "type": "chordpro",
+    "books": {}
   }
 ]
