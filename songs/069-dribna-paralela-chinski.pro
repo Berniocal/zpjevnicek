@@ -1,5 +1,6 @@
 {title: Dribná paralela}
-{artist: Chinski}
+{artist: Chinaski}
+{book: Zpjěvníček 1 = 69}
 
 Ta [C]stará [G]dobrá hra je [D]okoukaná
 [C]Nediv se, [G]brácho, kde kdo ji [D]zná
