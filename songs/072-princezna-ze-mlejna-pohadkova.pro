@@ -1,5 +1,6 @@
 {title: Princezna ze mlejna}
 {artist: Pohádková}
+{book: Zpjěvníček 1 = 72}
 
 [C]Vím jedno návrší, zámek [F]nádher[C]nej
 Z nejhez[C]čích pohádek ho [F]znám
