@@ -584,5 +584,14 @@
     "books": {
       "Zpjěvníček 1": 68
     }
+  },
+  {
+    "id": "songs/069-dribna-paralela-chinski.pro",
+    "file": "songs/069-dribna-paralela-chinski.pro",
+    "title": "Dribná paralela",
+    "author": "Chinski",
+    "number": 69,
+    "type": "chordpro",
+    "books": {}
   }
 ]
