@@ -593,5 +593,14 @@
     "number": 69,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/070-mach-a-sebestova-pohadkova.pro",
+    "file": "songs/070-mach-a-sebestova-pohadkova.pro",
+    "title": "Mach a Šebestová",
+    "author": "Pohádková",
+    "number": 70,
+    "type": "chordpro",
+    "books": {}
   }
 ]
