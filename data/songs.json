@@ -590,12 +590,15 @@
     }
   },
   {
-    "id": "074-dabel-a-syn-kabat",
+    "id": "songs/074-dabel-a-syn-kabat.pro",
     "number": 74,
     "title": "Ďábel a syn",
     "author": "Kabát",
     "file": "songs/074-dabel-a-syn-kabat.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 74
+    }
   },
   {
     "id": "075-pohoda-kabat",
