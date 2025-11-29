@@ -637,5 +637,14 @@
     "number": 79,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
+    "file": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
+    "title": "Lepší než almužna",
+    "author": "Svěrák a Uhlíř",
+    "number": 80,
+    "type": "chordpro",
+    "books": {}
   }
 ]
