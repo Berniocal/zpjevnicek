@@ -568,15 +568,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/072-princezna-ze-mlejna-pohadkova.pro",
+    "id": "072-princezna-ze-mlejna-pohadkova",
     "number": 72,
     "title": "Princezna ze mlejna",
     "author": "Pohádková",
     "file": "songs/072-princezna-ze-mlejna-pohadkova.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 72
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/073-chci-tancit-mirai.pro",
