@@ -629,5 +629,14 @@
     "number": 73,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/074-dabel-a-syn-kabat.pro",
+    "file": "songs/074-dabel-a-syn-kabat.pro",
+    "title": "Ďábel a syn",
+    "author": "Kabát",
+    "number": 74,
+    "type": "chordpro",
+    "books": {}
   }
 ]
