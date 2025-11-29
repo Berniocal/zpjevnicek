@@ -576,15 +576,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/073-chci-tancit-mirai.pro",
+    "id": "073-chci-tancit-mirai",
     "number": 73,
     "title": "Chci tančit",
     "author": "Mirai",
     "file": "songs/073-chci-tancit-mirai.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 73
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/074-dabel-a-syn-kabat.pro",
