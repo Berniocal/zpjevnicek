@@ -619,5 +619,14 @@
     "number": 77,
     "type": "chordpro",
     "books": {}
+  },
+  {
+    "id": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
+    "file": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
+    "title": "Dáme klukovi školy",
+    "author": "Svěrák a Uhlíř",
+    "number": 78,
+    "type": "chordpro",
+    "books": {}
   }
 ]
