@@ -1,5 +1,6 @@
 {title: Mach a Šebestová}
 {artist: Pohádková}
+{book: Zpjěvníček 1 = 70}
 
 [G]My jsme žáci třetí bé, 
 bereme však na [D]sebe 
