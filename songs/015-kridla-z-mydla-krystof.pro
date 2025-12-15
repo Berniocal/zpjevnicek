@@ -1,5 +1,6 @@
 {title: Křídla z mýdla}
 {artist: Kryštof}
+{book: Zpjěvníček 1 = 15}
 
 [A]Na všechno mám dost času, 
 [F#m]než přijde ticho hlasu
