@@ -924,9 +924,17 @@ async function tryUpdateSongsJson(ctx, patch){
     }
     const json = await getRes.json();
     const sha = json.sha;
-   const raw = b64utf8_decode(json.content);
-    let arr = [];
-    try{ arr = JSON.parse(raw); }catch(_){ arr = []; }
+    const raw = b64utf8_decode(json.content);
+
+    let arr;
+    try{
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error('songs.json není pole');
+      arr = parsed;
+    }catch(err){
+      console.warn('songs.json nelze parsovat, update přeskočen:', err.message);
+      return;
+    }
 
     const idx = arr.findIndex(x => x && x.file === patch.file);
 
@@ -939,23 +947,8 @@ async function tryUpdateSongsJson(ctx, patch){
       }
     }
 
-    if (idx >= 0){
-      const prev = arr[idx];
-
-      // připrav "books" jako objekt z interního pole {name, number}
-      let booksObj = undefined;
-      if (Array.isArray(patch.songbooks)){
-        booksObj = {};
-        for (const s of patch.songbooks){
-          if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
-        }
-      }
-
-      // SLUČOVÁNÍ: nesmaž dřívější zařazení – spoj staré a nové
-      const mergedBooks =
-        (booksObj !== undefined)
-          ? { ...(prev.books || {}), ...booksObj }
-          : (prev.books || {});
+      // Vstup ze songbook editoru je brán jako zdroj pravdy (může být i prázdný pro odebrání)
+      const mergedBooks = (booksObj !== undefined) ? booksObj : (prev.books || {});
 
       arr[idx] = {
         ...prev,
