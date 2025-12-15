@@ -104,26 +104,20 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/014-chci-ti-rict-mig-21.pro",
+    "id": "014-chci-ti-rict-mig-21",
     "number": 14,
     "title": "Chci ti říct",
     "author": "MIG 21",
     "file": "songs/014-chci-ti-rict-mig-21.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 14
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/015-kridla-z-mydla-krystof.pro",
+    "id": "015-kridla-z-mydla-krystof",
     "number": 15,
     "title": "Křídla z mýdla",
     "author": "Kryštof",
     "file": "songs/015-kridla-z-mydla-krystof.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 15
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/016-tancime-spolu-jelen.pro",
