@@ -1,5 +1,6 @@
 {title: Chci ti říct}
 {artist: MIG 21}
+{book: Zpjěvníček 1 = 14}
 
 [Gm]Chladná [C]rána jsou [Gm]tomu kdo [C]strádá
 [Gm]láskou [C]bolestnou, [Gm]neopětova[C]nou. 
