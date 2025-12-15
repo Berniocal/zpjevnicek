@@ -110,12 +110,13 @@
     }
   },
   {
-    "id": "011-srouby-a-matice-mandrage",
+    "id": "songs/011-srouby-a-matice-mandrage.pro",
     "number": 11,
     "title": "Šrouby a matice",
     "author": "Mandrage",
     "file": "songs/011-srouby-a-matice-mandrage.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {}
   },
   {
     "id": "012-1970-chinaski",
