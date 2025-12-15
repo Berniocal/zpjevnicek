@@ -96,15 +96,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/013-magdalena-jelen.pro",
+    "id": "013-magdalena-jelen",
     "number": 13,
     "title": "Magdaléna",
     "author": "Jelen",
     "file": "songs/013-magdalena-jelen.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 13
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/014-chci-ti-rict-mig-21.pro",
