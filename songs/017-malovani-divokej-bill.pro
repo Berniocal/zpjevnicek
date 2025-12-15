@@ -1,5 +1,6 @@
 {title: Malování}
 {artist: Divokej Bill}
+{book: Zpjěvníček 1 = 17}
 
 [Dm]Nesnaž se, znáš se. 
 [B]Řekni mi [C]co je jiný,
