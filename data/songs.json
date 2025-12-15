@@ -129,12 +129,15 @@
     }
   },
   {
-    "id": "016-tancime-spolu-jelen",
+    "id": "songs/016-tancime-spolu-jelen.pro",
     "number": 16,
     "title": "Tančíme spolu",
     "author": "Jelen",
     "file": "songs/016-tancime-spolu-jelen.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 16
+    }
   },
   {
     "id": "017-malovani-divokej-bill",
