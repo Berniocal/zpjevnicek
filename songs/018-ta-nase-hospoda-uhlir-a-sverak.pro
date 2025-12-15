@@ -1,5 +1,6 @@
 {title: Ta naše hospoda}
 {artist: Svěrák a Uhlíř}
+{book: Zpjěvníček 1 = 18}
 
 /: [C]Ta naše hospoda o[F]d zhora od spoda,
 [C]to je pěkné zaříze[G]ní. 
