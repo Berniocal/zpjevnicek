@@ -1,122 +1,91 @@
 [
   {
-    "id": "songs/001-vanocni-otcenas-pavel-helan.pro",
+    "id": "001-vanocni-otcenas-pavel-helan",
     "number": 1,
     "title": "Vánoční Otčenáš",
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 1
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/002-ibuh-pavel-helan.pro",
+    "id": "002-ibuh-pavel-helan",
     "number": 2,
     "title": "IBůh",
     "author": "Pavel Helan",
     "file": "songs/002-ibuh-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 2
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/003-dubovy-stul-pavel-helan.pro",
+    "id": "003-dubovy-stul-pavel-helan",
     "number": 3,
     "title": "Dubový stůl",
     "author": "Pavel Helan",
     "file": "songs/003-dubovy-stul-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 3
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/004-buchet-je-spousta-pohadkova.pro",
+    "id": "004-buchet-je-spousta-pohadkova",
     "number": 4,
     "title": "Buchet je spousta",
     "author": "Pohádková",
     "file": "songs/004-buchet-je-spousta-pohadkova.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 4
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/005-1-signalni-chinaski.pro",
+    "id": "005-1-signalni-chinaski",
     "number": 5,
     "title": "1. Signální",
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 5
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/006-cesta-krystof.pro",
+    "id": "006-cesta-krystof",
     "number": 6,
     "title": "Cesta",
     "author": "Kryštof",
     "file": "songs/006-cesta-krystof.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 6
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/007-vinari-chinaski.pro",
+    "id": "007-vinari-chinaski",
     "number": 7,
     "title": "Vinaři",
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 7
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/008-hlavolam-chinaski.pro",
+    "id": "008-hlavolam-chinaski",
     "number": 8,
     "title": "Hlavolam",
     "author": "Chinaski",
     "file": "songs/008-hlavolam-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 8
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/009-kazdy-rano-chinaski.pro",
+    "id": "009-kazdy-rano-chinaski",
     "number": 9,
     "title": "Každý ráno",
     "author": "Chinaski",
     "file": "songs/009-kazdy-rano-chinaski.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 9
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/010-cudzinka-v-tvojej-zemi-xindlx.pro",
+    "id": "010-cudzinka-v-tvojej-zemi-xindlx",
     "number": 10,
     "title": "Cudzinka v tvojej zemi",
     "author": "XindlX",
     "file": "songs/010-cudzinka-v-tvojej-zemi-xindlx.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 10
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/011-srouby-a-matice-mandrage.pro",
+    "id": "011-srouby-a-matice-mandrage",
     "number": 11,
     "title": "Šrouby a matice",
     "author": "Mandrage",
     "file": "songs/011-srouby-a-matice-mandrage.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/012-1970-chinaski.pro",
@@ -618,15 +587,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/074-dabel-a-syn-kabat.pro",
+    "id": "074-dabel-a-syn-kabat",
     "number": 74,
     "title": "Ďábel a syn",
     "author": "Kabát",
     "file": "songs/074-dabel-a-syn-kabat.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 74
-    }
+    "type": "chordpro"
   },
   {
     "id": "075-pohoda-kabat",
@@ -637,48 +603,43 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/076-na-tebe-zavisly-desmod.pro",
-    "file": "songs/076-na-tebe-zavisly-desmod.pro",
+    "id": "076-na-tebe-zavisly-desmod",
+    "number": 76,
     "title": "Na Tebe závislý",
     "author": "Desmod",
-    "number": 76,
-    "type": "chordpro",
-    "books": {}
+    "file": "songs/076-na-tebe-zavisly-desmod.pro",
+    "type": "chordpro"
   },
   {
-    "id": "songs/077-rano-ine-kafe.pro",
-    "file": "songs/077-rano-ine-kafe.pro",
+    "id": "077-rano-ine-kafe",
+    "number": 77,
     "title": "Ráno",
     "author": "Ine kafe",
-    "number": 77,
-    "type": "chordpro",
-    "books": {}
+    "file": "songs/077-rano-ine-kafe.pro",
+    "type": "chordpro"
   },
   {
-    "id": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
-    "file": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
+    "id": "078-dame-klukovi-skoly-sverak-a-uhlir",
+    "number": 78,
     "title": "Dáme klukovi školy",
     "author": "Svěrák a Uhlíř",
-    "number": 78,
-    "type": "chordpro",
-    "books": {}
+    "file": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
+    "type": "chordpro"
   },
   {
-    "id": "songs/079-jednim-tahem-vaclav-neckar.pro",
-    "file": "songs/079-jednim-tahem-vaclav-neckar.pro",
+    "id": "079-jednim-tahem-vaclav-neckar",
+    "number": 79,
     "title": "Jedním tahem",
     "author": "Václav Neckář",
-    "number": 79,
-    "type": "chordpro",
-    "books": {}
+    "file": "songs/079-jednim-tahem-vaclav-neckar.pro",
+    "type": "chordpro"
   },
   {
-    "id": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
-    "file": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
+    "id": "080-lepsi-nez-almuzna-sverak-a-uhlir",
+    "number": 80,
     "title": "Lepší než almužna",
     "author": "Svěrák a Uhlíř",
-    "number": 80,
-    "type": "chordpro",
-    "books": {}
+    "file": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
+    "type": "chordpro"
   }
 ]
