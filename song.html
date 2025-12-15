@@ -189,7 +189,7 @@ let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
 if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
 
 /* --- Klíče nastavení --- */
-const AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
+let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
 const AUTO_SPEED_KEY='zpj_autoSpeed';
 const AUTO_DELAY_KEY='zpj_autoDelay';
 const CHORD_COLOR_KEY='zpj_chordColor';
@@ -505,8 +505,8 @@ async function load(){
   // 6) Auto-scroll: tlačítko + ikony
   const tgl = document.getElementById('toggleAutoBtn');
   if (tgl) tgl.onclick = ()=>{
-    const v = !(localStorage.getItem('autoBtnVisible') === '0');
-    localStorage.setItem('autoBtnVisible', v ? '0' : '1');
+    AUTO_BTN_VISIBLE = !AUTO_BTN_VISIBLE;
+    localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE ? '1' : '0');
     updateAutoBtnVisibility();
   };
   const autoBtn=document.getElementById('autoScroll');
