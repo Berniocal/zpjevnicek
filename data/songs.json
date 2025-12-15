@@ -137,12 +137,15 @@
     }
   },
   {
-    "id": "017-malovani-divokej-bill",
+    "id": "songs/017-malovani-divokej-bill.pro",
     "number": 17,
     "title": "Malování",
     "author": "Divokej Bill",
     "file": "songs/017-malovani-divokej-bill.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 17
+    }
   },
   {
     "id": "018-ta-nase-hospoda-uhlir-a-sverak",
