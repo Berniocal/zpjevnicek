@@ -22,12 +22,15 @@
     }
   },
   {
-    "id": "003-dubovy-stul-pavel-helan",
+    "id": "songs/003-dubovy-stul-pavel-helan.pro",
     "number": 3,
     "title": "Dubový stůl",
     "author": "Pavel Helan",
     "file": "songs/003-dubovy-stul-pavel-helan.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 3
+    }
   },
   {
     "id": "songs/004-buchet-je-spousta-pohadkova.pro",
