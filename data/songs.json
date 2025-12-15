@@ -119,12 +119,15 @@
     "books": {}
   },
   {
-    "id": "012-1970-chinaski",
+    "id": "songs/012-1970-chinaski.pro",
     "number": 12,
     "title": "1970",
     "author": "Chinaski",
     "file": "songs/012-1970-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 12
+    }
   },
   {
     "id": "013-magdalena-jelen",
