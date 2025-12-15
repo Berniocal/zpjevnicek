@@ -142,12 +142,15 @@
     }
   },
   {
-    "id": "018-ta-nase-hospoda-uhlir-a-sverak",
+    "id": "songs/018-ta-nase-hospoda-uhlir-a-sverak.pro",
     "number": 18,
     "title": "Ta naše hospoda",
     "author": "Svěrák a Uhlíř",
     "file": "songs/018-ta-nase-hospoda-uhlir-a-sverak.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 18
+    }
   },
   {
     "id": "019-saro-traband",
