@@ -963,12 +963,7 @@ async function tryUpdateSongsJson(ctx, patch){
       delete arr[idx].songbooks; // uklid starého formátu
     } else {
       // nový záznam – ulož vše, co máme
-      let booksObj = {};
-      if (Array.isArray(patch.songbooks)){
-        for (const s of patch.songbooks){
-          if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
-        }
-      }
+   const newBooks = booksObj !== undefined ? booksObj : {};
       arr.push({
         id: patch.file,
         file: patch.file,
@@ -976,7 +971,7 @@ async function tryUpdateSongsJson(ctx, patch){
         author: patch.author || '',
         number: (patch.number!=null) ? patch.number : null,
         type: 'chordpro',
-        books: booksObj
+        books: newBooks
       });
     }
 
