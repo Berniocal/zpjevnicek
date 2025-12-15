@@ -1,5 +1,6 @@
 {title: 1970}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 12}
 
 [D]Nevím, [D]jestli je to [Em]znát, 
 možná by [Em]bylo lepší [F#m]lhát
