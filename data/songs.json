@@ -99,12 +99,15 @@
     }
   },
   {
-    "id": "010-cudzinka-v-tvojej-zemi-xindlx",
+    "id": "songs/010-cudzinka-v-tvojej-zemi-xindlx.pro",
     "number": 10,
     "title": "Cudzinka v tvojej zemi",
     "author": "XindlX",
     "file": "songs/010-cudzinka-v-tvojej-zemi-xindlx.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 10
+    }
   },
   {
     "id": "011-srouby-a-matice-mandrage",
