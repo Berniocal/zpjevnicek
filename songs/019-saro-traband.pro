@@ -1,5 +1,6 @@
 {title: Sáro}
 {artist: Traband}
+{book: Zpjěvníček 1 = 19}
 
 [Am]Sáro, [Em]Sáro, [F]v noci se mi [C]zdálo,
 že [F]tři andělé [C]k nám [F]přišli na obě[G]d.
