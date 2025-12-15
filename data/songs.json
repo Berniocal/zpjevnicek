@@ -77,12 +77,15 @@
     }
   },
   {
-    "id": "008-hlavolam-chinaski",
+    "id": "songs/008-hlavolam-chinaski.pro",
     "number": 8,
     "title": "Hlavolam",
     "author": "Chinaski",
     "file": "songs/008-hlavolam-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 8
+    }
   },
   {
     "id": "009-kazdy-rano-chinaski",
