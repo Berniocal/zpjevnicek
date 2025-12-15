@@ -220,8 +220,13 @@ let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
   const floater = document.getElementById('autoScroll');
+  const toggle = document.getElementById('toggleAutoBtn');
   if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
-  if (floater) floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
+ if (toggle) toggle.setAttribute('aria-pressed', AUTO_BTN_VISIBLE ? 'true' : 'false');
+  if (floater){
+    floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
+    floater.setAttribute('aria-hidden', AUTO_BTN_VISIBLE ? 'false' : 'true');
+  }
 }
 function setAutoIcon(state){
   const btn = document.getElementById('autoScroll');
@@ -507,6 +512,7 @@ async function load(){
   if (tgl) tgl.onclick = ()=>{
     AUTO_BTN_VISIBLE = !AUTO_BTN_VISIBLE;
     localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE ? '1' : '0');
+    if (!AUTO_BTN_VISIBLE && (autoRunning || _autoDelayTO)) stopAutoScroll();
     updateAutoBtnVisibility();
   };
   const autoBtn=document.getElementById('autoScroll');
