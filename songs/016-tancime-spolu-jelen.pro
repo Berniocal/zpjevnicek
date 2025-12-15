@@ -1,5 +1,6 @@
 {title: Tančíme spolu}
 {artist: Jelen}
+{book: Zpjěvníček 1 = 16}
 
 [G]  [C]  [G]  [D]  [C] [Em]  [C]  [G]  [D]  [C] 
 Na to se [Em]nezapomíná, ve s[C]klenici vína
