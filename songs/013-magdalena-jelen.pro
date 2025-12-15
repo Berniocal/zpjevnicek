@@ -1,5 +1,6 @@
 {title: Magdaléna}
 {artist: Jelen}
+{book: Zpjěvníček 1 = 13}
 
 [A]Zapal ten oheň ve mně. [D]Čeho se bojíš?
 [A]Zápalkou škrtni jemně.[D]
