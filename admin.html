@@ -946,7 +946,8 @@ async function tryUpdateSongsJson(ctx, patch){
         if (s && s.name && Number.isFinite(s.number)) booksObj[s.name] = s.number;
       }
     }
-
+    if (idx >= 0){
+      const prev = arr[idx] || {};
       // Vstup ze songbook editoru je brán jako zdroj pravdy (může být i prázdný pro odebrání)
       const mergedBooks = (booksObj !== undefined) ? booksObj : (prev.books || {});
 
@@ -963,7 +964,7 @@ async function tryUpdateSongsJson(ctx, patch){
       delete arr[idx].songbooks; // uklid starého formátu
     } else {
       // nový záznam – ulož vše, co máme
-   const newBooks = booksObj !== undefined ? booksObj : {};
+         const newBooks = booksObj !== undefined ? booksObj : {};
       arr.push({
         id: patch.file,
         file: patch.file,
