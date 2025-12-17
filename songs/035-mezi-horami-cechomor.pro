@@ -1,6 +1,5 @@
 {title: Mezi horami}
 {artist: Čechomor}
-{book: Zpjěvníček 1 = 35}
 
 /: [Am]Mezi [G]hora[Am]mi lipka [G]zele[Am]ná :/ 
 /: [C]Zabili Janka, [G]Janíčka, [Am]Janka 
