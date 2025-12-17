@@ -474,12 +474,15 @@
     }
   },
   {
-    "id": "049-mars-a-venuse-jelen",
+    "id": "songs/049-mars-a-venuse-jelen.pro",
     "number": 49,
     "title": "Mars a Venuše",
     "author": "Jelen",
     "file": "songs/049-mars-a-venuse-jelen.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 49
+    }
   },
   {
     "id": "050-pisnicka-pavel-calta",
