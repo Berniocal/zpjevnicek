@@ -210,12 +210,15 @@
     }
   },
   {
-    "id": "025-svaz-ceskejch-bohemu-wohnout",
+    "id": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
     "number": 25,
     "title": "Svaz českejch bohémů",
     "author": "Wohnout",
     "file": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 25
+    }
   },
   {
     "id": "026-boky-jako-skrin-ewa-farna",
