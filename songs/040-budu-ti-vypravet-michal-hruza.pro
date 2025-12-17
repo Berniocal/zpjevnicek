@@ -1,5 +1,6 @@
 {title: Budu ti vyprávět}
 {artist: Michal Hrůza}
+{book: Zpjěvníček 1 = 40}
 
 [D]  [Dmaj]            
 Náš [D]svět, promění se [A]hned
