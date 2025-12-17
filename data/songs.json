@@ -419,12 +419,15 @@
     }
   },
   {
-    "id": "044-vrchlabi-chinaski",
+    "id": "songs/044-vrchlabi-chinaski.pro",
     "number": 44,
     "title": "Vrchlabí",
     "author": "Chinaski",
     "file": "songs/044-vrchlabi-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 44
+    }
   },
   {
     "id": "045-venku-je-na-nule-chinaski",
