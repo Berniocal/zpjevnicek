@@ -1,11 +1,15 @@
 [
   {
-    "id": "001-vanocni-otcenas-pavel-helan",
+    "id": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "number": 1,
     "title": "Vánoční Otčenáš",
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 1,
+      "Zpjěvníček 2": 1
+    }
   },
   {
     "id": "002-ibuh-pavel-helan",
