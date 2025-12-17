@@ -265,12 +265,15 @@
     }
   },
   {
-    "id": "030-laska-a-pravda-pohadkova",
+    "id": "songs/030-laska-a-pravda-pohadkova.pro",
     "number": 30,
     "title": "Láska a pravda",
     "author": "Pohádková",
     "file": "songs/030-laska-a-pravda-pohadkova.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 30
+    }
   },
   {
     "id": "031-a-pak-tomas-klus",
