@@ -221,12 +221,15 @@
     }
   },
   {
-    "id": "026-boky-jako-skrin-ewa-farna",
+    "id": "songs/026-boky-jako-skrin-ewa-farna.pro",
     "number": 26,
     "title": "Boky jako skříň",
     "author": "Ewa Farna",
     "file": "songs/026-boky-jako-skrin-ewa-farna.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 26
+    }
   },
   {
     "id": "027-toulava-sebastian",
