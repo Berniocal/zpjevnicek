@@ -1,6 +1,7 @@
 {title: Nám se stalo něco překrásného}
 {artist: Svěrák a Uhlíř}
 {key: C}
+{book: Zpjěvníček 1 = 20}
 
 [C]Nám se stalo něco překrásného,
 [Am]nám se stalo něco divného,
