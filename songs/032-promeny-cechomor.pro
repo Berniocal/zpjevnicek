@@ -1,6 +1,5 @@
 {title: Proměny}
 {artist: Čechomor}
-{book: Zpjěvníček 1 = 32}
 
 [Am]Darmo sa ty trápíš [G]můj milý sy[C]nečku,
 nenosím já tebe, [E]nenosím v sr[Am]déčku,
