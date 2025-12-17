@@ -375,12 +375,15 @@
     }
   },
   {
-    "id": "040-budu-ti-vypravet-michal-hruza",
+    "id": "songs/040-budu-ti-vypravet-michal-hruza.pro",
     "number": 40,
     "title": "Budu ti vyprávět",
     "author": "Michal Hrůza",
     "file": "songs/040-budu-ti-vypravet-michal-hruza.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 40
+    }
   },
   {
     "id": "041-cekam-na-signal-nightwork",
