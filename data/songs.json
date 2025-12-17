@@ -287,12 +287,15 @@
     }
   },
   {
-    "id": "032-promeny-cechomor",
+    "id": "songs/032-promeny-cechomor.pro",
     "number": 32,
     "title": "Proměny",
     "author": "Čechomor",
     "file": "songs/032-promeny-cechomor.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 32
+    }
   },
   {
     "id": "033-tak-nejak-malo-tancim-krystof",
