@@ -320,12 +320,15 @@
     }
   },
   {
-    "id": "035-mezi-horami-cechomor",
+    "id": "songs/035-mezi-horami-cechomor.pro",
     "number": 35,
     "title": "Mezi horami",
     "author": "Čechomor",
     "file": "songs/035-mezi-horami-cechomor.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 35
+    }
   },
   {
     "id": "036-gorale-cechomor",
