@@ -430,12 +430,15 @@
     }
   },
   {
-    "id": "045-venku-je-na-nule-chinaski",
+    "id": "songs/045-venku-je-na-nule-chinaski.pro",
     "number": 45,
     "title": "Venku je na nule",
     "author": "Chinaski",
     "file": "songs/045-venku-je-na-nule-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 45
+    }
   },
   {
     "id": "046-kdyz-nemuzes-tak-pridej-mirai",
