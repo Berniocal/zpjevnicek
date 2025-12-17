@@ -1,6 +1,5 @@
 {title: Boky jako skříň}
 {artist: Ewa Farna}
-{book: Zpjěvníček 1 = 26}
 
 [G]Mám prostě od Pánbíčka
 [G]boky jako skříň, jako [G]skříň
