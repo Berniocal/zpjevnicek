@@ -1,5 +1,6 @@
 {title: Životní}
 {artist: Support Lesbiens}
+{book: Zpjěvníček 1 = 37}
 
 [Em]Srdce doutná, [C]mám svý plány.
 [Am]Cesta dlouhá, [C]zdají se krásný.
