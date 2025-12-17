@@ -1,5 +1,6 @@
 {title: Písnička}
 {artist: Pavel Calta}
+{book: Zpjěvníček 1 = 50}
 
 [F#m] [F#m] [E] [C#m7]
 [F#m]Návrat do rodné země 
