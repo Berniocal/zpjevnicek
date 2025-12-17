@@ -1,6 +1,5 @@
 {title: Až na to přijde}
 {artist: Sebastian}
-{book: Zpjěvníček 1 = 47}
 
 [A] [E] [F#m4d]
 Ještě něž [F#m2d]půjdeme [A2d]spát [D4d]
