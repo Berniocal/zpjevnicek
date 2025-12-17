@@ -1,6 +1,5 @@
 {title: Pod dubem za dubem}
 {artist: Svěrák a Uhlíř}
-{book: Zpjěvníček 1 = 42}
 
 [Am]Pod dubem, za dubem, 
 tam si na tě počíháme,
