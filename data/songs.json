@@ -233,8 +233,7 @@
     "title": "Spomal",
     "author": "Peha",
     "file": "songs/028-spomal-peha.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/029-jdevozem-tomas-klus.pro",
@@ -242,8 +241,7 @@
     "title": "JdeVoZem",
     "author": "Tomáš Klus",
     "file": "songs/029-jdevozem-tomas-klus.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/030-laska-a-pravda-pohadkova.pro",
@@ -251,8 +249,7 @@
     "title": "Láska a pravda",
     "author": "Pohádková",
     "file": "songs/030-laska-a-pravda-pohadkova.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/031-a-pak-tomas-klus.pro",
@@ -260,8 +257,7 @@
     "title": "A pak",
     "author": "Tomáš Klus",
     "file": "songs/031-a-pak-tomas-klus.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/032-promeny-cechomor.pro",
@@ -269,8 +265,7 @@
     "title": "Proměny",
     "author": "Čechomor",
     "file": "songs/032-promeny-cechomor.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/033-tak-nejak-malo-tancim-krystof.pro",
@@ -278,8 +273,7 @@
     "title": "Tak nějak málo tančím",
     "author": "Kryštof",
     "file": "songs/033-tak-nejak-malo-tancim-krystof.pro",
-    "type": "chordpro",
-    "books": {}
+    "type": "chordpro"
   },
   {
     "id": "songs/034-svarak-harlej.pro",
