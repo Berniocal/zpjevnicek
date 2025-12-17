@@ -2,6 +2,7 @@
 {artist: Pavel Helan}
 {key: C}
 {book: Zpjěvníček 1 = 2}
+{book: Zpjěvníček 2 = 2}
 
 [C]Koupil jsem si [Fmaj]iPhone, 
 [C]černý 4[Fmaj]s,
