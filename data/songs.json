@@ -342,12 +342,15 @@
     }
   },
   {
-    "id": "037-zivotni-support-lesbiens",
+    "id": "songs/037-zivotni-support-lesbiens.pro",
     "number": 37,
     "title": "Životní",
     "author": "Support Lesbiens",
     "file": "songs/037-zivotni-support-lesbiens.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 37
+    }
   },
   {
     "id": "038-andel-mirai",
