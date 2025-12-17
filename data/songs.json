@@ -188,12 +188,15 @@
     "type": "chordpro"
   },
   {
-    "id": "023-nad-stadem-koni-buty",
+    "id": "songs/023-nad-stadem-koni-buty.pro",
     "number": 23,
     "title": "Nad stádem koní",
     "author": "Buty",
     "file": "songs/023-nad-stadem-koni-buty.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 23
+    }
   },
   {
     "id": "024-kdyz-si-te-divko-predstavim-sverak-a-uhlir",
