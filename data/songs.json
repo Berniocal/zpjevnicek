@@ -397,12 +397,15 @@
     }
   },
   {
-    "id": "042-pod-dubem-za-dubem-sverak-a-uhlir",
+    "id": "songs/042-pod-dubem-za-dubem-sverak-a-uhlir.pro",
     "number": 42,
     "title": "Pod dubem za dubem",
     "author": "Svěrák a Uhlíř",
     "file": "songs/042-pod-dubem-za-dubem-sverak-a-uhlir.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 42
+    }
   },
   {
     "id": "043-ty-a-ja-krystof",
