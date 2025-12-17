@@ -1,6 +1,7 @@
 {title: Hruška}
 {artist: Čechomor}
 {key: D}
+{book: Zpjěvníček 1 = 21}
 
 [A]  Sto[D]jí hruška v ši[A]rém poli 
 vr[D]šek se jí [G]zele[A]ná 
