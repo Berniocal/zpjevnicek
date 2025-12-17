@@ -364,12 +364,15 @@
     }
   },
   {
-    "id": "039-pulnocni-vaclav-neckar",
+    "id": "songs/039-pulnocni-vaclav-neckar.pro",
     "number": 39,
     "title": "Půlnoční",
     "author": "Václav Neckář",
     "file": "songs/039-pulnocni-vaclav-neckar.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 39
+    }
   },
   {
     "id": "040-budu-ti-vypravet-michal-hruza",
