@@ -1,5 +1,6 @@
 {title: Šrouby a matice}
 {artist: Mandrage}
+{book: Zpjěvníček 1 = 11}
 
 Mezi zemí a [A]nebem a širým [E]světem
 je jeden[Hm] náš, tak dobře ho [D]znáš[E].
