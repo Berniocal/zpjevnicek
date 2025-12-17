@@ -12,12 +12,16 @@
     }
   },
   {
-    "id": "002-ibuh-pavel-helan",
+    "id": "songs/002-ibuh-pavel-helan.pro",
     "number": 2,
     "title": "IBůh",
     "author": "Pavel Helan",
     "file": "songs/002-ibuh-pavel-helan.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 2,
+      "Zpjěvníček 2": 2
+    }
   },
   {
     "id": "003-dubovy-stul-pavel-helan",
