@@ -254,12 +254,15 @@
     }
   },
   {
-    "id": "029-jdevozem-tomas-klus",
+    "id": "songs/029-jdevozem-tomas-klus.pro",
     "number": 29,
     "title": "JdeVoZem",
     "author": "Tomáš Klus",
     "file": "songs/029-jdevozem-tomas-klus.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 29
+    }
   },
   {
     "id": "030-laska-a-pravda-pohadkova",
