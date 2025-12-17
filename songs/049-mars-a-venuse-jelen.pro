@@ -1,5 +1,6 @@
 {title: Mars a Venuše}
 {artist: Jelen}
+{book: Zpjěvníček 1 = 49}
 
 Měsíční s[A]větlo se [F#m]plíží 
 po [D]reliéfu tvýho tě[D]la.
