@@ -441,12 +441,15 @@
     }
   },
   {
-    "id": "046-kdyz-nemuzes-tak-pridej-mirai",
+    "id": "songs/046-kdyz-nemuzes-tak-pridej-mirai.pro",
     "number": 46,
     "title": "Když nemůžeš tak přidej",
     "author": "Mirai",
     "file": "songs/046-kdyz-nemuzes-tak-pridej-mirai.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 46
+    }
   },
   {
     "id": "047-az-na-to-prijde-sebastian",
