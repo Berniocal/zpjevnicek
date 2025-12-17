@@ -1,5 +1,6 @@
 {title: Anděl}
 {artist: Mirai}
+{book: Zpjěvníček 1 = 38}
 
 [Em]Sedí [C]anděl na střeše[G]
 [Em]Shlíží [C]dolů, do uli[G]c
