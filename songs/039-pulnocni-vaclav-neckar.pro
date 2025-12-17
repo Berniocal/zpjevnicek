@@ -1,5 +1,6 @@
 {title: Půlnoční}
 {artist: Václav Neckář}
+{book: Zpjěvníček 1 = 39}
 
 [D]Jedu domů [D]po trati, [D]jedu přes kop[G]ce[A]
 [D]Za okny padá, [D]padá sníh, [D]budou Váno[G]ce[A]
