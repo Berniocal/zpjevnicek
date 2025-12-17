@@ -6,7 +6,9 @@
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 1  }
+    "books": {
+      "Zpjěvníček 1": 1
+    }
   },
   {
     "id": "songs/002-ibuh-pavel-helan.pro",
@@ -16,7 +18,6 @@
     "file": "songs/002-ibuh-pavel-helan.pro",
     "type": "chordpro",
     "books": {
-  
       "Zpjěvníček 1": 2
     }
   },
@@ -29,7 +30,6 @@
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 3
-    
     }
   },
   {
@@ -39,7 +39,9 @@
     "author": "Pohádková",
     "file": "songs/004-buchet-je-spousta-pohadkova.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 4  }
+    "books": {
+      "Zpjěvníček 1": 4
+    }
   },
   {
     "id": "005-1-signalni-chinaski",
@@ -48,7 +50,9 @@
     "author": "Chinaski",
     "file": "songs/005-1-signalni-chinaski.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 5  }
+    "books": {
+      "Zpjěvníček 1": 5
+    }
   },
   {
     "id": "006-cesta-krystof",
@@ -57,7 +61,9 @@
     "author": "Kryštof",
     "file": "songs/006-cesta-krystof.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 6  }
+    "books": {
+      "Zpjěvníček 1": 6
+    }
   },
   {
     "id": "007-vinari-chinaski",
@@ -66,7 +72,9 @@
     "author": "Chinaski",
     "file": "songs/007-vinari-chinaski.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 7  }
+    "books": {
+      "Zpjěvníček 1": 7
+    }
   },
   {
     "id": "008-hlavolam-chinaski",
@@ -75,7 +83,9 @@
     "author": "Chinaski",
     "file": "songs/008-hlavolam-chinaski.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 8  }
+    "books": {
+      "Zpjěvníček 1": 8
+    }
   },
   {
     "id": "009-kazdy-rano-chinaski",
@@ -84,7 +94,9 @@
     "author": "Chinaski",
     "file": "songs/009-kazdy-rano-chinaski.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 9  }
+    "books": {
+      "Zpjěvníček 1": 9
+    }
   },
   {
     "id": "010-cudzinka-v-tvojej-zemi-xindlx",
@@ -93,7 +105,9 @@
     "author": "XindlX",
     "file": "songs/010-cudzinka-v-tvojej-zemi-xindlx.pro",
     "type": "chordpro",
-      "books": { "Zpjěvníček 1": 10  }
+    "books": {
+      "Zpjěvníček 1": 10
+    }
   },
   {
     "id": "011-srouby-a-matice-mandrage",
@@ -102,7 +116,9 @@
     "author": "Mandrage",
     "file": "songs/011-srouby-a-matice-mandrage.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 11  }
+    "books": {
+      "Zpjěvníček 1": 11
+    }
   },
   {
     "id": "012-1970-chinaski",
@@ -111,7 +127,9 @@
     "author": "Chinaski",
     "file": "songs/012-1970-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 12  }
+    "books": {
+      "Zpjěvníček 1": 12
+    }
   },
   {
     "id": "013-magdalena-jelen",
@@ -120,7 +138,9 @@
     "author": "Jelen",
     "file": "songs/013-magdalena-jelen.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 13  }
+    "books": {
+      "Zpjěvníček 1": 13
+    }
   },
   {
     "id": "014-chci-ti-rict-mig-21",
@@ -129,7 +149,9 @@
     "author": "MIG 21",
     "file": "songs/014-chci-ti-rict-mig-21.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 14  }
+    "books": {
+      "Zpjěvníček 1": 14
+    }
   },
   {
     "id": "015-kridla-z-mydla-krystof",
@@ -138,7 +160,9 @@
     "author": "Kryštof",
     "file": "songs/015-kridla-z-mydla-krystof.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 15  }
+    "books": {
+      "Zpjěvníček 1": 15
+    }
   },
   {
     "id": "016-tancime-spolu-jelen",
@@ -147,7 +171,9 @@
     "author": "Jelen",
     "file": "songs/016-tancime-spolu-jelen.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 16  }
+    "books": {
+      "Zpjěvníček 1": 16
+    }
   },
   {
     "id": "017-malovani-divokej-bill",
@@ -156,7 +182,9 @@
     "author": "Divokej Bill",
     "file": "songs/017-malovani-divokej-bill.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 17  }
+    "books": {
+      "Zpjěvníček 1": 17
+    }
   },
   {
     "id": "018-ta-nase-hospoda-uhlir-a-sverak",
@@ -165,7 +193,9 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/018-ta-nase-hospoda-uhlir-a-sverak.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 18  }
+    "books": {
+      "Zpjěvníček 1": 18
+    }
   },
   {
     "id": "019-saro-traband",
@@ -174,7 +204,9 @@
     "author": "Traband",
     "file": "songs/019-saro-traband.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 19  }
+    "books": {
+      "Zpjěvníček 1": 19
+    }
   },
   {
     "id": "020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir",
@@ -183,7 +215,9 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 20  }
+    "books": {
+      "Zpjěvníček 1": 20
+    }
   },
   {
     "id": "021-hruska-cechomor",
@@ -192,7 +226,9 @@
     "author": "Čechomor",
     "file": "songs/021-hruska-cechomor.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 21  }
+    "books": {
+      "Zpjěvníček 1": 21
+    }
   },
   {
     "id": "022-zamilovany-princ-tomas-klus",
@@ -201,7 +237,9 @@
     "author": "Tomáš Klus",
     "file": "songs/022-zamilovany-princ-tomas-klus.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 22  }
+    "books": {
+      "Zpjěvníček 1": 22
+    }
   },
   {
     "id": "songs/023-nad-stadem-koni-buty.pro",
@@ -210,7 +248,9 @@
     "author": "Buty",
     "file": "songs/023-nad-stadem-koni-buty.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 23  }
+    "books": {
+      "Zpjěvníček 1": 23
+    }
   },
   {
     "id": "songs/024-kdyz-si-te-divko-predstavim-sverak-a-uhlir.pro",
@@ -219,7 +259,9 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/024-kdyz-si-te-divko-predstavim-sverak-a-uhlir.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 24  }
+    "books": {
+      "Zpjěvníček 1": 24
+    }
   },
   {
     "id": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
@@ -228,7 +270,9 @@
     "author": "Wohnout",
     "file": "songs/025-svaz-ceskejch-bohemu-wohnout.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 25  }
+    "books": {
+      "Zpjěvníček 1": 25
+    }
   },
   {
     "id": "songs/026-boky-jako-skrin-ewa-farna.pro",
@@ -237,7 +281,9 @@
     "author": "Ewa Farna",
     "file": "songs/026-boky-jako-skrin-ewa-farna.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 26  }
+    "books": {
+      "Zpjěvníček 1": 26
+    }
   },
   {
     "id": "songs/027-toulava-sebastian.pro",
@@ -246,7 +292,9 @@
     "author": "Sebastian",
     "file": "songs/027-toulava-sebastian.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 27  }
+    "books": {
+      "Zpjěvníček 1": 27
+    }
   },
   {
     "id": "songs/028-spomal-peha.pro",
@@ -255,7 +303,9 @@
     "author": "Peha",
     "file": "songs/028-spomal-peha.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 28  }
+    "books": {
+      "Zpjěvníček 1": 28
+    }
   },
   {
     "id": "songs/029-jdevozem-tomas-klus.pro",
@@ -264,7 +314,9 @@
     "author": "Tomáš Klus",
     "file": "songs/029-jdevozem-tomas-klus.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 29  }
+    "books": {
+      "Zpjěvníček 1": 29
+    }
   },
   {
     "id": "songs/030-laska-a-pravda-pohadkova.pro",
@@ -273,7 +325,9 @@
     "author": "Pohádková",
     "file": "songs/030-laska-a-pravda-pohadkova.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 30  }
+    "books": {
+      "Zpjěvníček 1": 30
+    }
   },
   {
     "id": "songs/031-a-pak-tomas-klus.pro",
@@ -282,7 +336,9 @@
     "author": "Tomáš Klus",
     "file": "songs/031-a-pak-tomas-klus.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 31  }
+    "books": {
+      "Zpjěvníček 1": 31
+    }
   },
   {
     "id": "songs/032-promeny-cechomor.pro",
@@ -291,7 +347,9 @@
     "author": "Čechomor",
     "file": "songs/032-promeny-cechomor.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 32  }
+    "books": {
+      "Zpjěvníček 1": 32
+    }
   },
   {
     "id": "songs/033-tak-nejak-malo-tancim-krystof.pro",
@@ -300,8 +358,9 @@
     "author": "Kryštof",
     "file": "songs/033-tak-nejak-malo-tancim-krystof.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 33  }
-   
+    "books": {
+      "Zpjěvníček 1": 33
+    }
   },
   {
     "id": "songs/034-svarak-harlej.pro",
@@ -497,7 +556,9 @@
     "author": "",
     "file": "songs/051-hoja-hoj.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 51  }
+    "books": {
+      "Zpjěvníček 1": 51
+    }
   },
   {
     "id": "052-slovensky-klin-chinaski",
@@ -506,7 +567,9 @@
     "author": "Chinaski",
     "file": "songs/052-slovensky-klin-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 52  }
+    "books": {
+      "Zpjěvníček 1": 52
+    }
   },
   {
     "id": "053-i-cesta-muze-byt-cil-mnaga-a-zdorp",
@@ -515,7 +578,9 @@
     "author": "Mňága a žďorp",
     "file": "songs/053-i-cesta-muze-byt-cil-mnaga-a-zdorp.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 53  }
+    "books": {
+      "Zpjěvníček 1": 53
+    }
   },
   {
     "id": "054-amerika-lucie",
@@ -524,7 +589,9 @@
     "author": "Lucie",
     "file": "songs/054-amerika-lucie.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 54  }
+    "books": {
+      "Zpjěvníček 1": 54
+    }
   },
   {
     "id": "055-dlouhej-kour-chinaski",
@@ -533,7 +600,9 @@
     "author": "Chinaski",
     "file": "songs/055-dlouhej-kour-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 55  }
+    "books": {
+      "Zpjěvníček 1": 55
+    }
   },
   {
     "id": "056-kutil-chinaski",
@@ -542,16 +611,20 @@
     "author": "Chinaski",
     "file": "songs/056-kutil-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 56  }
+    "books": {
+      "Zpjěvníček 1": 56
+    }
   },
   {
-    "id": "057-jelen-jelen",
+    "id": "songs/057-jelen-jelen.pro",
     "number": 57,
     "title": "Jelen",
     "author": "Jelen",
     "file": "songs/057-jelen-jelen.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 571  }
+    "books": {
+      "Zpjěvníček 1": 57
+    }
   },
   {
     "id": "058-zejtra-mam-ready-kirken",
@@ -560,7 +633,9 @@
     "author": "Ready Kirken",
     "file": "songs/058-zejtra-mam-ready-kirken.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 58  }
+    "books": {
+      "Zpjěvníček 1": 58
+    }
   },
   {
     "id": "059-1-1-ready-kirken",
@@ -569,7 +644,9 @@
     "author": "Ready Kirken",
     "file": "songs/059-1-1-ready-kirken.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 59  }
+    "books": {
+      "Zpjěvníček 1": 59
+    }
   },
   {
     "id": "060-lhuta-zarucni-slza",
@@ -578,7 +655,9 @@
     "author": "Slza",
     "file": "songs/060-lhuta-zarucni-slza.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 60  }
+    "books": {
+      "Zpjěvníček 1": 60
+    }
   },
   {
     "id": "061-zafukane-fleret",
@@ -587,7 +666,9 @@
     "author": "Fleret",
     "file": "songs/061-zafukane-fleret.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 61  }
+    "books": {
+      "Zpjěvníček 1": 61
+    }
   },
   {
     "id": "062-s-tebou-me-bavi-svet-filmova",
@@ -596,7 +677,9 @@
     "author": "Filmová",
     "file": "songs/062-s-tebou-me-bavi-svet-filmova.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 62  }
+    "books": {
+      "Zpjěvníček 1": 62
+    }
   },
   {
     "id": "063-cesta-mirai",
@@ -605,7 +688,9 @@
     "author": "Mirai",
     "file": "songs/063-cesta-mirai.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 63  }
+    "books": {
+      "Zpjěvníček 1": 63
+    }
   },
   {
     "id": "064-do-roka-a-do-dne-divokej-bill",
@@ -614,7 +699,9 @@
     "author": "Divokej Bill",
     "file": "songs/064-do-roka-a-do-dne-divokej-bill.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 64  }
+    "books": {
+      "Zpjěvníček 1": 64
+    }
   },
   {
     "id": "065-pijte-vodu-jaromir-nohavica",
@@ -623,7 +710,9 @@
     "author": "Jaromír Nohavica",
     "file": "songs/065-pijte-vodu-jaromir-nohavica.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 65  }
+    "books": {
+      "Zpjěvníček 1": 65
+    }
   },
   {
     "id": "066-duse-z-gumy-chinaski",
@@ -632,7 +721,9 @@
     "author": "Chinaski",
     "file": "songs/066-duse-z-gumy-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 66  }
+    "books": {
+      "Zpjěvníček 1": 66
+    }
   },
   {
     "id": "067-nikdy-nebylo-nic-sto-zvirat",
@@ -641,7 +732,9 @@
     "author": "Sto zvířat",
     "file": "songs/067-nikdy-nebylo-nic-sto-zvirat.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 67  }
+    "books": {
+      "Zpjěvníček 1": 67
+    }
   },
   {
     "id": "068-zanedbany-sex-elan",
@@ -650,7 +743,9 @@
     "author": "Elán",
     "file": "songs/068-zanedbany-sex-elan.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 68  }
+    "books": {
+      "Zpjěvníček 1": 68
+    }
   },
   {
     "id": "069-dribna-paralela-chinski",
@@ -659,7 +754,9 @@
     "author": "Chinaski",
     "file": "songs/069-dribna-paralela-chinski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 69  }
+    "books": {
+      "Zpjěvníček 1": 69
+    }
   },
   {
     "id": "070-mach-a-sebestova-pohadkova",
@@ -668,7 +765,9 @@
     "author": "Pohádková",
     "file": "songs/070-mach-a-sebestova-pohadkova.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 70  }
+    "books": {
+      "Zpjěvníček 1": 70
+    }
   },
   {
     "id": "071-zadarmo-chinaski",
@@ -677,7 +776,9 @@
     "author": "Chinaski",
     "file": "songs/071-zadarmo-chinaski.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 71  }
+    "books": {
+      "Zpjěvníček 1": 71
+    }
   },
   {
     "id": "072-princezna-ze-mlejna-pohadkova",
@@ -686,7 +787,9 @@
     "author": "Pohádková",
     "file": "songs/072-princezna-ze-mlejna-pohadkova.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 72  }
+    "books": {
+      "Zpjěvníček 1": 72
+    }
   },
   {
     "id": "073-chci-tancit-mirai",
@@ -695,7 +798,9 @@
     "author": "Mirai",
     "file": "songs/073-chci-tancit-mirai.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 73  }
+    "books": {
+      "Zpjěvníček 1": 73
+    }
   },
   {
     "id": "074-dabel-a-syn-kabat",
@@ -704,7 +809,9 @@
     "author": "Kabát",
     "file": "songs/074-dabel-a-syn-kabat.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 74  }
+    "books": {
+      "Zpjěvníček 1": 74
+    }
   },
   {
     "id": "075-pohoda-kabat",
@@ -713,7 +820,9 @@
     "author": "Kabát",
     "file": "songs/075-pohoda-kabat.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 75  }
+    "books": {
+      "Zpjěvníček 1": 75
+    }
   },
   {
     "id": "076-na-tebe-zavisly-desmod",
@@ -722,7 +831,9 @@
     "author": "Desmod",
     "file": "songs/076-na-tebe-zavisly-desmod.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 76  }
+    "books": {
+      "Zpjěvníček 1": 76
+    }
   },
   {
     "id": "077-rano-ine-kafe",
@@ -731,7 +842,9 @@
     "author": "Ine kafe",
     "file": "songs/077-rano-ine-kafe.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 77  }
+    "books": {
+      "Zpjěvníček 1": 77
+    }
   },
   {
     "id": "078-dame-klukovi-skoly-sverak-a-uhlir",
@@ -740,7 +853,9 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/078-dame-klukovi-skoly-sverak-a-uhlir.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 78  }
+    "books": {
+      "Zpjěvníček 1": 78
+    }
   },
   {
     "id": "079-jednim-tahem-vaclav-neckar",
@@ -749,7 +864,9 @@
     "author": "Václav Neckář",
     "file": "songs/079-jednim-tahem-vaclav-neckar.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 79  }
+    "books": {
+      "Zpjěvníček 1": 79
+    }
   },
   {
     "id": "080-lepsi-nez-almuzna-sverak-a-uhlir",
@@ -758,6 +875,8 @@
     "author": "Svěrák a Uhlíř",
     "file": "songs/080-lepsi-nez-almuzna-sverak-a-uhlir.pro",
     "type": "chordpro",
-    "books": { "Zpjěvníček 1": 80  }
+    "books": {
+      "Zpjěvníček 1": 80
+    }
   }
 ]
