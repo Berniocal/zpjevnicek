@@ -60,6 +60,10 @@
   .row-actions{ display:flex; gap:6px; }
   .chips{ display:flex; flex-wrap:wrap; gap:6px; }
   .chip{ padding:4px 8px; border:1px solid #273142; border-radius:999px; }
+   .sb-manage-list .item{ display:grid; grid-template-columns: 80px 1fr 80px 36px 36px; gap:8px; align-items:center; padding:6px 0; border-bottom:1px solid #1f2b46; }
+  .sb-manage-list .item:last-child{ border-bottom:none; }
+  .sb-manage-num{ width:100%; }
+  .sb-manage-order{ display:flex; gap:4px; }
 </style>
 </head>
 
@@ -220,6 +224,47 @@
         </div>
 
         <div id="editStatus" class="note" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </details>
+  
+  <!-- ========== SEKCE 3: SPRÁVA ZPĚVNÍKŮ (COLLAPSIBLE) ========== -->
+  <details class="accordion">
+    <summary>Zpěvníky – tvorba a úpravy</summary>
+    <div class="accordion-body">
+      <div class="card">
+        <h2 style="margin:0 0 8px">Spravovat zpěvník</h2>
+
+        <div class="grid two">
+          <label>Vybrat existující zpěvník
+            <select id="sbManageSelect"></select>
+          </label>
+          <div class="row-actions" style="align-self:end;justify-self:end">
+            <button id="sbManageLoad">Načíst</button>
+            <button id="sbManageClear" class="ghost">Vyčistit</button>
+          </div>
+        </div>
+
+        <label>Název zpěvníku
+          <input id="sbManageName" placeholder="Zpjěvníček 2" />
+        </label>
+
+        <div class="grid two">
+          <label>Vyhledat píseň pro přidání
+            <input id="sbManageSearch" placeholder="název nebo číslo" />
+          </label>
+          <div class="note" style="align-self:end">Přidej kliknutím na „+“ nebo přetřiď pomocí šipek.</div>
+        </div>
+        <div id="sbManageSearchResults" class="list" style="margin-top:6px"></div>
+
+        <h3 style="margin:12px 0 4px">Písně ve zpěvníku</h3>
+        <div id="sbManageList" class="sb-manage-list"></div>
+        <div class="row-actions" style="margin-top:8px; justify-content:space-between;">
+          <button id="sbManageReindex" class="ghost">Přečíslovat podle pořadí</button>
+          <button id="sbManageSave">💾 Uložit zpěvník</button>
+        </div>
+
+        <div id="sbManageStatus" class="note" style="margin-top:6px"></div>
       </div>
     </div>
   </details>
@@ -435,9 +480,21 @@ const sbEditAddBtn = document.getElementById('sbEditAdd');
 const sbNewHint = document.getElementById('sbNewHint');
 const sbEditHint = document.getElementById('sbEditHint');
 const datalistAll = document.getElementById('songbooksAll');
+  
+const sbManageSelect = document.getElementById('sbManageSelect');
+const sbManageLoadBtn = document.getElementById('sbManageLoad');
+const sbManageClearBtn = document.getElementById('sbManageClear');
+const sbManageNameEl = document.getElementById('sbManageName');
+const sbManageSearchEl = document.getElementById('sbManageSearch');
+const sbManageSearchResultsEl = document.getElementById('sbManageSearchResults');
+const sbManageListEl = document.getElementById('sbManageList');
+const sbManageSaveBtn = document.getElementById('sbManageSave');
+const sbManageStatusEl = document.getElementById('sbManageStatus');
+const sbManageReindexBtn = document.getElementById('sbManageReindex');
 
 let ALL_SONGBOOKS = []; // naplní se ze songs.json (pokud obsahuje 'songbooks')
-
+let SONGBOOK_INDEX = new Map(); // jméno -> [{song, number}]
+let MANAGED_BOOK = { name: '', items: [] }; // items: {id, file, title, author, number}
 function renderSongbookRow(container, name='', num=''){
   const row = document.createElement('div');
   row.className = 'songbook-row';
@@ -475,7 +532,107 @@ function fillDatalist(){
     .sort((a,b)=>a.localeCompare(b,'cs'))
     .map(n=>`<option value="${escapeHtml(n)}"></option>`).join('');
 }
+function buildSongbookIndex(){
+  const map = new Map();
+  for (const it of SONG_INDEX_DATA){
+    const books = [];
+    if (it && it.books && typeof it.books === 'object'){
+      for (const k of Object.keys(it.books)) books.push({ name: k, number: it.books[k] });
+    }
+    if (Array.isArray(it.songbooks)){
+      for (const sb of it.songbooks){
+        if (sb && sb.name) books.push({ name: sb.name, number: sb.number });
+      }
+    }
+    for (const sb of books){
+      if (!map.has(sb.name)) map.set(sb.name, []);
+      map.get(sb.name).push({ song: it, number: sb.number });
+    }
+  }
+  SONGBOOK_INDEX = map;
+  renderSongbookSelect();
+}
+function renderSongbookSelect(){
+  const names = Array.from(SONGBOOK_INDEX.keys()).sort((a,b)=>a.localeCompare(b,'cs'));
+  sbManageSelect.innerHTML = ['<option value="">Vyber zpěvník…</option>', ...names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`)].join('');
+}
+function sbManageStatus(msg, ok=false){
+  sbManageStatusEl.textContent = msg;
+  sbManageStatusEl.className = 'note' + (ok?' ok':'');
+}
+function setManagedBook(name, items){
+  MANAGED_BOOK = { name, items: [...items] };
+  sbManageNameEl.value = name || '';
+  renderManagedList();
+}
+function renderManagedList(){
+  if (!MANAGED_BOOK.items.length){
+    sbManageListEl.innerHTML = '<div class="note">Zpěvník je prázdný. Přidej písně vlevo nahoře.</div>';
+    return;
+  }
+  sbManageListEl.innerHTML = MANAGED_BOOK.items.map((it, idx)=>{
+    const author = it.author ? ` — <span class="muted">${escapeHtml(it.author)}</span>` : '';
+    const title = `<div><b>${escapeHtml(it.title)}</b>${author}</div>`;
+    const path = `<div class="note" style="font-size:12px">${escapeHtml(it.file || '')}</div>`;
+    return `
+      <div class="item" data-id="${encodeURIComponent(it.id || it.file || it.title)}">
+        <input class="sb-manage-num" type="number" min="1" step="1" value="${escapeHtml(String(it.number||idx+1))}" />
+        <div>${title}${path}</div>
+        <div class="sb-manage-order">
+          <button type="button" class="ghost" data-up>↑</button>
+          <button type="button" class="ghost" data-down>↓</button>
+        </div>
+        <button type="button" class="ghost sb-del">✕</button>
+        <span></span>
+      </div>`;
+  }).join('');
 
+  sbManageListEl.querySelectorAll('.sb-manage-num').forEach((inp, idx)=>{
+    inp.onchange = ()=>{
+      const num = Number(inp.value);
+      if (!Number.isFinite(num)) return;
+      MANAGED_BOOK.items[idx].number = num;
+    };
+  });
+  sbManageListEl.querySelectorAll('[data-up]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const row = btn.closest('.item');
+      const id = row?.getAttribute('data-id');
+      const i = MANAGED_BOOK.items.findIndex(x=> encodeURIComponent(x.id || x.file || x.title) === id);
+      if (i>0){
+        const tmp = MANAGED_BOOK.items[i-1];
+        MANAGED_BOOK.items[i-1] = MANAGED_BOOK.items[i];
+        MANAGED_BOOK.items[i] = tmp;
+        reindexManagedNumbers();
+      }
+    };
+  });
+  sbManageListEl.querySelectorAll('[data-down]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const row = btn.closest('.item');
+      const id = row?.getAttribute('data-id');
+      const i = MANAGED_BOOK.items.findIndex(x=> encodeURIComponent(x.id || x.file || x.title) === id);
+      if (i>=0 && i < MANAGED_BOOK.items.length-1){
+        const tmp = MANAGED_BOOK.items[i+1];
+        MANAGED_BOOK.items[i+1] = MANAGED_BOOK.items[i];
+        MANAGED_BOOK.items[i] = tmp;
+        reindexManagedNumbers();
+      }
+    };
+  });
+  sbManageListEl.querySelectorAll('.sb-del').forEach(btn=>{
+    btn.onclick = ()=>{
+      const row = btn.closest('.item');
+      const id = row?.getAttribute('data-id');
+      MANAGED_BOOK.items = MANAGED_BOOK.items.filter(x=> encodeURIComponent(x.id || x.file || x.title) !== id);
+      renderManagedList();
+    };
+  });
+}
+function reindexManagedNumbers(){
+  MANAGED_BOOK.items = MANAGED_BOOK.items.map((it, idx)=>({ ...it, number: idx+1 }));
+  renderManagedList();
+}
 /* --------------------- SAVE – NOVÁ PÍSEŇ --------------------- */
 document.getElementById('saveBtn').onclick = async () => {
   try {
@@ -588,8 +745,9 @@ for (const it of SONG_INDEX_DATA){
     }
   }
 }
-ALL_SONGBOOKS = acc;
-fillDatalist();
+  ALL_SONGBOOKS = acc;
+  fillDatalist();
+  buildSongbookIndex();
 
 
     estatus('Seznam písní načten.', true);
@@ -608,6 +766,19 @@ function searchSongs(q){
     const numberHit = Number.isFinite(asNum) && ( (item.number|0) === asNum );
     return titleHit || numberHit;
   }).slice(0, 20);
+}
+  function getBookNumberFromItem(item, book){
+  if (!item) return null;
+  if (item.books && Object.prototype.hasOwnProperty.call(item.books, book)){
+    const num = Number(item.books[book]);
+    if (Number.isFinite(num)) return num;
+  }
+  if (Array.isArray(item.songbooks)){
+    for (const sb of item.songbooks){
+      if (sb && sb.name === book && Number.isFinite(+sb.number)) return Number(sb.number);
+    }
+  }
+  return null;
 }
 function renderEditResults(list){
   if(!list.length){
@@ -633,6 +804,64 @@ function renderEditResults(list){
       if(found) loadSongForEdit(found);
     };
   });
+}
+  function loadSongbookForManage(name){
+  const list = SONGBOOK_INDEX.get(name) || [];
+  const sorted = [...list].sort((a,b)=>{
+    const an = Number.isFinite(+a.number) ? +a.number : 1e9;
+    const bn = Number.isFinite(+b.number) ? +b.number : 1e9;
+    if (an !== bn) return an - bn;
+    return (a.song.title||'').localeCompare(b.song.title||'', 'cs');
+  });
+  const items = sorted.map((it, idx)=>({
+    id: it.song.id || it.song.file || it.song.title,
+    file: it.song.file,
+    title: it.song.title || 'Neznámá píseň',
+    author: it.song.author || '',
+    number: Number.isFinite(+it.number) ? Number(it.number) : idx+1
+  }));
+  setManagedBook(name, items);
+  sbManageStatus(`Načten zpěvník „${name}“ (${items.length} písní).`, true);
+}
+function renderSongAddResults(list){
+  if(!list.length){
+    sbManageSearchResultsEl.innerHTML = '';
+    return;
+  }
+  sbManageSearchResultsEl.innerHTML = list.map(it=>{
+    const num = (it.number!=null && it.number!=='') ? `${it.number} · ` : '';
+    const author = it.author ? ` — <span class="muted">${escapeHtml(it.author)}</span>` : '';
+    return `
+      <div class="item" style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;">
+        <div>
+          <div><b>${num}${escapeHtml(it.title||'')}</b>${author}</div>
+          <div class="note" style="font-size:12px">${escapeHtml(it.file||'')}</div>
+        </div>
+        <div><button class="ghost" data-add="${encodeURIComponent(it.id || it.file || it.title)}">+</button></div>
+      </div>`;
+  }).join('');
+
+  sbManageSearchResultsEl.querySelectorAll('button[data-add]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = decodeURIComponent(btn.getAttribute('data-add'));
+      const found = SONG_INDEX_DATA.find(s=> (s.id===id) || (s.file===id) || (s.title===id) );
+      if(found) addSongToManaged(found);
+    };
+  });
+}
+function addSongToManaged(song){
+  if (!song) return;
+  const exists = MANAGED_BOOK.items.some(it=> (it.id === song.id) || (it.file === song.file));
+  if (exists) return;
+  const maxNum = MANAGED_BOOK.items.reduce((m,it)=> Math.max(m, Number(it.number)||0), 0);
+  MANAGED_BOOK.items.push({
+    id: song.id || song.file || song.title,
+    file: song.file,
+    title: song.title || 'Neznámá píseň',
+    author: song.author || '',
+    number: maxNum + 1
+  });
+  renderManagedList();
 }
 function parseChordProMetaAndBody(text){
   const lines = text.replace(/\r/g,'').split('\n');
@@ -713,6 +942,65 @@ if (!sbSrc.length && Array.isArray(item.songbooks)){
     estatus('Chyba: ' + e.message);
   }
 }
+function rewriteSongForBook(text, bookName, newNumber, fallback){
+  const { meta, body, songbooks } = parseChordProMetaAndBody(text);
+  const others = songbooks.filter(sb => sb.name !== bookName);
+  if (newNumber != null) others.push({ name: bookName, number: newNumber });
+
+  const lines = [];
+  if (meta.title || (fallback && fallback.title)) lines.push(`{title: ${meta.title || fallback.title}}`);
+  if (meta.artist || (fallback && fallback.author)) lines.push(`{artist: ${meta.artist || fallback.author}}`);
+  if (meta.key) lines.push(`{key: ${meta.key}}`);
+  if (meta.number) lines.push(`{number: ${meta.number}}`);
+  for (const k of Object.keys(meta)){
+    if (['title','artist','key','number'].includes(k)) continue;
+    lines.push(`{${k}: ${meta[k]}}`);
+  }
+  others.sort((a,b)=> (a.number??1e9) - (b.number??1e9)).forEach(sb=>{
+    lines.push(`{book: ${sb.name} = ${sb.number}}`);
+  });
+  lines.push('');
+  lines.push(body);
+  return { text: lines.join('\n'), songbooks: others };
+}
+async function updateSongFileForBook(ctx, song, bookName, newNumber){
+  const path = (song.file && song.file.startsWith('songs/')) ? song.file : `songs/${(song.file||'').split('/').pop()}`;
+  const metaRes = await fetch(`https://api.github.com/repos/${ctx.user}/${ctx.repo}/contents/${encodeURIComponent(path)}`, {
+    headers: { 'Authorization': `Bearer ${ctx.token}`, 'Accept': 'application/vnd.github+json' }
+  });
+  if(!metaRes.ok){
+    const t = await metaRes.text();
+    throw new Error(`GitHub API (get ${path}) ${metaRes.status}: ${t}`);
+  }
+  const metaJson = await metaRes.json();
+  const raw = b64utf8_decode(metaJson.content || '');
+  const rewritten = rewriteSongForBook(raw, bookName, newNumber, { title: song.title, author: song.author });
+  if (rewritten.text === raw) return; // nic se nezměnilo
+
+  const putRes = await fetch(`https://api.github.com/repos/${ctx.user}/${ctx.repo}/contents/${encodeURIComponent(path)}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${ctx.token}`, 'Accept': 'application/vnd.github+json' },
+    body: JSON.stringify({
+      message: `chore(songbook): ${bookName} → ${song.title || path}`,
+      content: b64utf8(rewritten.text),
+      branch: 'main',
+      sha: metaJson.sha
+    })
+  });
+  if(!putRes.ok){
+    const t = await putRes.text();
+    throw new Error(`GitHub API (save ${path}) ${putRes.status}: ${t}`);
+  }
+
+  await tryUpdateSongsJson(ctx, {
+    file: path,
+    title: song.title || '',
+    author: song.author || '',
+    number: song.number ?? null,
+    songbooks: rewritten.songbooks
+  });
+}
+  
 function buildChordProFromEditor(){
   const lines = [];
   if (eTitleEl.value.trim()) lines.push(`{title: ${eTitleEl.value.trim()}}`);
@@ -841,7 +1129,43 @@ async function deleteEditedSong(){
     estatus('Chyba: ' + e.message);
   }
 }
+async function saveManagedSongbook(){
+  const bookName = sbManageNameEl.value.trim();
+  if (!bookName) return sbManageStatus('Zadej prosím název zpěvníku.');
+  const { user, repo } = detectRepo();
+  if (!user || !repo) return sbManageStatus('Nepodařilo se odvodit user/repo z URL.');
+  const token = (document.querySelector('#token')?.value || localStorage.getItem('gh_pat') || '').trim();
+  if (!token) return sbManageStatus('Chybí PAT token (zadej nahoře).');
 
+  // map s novým pořadím
+  const desired = new Map();
+  for (const it of MANAGED_BOOK.items){
+    const num = Number(it.number);
+    if (!Number.isFinite(num)) return sbManageStatus('Všechna čísla musí být platná čísla.');
+    desired.set(it.file, num);
+  }
+
+  sbManageStatus('Ukládám změny…');
+  const ctx = { user, repo, token };
+  let processed = 0;
+  for (const song of SONG_INDEX_DATA){
+    const currentNum = getBookNumberFromItem(song, bookName);
+    const newNum = desired.has(song.file) ? desired.get(song.file) : null;
+    if ((currentNum ?? null) === (newNum ?? null)) continue;
+    try{
+      await updateSongFileForBook(ctx, song, bookName, newNum);
+      processed++;
+    }catch(e){
+      console.error(e);
+      sbManageStatus('Chyba při ukládání: ' + e.message);
+      return;
+    }
+  }
+
+  await loadSongsIndex();
+  sbManageStatus(`Hotovo. Aktualizováno souborů: ${processed}.`, true);
+  if (bookName) loadSongbookForManage(bookName);
+}
 /* ------------------- MARKS pro EDIT ------------------- */
 function rebuildEditMarks(){
   if (!editMarksEnabled){
@@ -902,6 +1226,19 @@ reloadIndexBtn.onclick = ()=> loadSongsIndex().then(()=>{
 });
 saveEditBtn.onclick = saveEditedSong;
 deleteEditBtn.onclick = deleteEditedSong;
+/* ------------------- Dráty UI (songbook manager) ------------------- */
+sbManageLoadBtn.onclick = ()=>{
+  const name = sbManageSelect.value;
+  if (name) loadSongbookForManage(name);
+};
+sbManageClearBtn.onclick = ()=>{ setManagedBook('', []); sbManageStatus(''); };
+sbManageSearchEl.addEventListener('input', ()=>{
+  const q = sbManageSearchEl.value;
+  const res = searchSongs(q).filter(it=> !MANAGED_BOOK.items.some(x=> x.file === it.file));
+  renderSongAddResults(res);
+});
+sbManageSaveBtn.onclick = saveManagedSongbook;
+sbManageReindexBtn.onclick = reindexManagedNumbers;
 
 /* ------------------- Načíst index při startu ------------------- */
 loadSongsIndex();
