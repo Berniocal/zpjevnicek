@@ -452,12 +452,15 @@
     }
   },
   {
-    "id": "047-az-na-to-prijde-sebastian",
+    "id": "songs/047-az-na-to-prijde-sebastian.pro",
     "number": 47,
     "title": "Až na to přijde",
     "author": "Sebastian",
     "file": "songs/047-az-na-to-prijde-sebastian.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 47
+    }
   },
   {
     "id": "048-dobre-rano-tomas-klus",
