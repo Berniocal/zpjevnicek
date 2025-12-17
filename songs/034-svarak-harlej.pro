@@ -1,5 +1,6 @@
 {title: Svařák}
 {artist: Harlej}
+{book: Zpjěvníček 1 = 34}
 
 [G]Když jsem sám doma, [Am]poslouchám Vavra,
 [C]starýho vola, [D]pořád dokola.
