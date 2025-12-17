@@ -1,6 +1,5 @@
 {title: Spomal}
 {artist: Peha}
-{book: Zpjěvníček 1 = 28}
 
 [A]Za niečim [Em]krásnym, 
 [A]tak rýchlo [Em]ako sa dá
