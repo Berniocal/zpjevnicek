@@ -298,12 +298,15 @@
     }
   },
   {
-    "id": "033-tak-nejak-malo-tancim-krystof",
+    "id": "songs/033-tak-nejak-malo-tancim-krystof.pro",
     "number": 33,
     "title": "Tak nějak málo tančím",
     "author": "Kryštof",
     "file": "songs/033-tak-nejak-malo-tancim-krystof.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 33
+    }
   },
   {
     "id": "034-svarak-harlej",
