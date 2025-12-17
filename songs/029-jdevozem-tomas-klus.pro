@@ -1,5 +1,6 @@
 {title: JdeVoZem}
 {artist: Tomáš Klus}
+{book: Zpjěvníček 1 = 29}
 
 [G]Chtěl bych se Malým vo[G]zem
 [Em]proletět kolem Mléčné [Em]dráhy
