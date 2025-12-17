@@ -1,5 +1,6 @@
 {title: Když nemůžeš tak přidej}
 {artist: Mirai}
+{book: Zpjěvníček 1 = 46}
 
 Nez[G]vládáš dojít [G]k cíli, 
 odpo[C]číváš každou [G]chvíli.
