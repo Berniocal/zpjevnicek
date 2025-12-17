@@ -1,6 +1,5 @@
 {title: Ty a já}
 {artist: Kryštof}
-{book: Zpjěvníček 1 = 43}
 
 Znám [C]milion blyštivých měst, 
 v nich milion [F]dveří,
