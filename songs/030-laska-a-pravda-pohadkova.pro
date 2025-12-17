@@ -1,5 +1,6 @@
 {title: Láska a pravda}
 {artist: Pohádková}
+{book: Zpjěvníček 1 = 30}
 
 [E]Slyším své srdce [A]bít,
 [E]láska mi signál [A]dává,
