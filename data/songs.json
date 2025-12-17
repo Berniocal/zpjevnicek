@@ -232,12 +232,15 @@
     }
   },
   {
-    "id": "027-toulava-sebastian",
+    "id": "songs/027-toulava-sebastian.pro",
     "number": 27,
     "title": "Toulavá",
     "author": "Sebastian",
     "file": "songs/027-toulava-sebastian.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 27
+    }
   },
   {
     "id": "028-spomal-peha",
