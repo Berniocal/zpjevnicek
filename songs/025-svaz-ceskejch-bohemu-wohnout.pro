@@ -1,5 +1,6 @@
 {title: Svaz českejch bohémů}
 {artist: Wohnout}
+{book: Zpjěvníček 1 = 25}
 
 [D]Vracím se domů nad ránem,
 [Am]kvalitním vínem omámen,
