@@ -353,12 +353,15 @@
     }
   },
   {
-    "id": "038-andel-mirai",
+    "id": "songs/038-andel-mirai.pro",
     "number": 38,
     "title": "Anděl",
     "author": "Mirai",
     "file": "songs/038-andel-mirai.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 38
+    }
   },
   {
     "id": "039-pulnocni-vaclav-neckar",
