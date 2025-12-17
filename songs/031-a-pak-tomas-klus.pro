@@ -1,6 +1,5 @@
 {title: A pak}
 {artist: Tomáš Klus}
-{book: Zpjěvníček 1 = 31}
 
 Jednou š[A]těstí dohoní 
 i ty [C#mi]jezdce na koních,
