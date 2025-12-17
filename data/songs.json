@@ -331,12 +331,15 @@
     }
   },
   {
-    "id": "036-gorale-cechomor",
+    "id": "songs/036-gorale-cechomor.pro",
     "number": 36,
     "title": "Gorale",
     "author": "Čechomor",
     "file": "songs/036-gorale-cechomor.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 36
+    }
   },
   {
     "id": "037-zivotni-support-lesbiens",
