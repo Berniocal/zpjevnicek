@@ -1,21 +1,16 @@
-diff --git a/scripts/indexer.js b/scripts/indexer.js
-index 4379d945810c227c4b02466d0bfadca624846910..c56decf1bd225c23ad9ffd928b17bb8a64c9e63f 100644
---- a/scripts/indexer.js
-+++ b/scripts/indexer.js
-@@ -1,62 +1,118 @@
  // Node skript: projde /songs a vytvoří data/songs.json
  import { readdir, readFile, writeFile } from 'node:fs/promises';
  import path from 'node:path';
  
  const GP_RX = /\.(gp|gp3|gp4|gp5|gpx|musicxml|xml)$/i;
  const CP_RX = /\.(pro|cho)$/i;
-+const BOOK_RX = /^\{book:\s*(.*?)\s*(?:=|\|)\s*(.*?)\s*\}$/i;
+const BOOK_RX = /^\{book:\s*(.*?)\s*(?:=|\|)\s*(.*?)\s*\}$/i;
  
  function parseName(name){
    const base = name.replace(/\.(.*)$/, '');
    const m = base.match(/^(\d{1,4})-(.+)$/);
    let number = null, rest = base;
-+  if (m){ number = Number(m[1]); rest = m[2]; }
+  if (m){ number = Number(m[1]); rest = m[2]; }
    const parts = rest.split('-');
    const titleGuess = parts.join(' ').trim();
    const id = base.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -24,44 +19,44 @@ index 4379d945810c227c4b02466d0bfadca624846910..c56decf1bd225c23ad9ffd928b17bb8a
  
  function parseChordProMeta(text){
    const meta = {};
-+  const books = {};
+ const books = {};
    for (const line of text.split(/\r?\n/)) {
      const m = line.match(/^\{(\w+)\s*:\s*(.*?)\s*\}$/);
-+    if (m) {
-+      const key = m[1].toLowerCase();
-+      const val = m[2];
-+      if (key === 'book') {
-+        const bm = val.match(BOOK_RX);
-+        const name = (bm?.[1] ?? '').trim();
-+        const num  = Number((bm?.[2] ?? '').trim());
-+        if (name && Number.isFinite(num)) books[name] = num;
-+      } else if (key === 'songbook') {
-+        const parts = val.split('|');
-+        const name = (parts[0]||'').trim();
-+        const num  = Number((parts[1]||'').trim());
-+        if (name && Number.isFinite(num)) books[name] = num;
-+      } else {
-+        meta[key] = val;
-+      }
-+    }
-+    if (Object.keys(meta).length >= 3 && Object.keys(books).length >= 1) break;
-+  }
-+  return {
-+    title: meta.title,
-+    author: meta.artist || meta.composer,
-+    key: meta.key,
-+    number: meta.number ? Number(meta.number) : null,
-+    books
-+  };
-+}
-+
-+async function loadExistingIndex(){
-+  try{
-+    const txt = await readFile('data/songs.json', 'utf8');
-+    const parsed = JSON.parse(txt);
-+    return Array.isArray(parsed) ? parsed : [];
-+  }catch{
-+    return [];
+    if (m) {
+      const key = m[1].toLowerCase();
+      const val = m[2];
+      if (key === 'book') {
+        const bm = val.match(BOOK_RX);
+        const name = (bm?.[1] ?? '').trim();
+        const num  = Number((bm?.[2] ?? '').trim());
+        if (name && Number.isFinite(num)) books[name] = num;
+      } else if (key === 'songbook') {
+        const parts = val.split('|');
+        const name = (parts[0]||'').trim();
+        const num  = Number((parts[1]||'').trim());
+        if (name && Number.isFinite(num)) books[name] = num;
+      } else {
+        meta[key] = val;
+      }
+    }
+    if (Object.keys(meta).length >= 3 && Object.keys(books).length >= 1) break;
+  }
+  return {
+    title: meta.title,
+    author: meta.artist || meta.composer,
+    key: meta.key,
+    number: meta.number ? Number(meta.number) : null,
+    books
+  };
+}
+
+async function loadExistingIndex(){
+  try{
+    const txt = await readFile('data/songs.json', 'utf8');
+    const parsed = JSON.parse(txt);
+    return Array.isArray(parsed) ? parsed : [];
+  }catch{
+    return [];
    }
  }
  
@@ -71,22 +66,22 @@ index 4379d945810c227c4b02466d0bfadca624846910..c56decf1bd225c23ad9ffd928b17bb8a
    .filter(n => GP_RX.test(n) || CP_RX.test(n));
  
  const items = [];
-+const existingByFile = new Map();
-+for (const prev of await loadExistingIndex()){
-+  if (prev && prev.file) existingByFile.set(prev.file, prev);
-+}
-+
+const existingByFile = new Map();
+for (const prev of await loadExistingIndex()){
+  if (prev && prev.file) existingByFile.set(prev.file, prev);
+}
+
  for (const f of files){
    const filePath = path.join('songs', f);
    const metaName = parseName(f);
    let title = metaName.titleGuess;
    let author = '';
    let type = GP_RX.test(f) ? 'score' : 'chordpro';
-+  let number = metaName.number;
-+  let books = {};
-+
-+  const prev = existingByFile.get(filePath) || {};
-+  let id = prev.id || metaName.id;
+  let number = metaName.number;
+  let books = {};
+
+  const prev = existingByFile.get(filePath) || {};
+  let id = prev.id || metaName.id;
  
    if (CP_RX.test(f)){
      try{
@@ -94,29 +89,29 @@ index 4379d945810c227c4b02466d0bfadca624846910..c56decf1bd225c23ad9ffd928b17bb8a
        const m = parseChordProMeta(txt);
        if (m.title) title = m.title;
        if (m.author) author = m.author;
-+      if (m.number != null) number = m.number;
-+      if (m.books && Object.keys(m.books).length) books = m.books;
+      if (m.number != null) number = m.number;
+      if (m.books && Object.keys(m.books).length) books = m.books;
      }catch(e){}
    }
-+
-+  if (!Object.keys(books).length && prev.books && typeof prev.books === 'object'){
-+    books = prev.books;
-+  }
-+  if (prev.title && !title) title = prev.title;
-+  if (prev.author && !author) author = prev.author;
-+  if (prev.number != null && number == null) number = prev.number;
-+  if (prev.type) type = prev.type;
-+
+
+  if (!Object.keys(books).length && prev.books && typeof prev.books === 'object'){
+    books = prev.books;
+  }
+  if (prev.title && !title) title = prev.title;
+  if (prev.author && !author) author = prev.author;
+  if (prev.number != null && number == null) number = prev.number;
+  if (prev.type) type = prev.type;
+
    items.push({
 
-+    id,
-+    number,
+    id,
+    number,
      title,
      author,
      file: filePath,
 
-+    type,
-+    ...(Object.keys(books).length ? { books } : {})
+    type,
+    ...(Object.keys(books).length ? { books } : {})
    });
  }
  
