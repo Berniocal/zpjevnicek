@@ -1,5 +1,6 @@
 {title: Nad stádem koní}
 {artist: Buty}
+{book: Zpjěvníček 1 = 23}
 
 [D]Nad stádem [A]koní [Em]podkovy [G]zvoní, zvoní,
 [D]Černý vůz [A]vlečou, [Em]a slzy [G]tečou,
