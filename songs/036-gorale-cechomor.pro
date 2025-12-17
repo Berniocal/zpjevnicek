@@ -1,5 +1,6 @@
 {title: Gorale}
 {artist: Čechomor}
+{book: Zpjěvníček 1 = 36}
 
 [D]Za lasami [G]za gorami [A]za dolina[D]mi 
 [D]pobili sie [G]dwaj gorale [A]ciupaga[D]mi 
