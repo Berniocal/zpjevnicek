@@ -485,12 +485,15 @@
     }
   },
   {
-    "id": "050-pisnicka-pavel-calta",
+    "id": "songs/050-pisnicka-pavel-calta.pro",
     "number": 50,
     "title": "Písnička",
     "author": "Pavel Calta",
     "file": "songs/050-pisnicka-pavel-calta.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 50
+    }
   },
   {
     "id": "051-hoja-hoj",
