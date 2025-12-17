@@ -1,5 +1,6 @@
 {title: Tak nějak málo tančím}
 {artist: Kryštof}
+{book: Zpjěvníček 1 = 33}
 
 Všem strunám řeky [Gmaj7]toužím být [D]tón, všem
 okapovým [Gmaj7]loužím jejich [D]břeh, signálu
