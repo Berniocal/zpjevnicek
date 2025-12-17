@@ -1,6 +1,5 @@
 {title: Dobré ráno}
 {artist: Tomáš Klus}
-{book: Zpjěvníček 1 = 48}
 
 [D]Dobré ráno všem 
 co taky [Hm]vstali před chvílí,
