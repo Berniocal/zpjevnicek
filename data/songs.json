@@ -80,15 +80,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/011-srouby-a-matice-mandrage.pro",
+    "id": "011-srouby-a-matice-mandrage",
     "number": 11,
     "title": "Šrouby a matice",
     "author": "Mandrage",
     "file": "songs/011-srouby-a-matice-mandrage.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 11
-    }
+    "type": "chordpro"
   },
   {
     "id": "012-1970-chinaski",
@@ -155,26 +152,20 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
+    "id": "020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir",
     "number": 20,
     "title": "Nám se stalo něco překrásného",
     "author": "Svěrák a Uhlíř",
     "file": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 20
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/021-hruska-cechomor.pro",
+    "id": "021-hruska-cechomor",
     "number": 21,
     "title": "Hruška",
     "author": "Čechomor",
     "file": "songs/021-hruska-cechomor.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 21
-    }
+    "type": "chordpro"
   },
   {
     "id": "022-zamilovany-princ-tomas-klus",
