@@ -147,15 +147,12 @@
     "type": "chordpro"
   },
   {
-    "id": "songs/019-saro-traband.pro",
+    "id": "019-saro-traband",
     "number": 19,
     "title": "Sáro",
     "author": "Traband",
     "file": "songs/019-saro-traband.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 19
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
