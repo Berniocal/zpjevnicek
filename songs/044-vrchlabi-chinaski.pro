@@ -1,5 +1,6 @@
 {title: Vrchlabí}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 44}
 
 Jela jsem s [G]Marcelou a Martou
 [G/F#]po koncertě [Em]autem domů z Vrchla[A]bí
