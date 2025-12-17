@@ -309,12 +309,15 @@
     }
   },
   {
-    "id": "034-svarak-harlej",
+    "id": "songs/034-svarak-harlej.pro",
     "number": 34,
     "title": "Svařák",
     "author": "Harlej",
     "file": "songs/034-svarak-harlej.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 34
+    }
   },
   {
     "id": "035-mezi-horami-cechomor",
