@@ -386,12 +386,15 @@
     }
   },
   {
-    "id": "041-cekam-na-signal-nightwork",
+    "id": "songs/041-cekam-na-signal-nightwork.pro",
     "number": 41,
     "title": "Čekám na signál",
     "author": "Nightwork",
     "file": "songs/041-cekam-na-signal-nightwork.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 41
+    }
   },
   {
     "id": "042-pod-dubem-za-dubem-sverak-a-uhlir",
