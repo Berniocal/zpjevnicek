@@ -1,5 +1,6 @@
 {title: Čekám na signál}
 {artist: Nightwork}
+{book: Zpjěvníček 1 = 41}
 
 [C]Čekám na [Em]sig[Am]nál, 
 [C/G]ten z nebe [F]nepřichází,
