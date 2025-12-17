@@ -408,12 +408,15 @@
     }
   },
   {
-    "id": "043-ty-a-ja-krystof",
+    "id": "songs/043-ty-a-ja-krystof.pro",
     "number": 43,
     "title": "Ty a já",
     "author": "Kryštof",
     "file": "songs/043-ty-a-ja-krystof.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 43
+    }
   },
   {
     "id": "044-vrchlabi-chinaski",
