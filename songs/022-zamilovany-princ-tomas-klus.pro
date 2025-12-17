@@ -1,6 +1,7 @@
 {title: Zamilovaný princ}
 {artist: Tomáš Klus}
 {key: G}
+{book: Zpjěvníček 1 = 22}
 
 [G]Co s touhle šťastnou [D]chvílí, 
 to [Em]když se náhle 
