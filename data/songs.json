@@ -243,12 +243,15 @@
     }
   },
   {
-    "id": "028-spomal-peha",
+    "id": "songs/028-spomal-peha.pro",
     "number": 28,
     "title": "Spomal",
     "author": "Peha",
     "file": "songs/028-spomal-peha.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 28
+    }
   },
   {
     "id": "029-jdevozem-tomas-klus",
