@@ -2,6 +2,7 @@
 {artist: Pavel Helan}
 {key: D}
 {book: Zpjěvníček 1 = 1}
+{book: Zpjěvníček 2 = 1}
 
 [G]Tvůj syn se narodil ve frontě u kasy
 [C]koupil si štěrchátko a lak na řasy
