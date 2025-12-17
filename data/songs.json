@@ -158,12 +158,15 @@
     }
   },
   {
-    "id": "020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir",
+    "id": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
     "number": 20,
     "title": "Nám se stalo něco překrásného",
     "author": "Svěrák a Uhlíř",
     "file": "songs/020-nam-se-stalo-neco-prekrasneho-sverak-a-uhlir.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 20
+    }
   },
   {
     "id": "021-hruska-cechomor",
