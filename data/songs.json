@@ -463,12 +463,15 @@
     }
   },
   {
-    "id": "048-dobre-rano-tomas-klus",
+    "id": "songs/048-dobre-rano-tomas-klus.pro",
     "number": 48,
     "title": "Dobré ráno",
     "author": "Tomáš Klus",
     "file": "songs/048-dobre-rano-tomas-klus.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 48
+    }
   },
   {
     "id": "049-mars-a-venuse-jelen",
