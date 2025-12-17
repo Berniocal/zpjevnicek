@@ -1,27 +1,19 @@
 [
   {
-    "id": "songs/001-vanocni-otcenas-pavel-helan.pro",
+    "id": "001-vanocni-otcenas-pavel-helan",
     "number": 1,
     "title": "Vánoční Otčenáš",
     "author": "Pavel Helan",
     "file": "songs/001-vanocni-otcenas-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 1,
-      "Zpjěvníček 2": 1
-    }
+    "type": "chordpro"
   },
   {
-    "id": "songs/002-ibuh-pavel-helan.pro",
+    "id": "002-ibuh-pavel-helan",
     "number": 2,
     "title": "IBůh",
     "author": "Pavel Helan",
     "file": "songs/002-ibuh-pavel-helan.pro",
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 2,
-      "Zpjěvníček 2": 2
-    }
+    "type": "chordpro"
   },
   {
     "id": "songs/003-dubovy-stul-pavel-helan.pro",
