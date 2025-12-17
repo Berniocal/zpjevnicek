@@ -276,12 +276,15 @@
     }
   },
   {
-    "id": "031-a-pak-tomas-klus",
+    "id": "songs/031-a-pak-tomas-klus.pro",
     "number": 31,
     "title": "A pak",
     "author": "Tomáš Klus",
     "file": "songs/031-a-pak-tomas-klus.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 31
+    }
   },
   {
     "id": "032-promeny-cechomor",
