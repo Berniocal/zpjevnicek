@@ -1,5 +1,6 @@
 {title: Venku je na nule}
 {artist: Chinaski}
+{book: Zpjěvníček 1 = 45}
 
 [Em] [C] [G] [D/F#]
 [Em]Odbila [Cmaj]celá, bylo [D]čtvrt a bude [A2]půl,
