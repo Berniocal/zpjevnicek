@@ -169,12 +169,15 @@
     }
   },
   {
-    "id": "021-hruska-cechomor",
+    "id": "songs/021-hruska-cechomor.pro",
     "number": 21,
     "title": "Hruška",
     "author": "Čechomor",
     "file": "songs/021-hruska-cechomor.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 21
+    }
   },
   {
     "id": "022-zamilovany-princ-tomas-klus",
