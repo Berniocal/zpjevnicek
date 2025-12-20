@@ -246,46 +246,22 @@ document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
 
-function resolveScrollState(){
+function getViewScrollState(){
   const view = document.getElementById('view');
+  if (!view) return null;
 
-  // 1) preferuj #view (to je náš hlavní scroller)
-  if (view){
-    const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
-    if (max > 0.5){
-      return {
-        target: view,
-        scrollTop: view.scrollTop || 0,
-        max,
-        isDoc: false,
-      };
-    }
-  }
-
-  // 2) fallback: dokument (kdyby někdy #view nebyl scrollovatelný)
-  const doc = document.scrollingElement || document.documentElement || document.body;
-  if (doc){
-    const docScrollTop = doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0;
-    const max = Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0);
-    return {
-      target: doc,
-      scrollTop: docScrollTop,
-      max,
-      isDoc: true,
-    };
-  }
-
-  return null;
+  const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
+  return {
+    target: view,
+    scrollTop: view.scrollTop || 0,
+    max
+  };
 }
 
-  
-function setScrollTop(state, value){
-  if (!state || !state.target) return;
-  if (state.isDoc) {
-    window.scrollTo({ top: value, behavior: 'auto' });
-  } else {
-    state.target.scrollTop = value;
-  }
+function setViewScrollTop(value){
+  const view = document.getElementById('view');
+  if (!view) return;
+  view.scrollTop = value;
 }
 
 function updateAutoBtnVisibility(){
@@ -328,19 +304,24 @@ function startAutoScroll(){
       const dt = (ts - _lastTs) / 1000;
       _lastTs = ts;
 
-      const state = resolveScrollState();
-      if (!state || state.max <= 0){
-        stopAutoScroll();
-        return;
-      }
+const state = getViewScrollState();
+
+// když ještě není dopočítaný layout (typicky PC/tablet po renderu),
+// tak NEkonči, jen čekej další frame
+if (!state || state.max <= 0){
+  _autoRaf = requestAnimationFrame(tick);
+  return;
+}
+
 
       if (state.scrollTop >= state.max - 1){
         stopAutoScroll();
         return;
       }
 
-      const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
-      setScrollTop(state, next);
+const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
+setViewScrollTop(next);
+
 
       _autoRaf = requestAnimationFrame(tick);
     };
@@ -348,8 +329,7 @@ function startAutoScroll(){
     _autoRaf = requestAnimationFrame(tick);
   };
 
-  const initial = resolveScrollState();
-  if (!initial || initial.max <= 0) return;
+
 
 if (AUTO_DELAY > 0){
   const btn = document.getElementById('autoScroll');
@@ -806,6 +786,7 @@ const render = ()=>{
     view.appendChild(el);
     applyChordVisibility();
     updateChromeHeight();
+    requestAnimationFrame(()=>{ /* jen aby se layout dosadil */ });
     return;
   }
 
