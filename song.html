@@ -216,32 +216,47 @@ document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
 /* --- Auto scroll --- */
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
-function getScrollContainer(){
+function resolveScrollState(){
   const view = document.getElementById('view');
-  if (view && (view.scrollHeight - view.clientHeight) > 1) return view;
   const doc = document.scrollingElement || document.documentElement || document.body;
-  return (doc && (doc.scrollHeight - doc.clientHeight) > 1) ? doc : view;
-}
-function readScrollState(target){
-  const doc = document.scrollingElement || document.documentElement || document.body;
-  const isDoc = target === doc || target === document.body || target === document.documentElement;
-  const scrollTop = isDoc
-    ? (doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0)
-    : target?.scrollTop || 0;
-  const max = isDoc
-    ? Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0)
-    : Math.max((target?.scrollHeight || 0) - (target?.clientHeight || 0), 0);
-  return { target: isDoc ? doc : target, scrollTop, max, isDoc };
+
+  const candidates = [];
+  if (view){
+    candidates.push({
+      target: view,
+      scrollTop: view.scrollTop || 0,
+      max: Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0),
+      isDoc: false,
+    });
+  }
+  if (doc){
+    const docScrollTop = doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0;
+    candidates.push({
+      target: doc,
+      scrollTop: docScrollTop,
+      max: Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0),
+      isDoc: true,
+    });
+  }
+
+  let best = null;
+  for (const c of candidates){
+    if (!best) { best = c; continue; }
+    const diff = c.max - best.max;
+    if (diff > 0.5 || (Math.abs(diff) <= 0.5 && c.scrollTop > best.scrollTop)){
+      best = c;
+    }
+  }
+  return best;
 }
 function setScrollTop(state, value){
-  if (!state.target) return;
+  if (!state || !state.target) return;
   if (state.isDoc) {
     window.scrollTo({ top: value, behavior: 'auto' });
   } else {
     state.target.scrollTop = value;
   }
 }
-
 
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
@@ -270,8 +285,8 @@ function stopAutoScroll(){
 }
 function startAutoScroll(){
   if (autoRunning || _autoDelayTO) { return; }
-  const scroller = getScrollContainer();
-  if (!scroller) return;
+  const initial = resolveScrollState();
+  if (!initial || initial.max <= 0) return;
   if (AUTO_DELAY > 0){
     setAutoIcon('waiting');
     _autoDelayTO = setTimeout(()=>{
