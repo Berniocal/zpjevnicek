@@ -933,5 +933,16 @@
     "books": {
       "Zpjěvníček 1": 85
     }
+  },
+  {
+    "id": "songs/086-trezor-karel-gott.pro",
+    "file": "songs/086-trezor-karel-gott.pro",
+    "title": "Trezor",
+    "author": "Karel Gott",
+    "number": 86,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 86
+    }
   }
 ]
