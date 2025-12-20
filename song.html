@@ -304,43 +304,54 @@ function stopAutoScroll(){
   setAutoIcon('idle');
 }
 function startAutoScroll(){
-  if (autoRunning || _autoDelayTO) { return; }
-  const initial = resolveScrollState();
-  if (!initial || initial.max <= 0) return;
-  if (AUTO_DELAY > 0){
-    setAutoIcon('waiting');
-    _autoDelayTO = setTimeout(()=>{
-      _autoDelayTO = 0;
-      autoRunning = true;
-      _lastTs = 0;
-      setAutoIcon('running');
-      tickStart();
-    }, AUTO_DELAY*1000);
-  } else {
+  if (autoRunning || _autoDelayTO) return;
+
+  const begin = () => {
     autoRunning = true;
     _lastTs = 0;
     setAutoIcon('running');
-    tickStart();
-  }
 
-  function tickStart(){
-    function tick(ts){
-      if (!autoRunning){ return; }
+    const tick = (ts) => {
+      if (!autoRunning) return;
+
       if (!_lastTs) _lastTs = ts;
-      const dt = (ts - _lastTs) / 1000; _lastTs = ts;
+      const dt = (ts - _lastTs) / 1000;
+      _lastTs = ts;
 
-      const max = view.scrollHeight - view.clientHeight;
-      if (view.scrollTop >= max - 1){
+      const state = resolveScrollState();
+      if (!state || state.max <= 0){
         stopAutoScroll();
-      } else {
-        const next = Math.min(max, view.scrollTop + AUTO_SPEED * dt);
-        view.scrollTop = next;
-        _autoRaf = requestAnimationFrame(tick);
+        return;
       }
-    }
+
+      if (state.scrollTop >= state.max - 1){
+        stopAutoScroll();
+        return;
+      }
+
+      const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
+      setScrollTop(state, next);
+
+      _autoRaf = requestAnimationFrame(tick);
+    };
+
     _autoRaf = requestAnimationFrame(tick);
+  };
+
+  const initial = resolveScrollState();
+  if (!initial || initial.max <= 0) return;
+
+  if (AUTO_DELAY > 0){
+    setAutoIcon('waiting');
+    _autoDelayTO = setTimeout(() => {
+      _autoDelayTO = 0;
+      begin();
+    }, AUTO_DELAY * 1000);
+  } else {
+    begin();
   }
 }
+
 
 /* --- CZ noty + transpozice --- */
 const NOTES_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
@@ -479,7 +490,7 @@ function goPrevSong(){
 }
 
 /* --- velikost textu napříč PWA --- */
-const ZPJ_FONT_KEY='zpj-fontScale
+const ZPJ_FONT_KEY='zpj-fontScale;
   /* --- sloupce --- */
 const ZPJ_COLS_KEY = 'zpj-cols'; // "1" nebo "2"
 let COLS = parseInt(localStorage.getItem(ZPJ_COLS_KEY) || '1', 10);
