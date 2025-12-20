@@ -922,5 +922,16 @@
     "books": {
       "Zpjěvníček 1": 84
     }
+  },
+  {
+    "id": "songs/085-touha-daniel-landa.pro",
+    "file": "songs/085-touha-daniel-landa.pro",
+    "title": "Touha",
+    "author": "Daniel Landa",
+    "number": 85,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 85
+    }
   }
 ]
