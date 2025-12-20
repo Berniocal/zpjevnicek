@@ -245,52 +245,57 @@ document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
 /* --- Auto scroll --- */
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
+let _countdownIV = 0;
 
-function getViewScrollState(){
+function resolveScrollState(){
   const view = document.getElementById('view');
-  if (!view) return null;
+  const doc = document.scrollingElement || document.documentElement;
 
-  const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
-  return {
-    target: view,
-    scrollTop: view.scrollTop || 0,
-    max
-  };
+  const candidates = [];
+
+  if (view){
+    const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
+    candidates.push({ target:view, isDoc:false, scrollTop:view.scrollTop||0, max });
+  }
+
+  if (doc){
+    const max = Math.max((doc.scrollHeight || 0) - (doc.clientHeight || 0), 0);
+    candidates.push({ target:doc, isDoc:true, scrollTop:doc.scrollTop||0, max });
+  }
+
+  // vyber ten, který má největší max (nejvíc scrollovatelný)
+  let best = null;
+  for (const c of candidates){
+    if (!best) best = c;
+    else if (c.max > best.max + 1) best = c;
+  }
+  return best;
 }
 
-function setViewScrollTop(value){
-  const view = document.getElementById('view');
-  if (!view) return;
-  view.scrollTop = value;
-}
-
-function updateAutoBtnVisibility(){
-  const ico = document.getElementById('autoBtnIcon');
-  const floater = document.getElementById('autoScroll');
-  const toggle = document.getElementById('toggleAutoBtn');
-  if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
- if (toggle) toggle.setAttribute('aria-pressed', AUTO_BTN_VISIBLE ? 'true' : 'false');
-  if (floater){
-    floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
-    floater.setAttribute('aria-hidden', AUTO_BTN_VISIBLE ? 'false' : 'true');
+function setScrollTop(state, value){
+  if (!state || !state.target) return;
+  if (state.isDoc){
+    state.target.scrollTop = value;
+  } else {
+    state.target.scrollTop = value;
   }
 }
-async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
+
+async function waitForScrollable(minMax = 20, timeoutMs = 2000){
   const t0 = performance.now();
   while (performance.now() - t0 < timeoutMs){
-    // vynucení layoutu po reflow (sloupce + akordy)
+    // po renderu (sloupce/akordy) se výšky mění -> donutit layout
     updateChromeHeight();
     relayoutChords();
 
-    const s = getViewScrollState();
+    const s = resolveScrollState();
     if (s && s.max >= minMax) return s;
 
-    // počkej 1 frame
     await new Promise(r => requestAnimationFrame(r));
   }
-  return getViewScrollState(); // vrať co je, i kdyby bylo malé
+  return resolveScrollState();
 }
-  
+
 function setAutoIcon(state){
   const btn = document.getElementById('autoScroll');
   if (!btn) return;
@@ -298,13 +303,19 @@ function setAutoIcon(state){
   else if (state === 'waiting') btn.textContent = '…';
   else btn.textContent = '∨';
 }
+
 function stopAutoScroll(){
   autoRunning = false;
-  if(_autoRaf) cancelAnimationFrame(_autoRaf);
+
+  if (_autoRaf) cancelAnimationFrame(_autoRaf);
   _autoRaf = 0; _lastTs = 0;
-  if(_autoDelayTO){ clearTimeout(_autoDelayTO); _autoDelayTO = 0; }
+
+  if (_autoDelayTO){ clearTimeout(_autoDelayTO); _autoDelayTO = 0; }
+  if (_countdownIV){ clearInterval(_countdownIV); _countdownIV = 0; }
+
   setAutoIcon('idle');
 }
+
 function startAutoScroll(){
   if (autoRunning || _autoDelayTO) return;
 
@@ -312,8 +323,9 @@ function startAutoScroll(){
     autoRunning = true;
     _lastTs = 0;
     setAutoIcon('running');
-// počkej, až bude #view opravdu scrollovatelný (PC/tablet často dopočítává layout později)
-await waitForScrollableView(20, 1500);
+
+    // počkej, až bude co scrollovat (na PC/tabletu se layout často dopočítá až později)
+    await waitForScrollable(20, 2500);
 
     const tick = (ts) => {
       if (!autoRunning) return;
@@ -322,32 +334,26 @@ await waitForScrollableView(20, 1500);
       const dt = (ts - _lastTs) / 1000;
       _lastTs = ts;
 
-const state = getViewScrollState();
+      const state = resolveScrollState();
+      if (!state){
+        _autoRaf = requestAnimationFrame(tick);
+        return;
+      }
 
-// když ještě není dopočítaný layout (typicky PC/tablet po renderu),
-// tak NEkonči, jen čekej další frame
-if (!state || state.max <= 0){
-  _autoRaf = requestAnimationFrame(tick);
-  return;
-}
+      // když max je pořád malé, ještě není hotový layout -> jen čekej
+      if (state.max < 20){
+        _autoRaf = requestAnimationFrame(tick);
+        return;
+      }
 
+      // konec až fakt u konce
+      if (state.scrollTop >= state.max - 2){
+        stopAutoScroll();
+        return;
+      }
 
- // když je max maličké (typicky ještě nedopočítaný layout), neukončuj, jen čekej
-if (state.max < 20){
-  _autoRaf = requestAnimationFrame(tick);
-  return;
-}
-
-// konec – až když jsme opravdu na konci
-if (state.scrollTop >= state.max - 2){
-  stopAutoScroll();
-  return;
-}
-
-
-const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
-setViewScrollTop(next);
-
+      const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
+      setScrollTop(state, next);
 
       _autoRaf = requestAnimationFrame(tick);
     };
@@ -355,66 +361,50 @@ setViewScrollTop(next);
     _autoRaf = requestAnimationFrame(tick);
   };
 
+  // countdown (restartovat a čísla vždy od začátku)
+  if (AUTO_DELAY > 0){
+    const btn = document.getElementById('autoScroll');
+    let remaining = AUTO_DELAY;
 
+    setAutoIcon('waiting');
+    if (btn) btn.textContent = String(Math.ceil(remaining));
 
-if (AUTO_DELAY > 0){
-  const btn = document.getElementById('autoScroll');
-  let remaining = AUTO_DELAY;
-  setAutoIcon('waiting');
-  if (btn) btn.textContent = Math.ceil(remaining);
+    if (_countdownIV) clearInterval(_countdownIV);
+    _countdownIV = setInterval(() => {
+      if (!_autoDelayTO) return;
+      remaining -= 0.1;
+      if (btn) btn.textContent = String(Math.max(0, Math.ceil(remaining)));
+    }, 100);
 
-  const tickCountdown = () => {
-    if (!_autoDelayTO) return;
-    remaining -= 0.25;
-    if (btn) btn.textContent = String(Math.max(0, Math.ceil(remaining)));
-  };
-
-  const iv = setInterval(tickCountdown, 250);
-
-  _autoDelayTO = setTimeout(() => {
-    clearInterval(iv);
-    _autoDelayTO = 0;
+    _autoDelayTO = setTimeout(() => {
+      if (_countdownIV){ clearInterval(_countdownIV); _countdownIV = 0; }
+      _autoDelayTO = 0;
+      begin();
+    }, AUTO_DELAY * 1000);
+  } else {
     begin();
-  }, AUTO_DELAY * 1000);
-
-} else {
-  begin();
-}
-
+  }
 }
 
 function wireAutoScrollDesktopControls(){
   const view = document.getElementById('view');
   if (!view) return;
 
-  // když uživatel scrolluje ručně (kolečko/trackpad), autoscroll zastav
-  view.addEventListener('wheel', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
+  // ruční zásah = stop
+  view.addEventListener('wheel', () => { if (autoRunning || _autoDelayTO) stopAutoScroll(); }, { passive:true });
+  view.addEventListener('touchstart', () => { if (autoRunning || _autoDelayTO) stopAutoScroll(); }, { passive:true });
+  view.addEventListener('pointerdown', () => { if (autoRunning || _autoDelayTO) stopAutoScroll(); }, { passive:true });
 
-  // když uživatel začne tahat / scrollovat dotykem, autoscroll zastav
-  view.addEventListener('touchstart', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
-
-  // klik do textu (myš / touch) může taky autoscroll stopnout
-  view.addEventListener('pointerdown', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
-
-  // mezerník = start/stop (na PC fakt příjemné)
+  // Space = start/stop (PC)
   window.addEventListener('keydown', (e) => {
     if (e.code !== 'Space') return;
-
-    // když píšeš do inputu v panelu nastavení, neřeš
     const tag = (document.activeElement?.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
-
     e.preventDefault();
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-    else startAutoScroll();
+    if (autoRunning || _autoDelayTO) stopAutoScroll(); else startAutoScroll();
   });
 }
+
 
 
 /* --- CZ noty + transpozice --- */
