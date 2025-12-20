@@ -72,6 +72,10 @@
            calc(var(--song-pad-bottom) + env(safe-area-inset-bottom, 0px) + 12px)
            var(--song-pad-x);
   scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
+  touch-action: pan-y;
+overscroll-behavior-x: contain;
+
+  
 }
 
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
@@ -529,17 +533,115 @@ function wireDoubleToggle(){
   }, {passive:false});
 }
 function wireSwipeNavigation(){
-  const view=document.getElementById('view'); if(!view) return;
+  const view = document.getElementById('view');
+  if (!view) return;
+
   let sx=0, sy=0, startTime=0;
-  view.addEventListener('touchstart', (e)=>{ if(e.touches.length!==1) return; const t=e.touches[0]; sx=t.clientX; sy=t.clientY; startTime=Date.now(); }, {passive:true});
+  let tracking=false;
+  let locked=null; // 'h' | 'v' | null
+  let pid=null;
+
+  const THRESH_LOCK = 12;
+  const THRESH_SWIPE_X = 70;
+  const THRESH_SWIPE_Y = 45;
+  const THRESH_TIME = 650;
+
+  // Pokud začínáš úplně u kraje, Samsung/Android někdy bere gesto jako systémové (zpět/VPRED).
+  // Necháme to ignorovat.
+  const EDGE = 12;
+
+  function start(x,y, pointerId){
+    sx=x; sy=y; startTime=Date.now();
+    tracking=true;
+    locked=null;
+    pid=pointerId;
+  }
+
+  function move(x,y, ev){
+    if (!tracking) return;
+    const dx = x - sx;
+    const dy = y - sy;
+
+    if (!locked){
+      if (Math.abs(dx) > THRESH_LOCK || Math.abs(dy) > THRESH_LOCK){
+        locked = (Math.abs(dx) > Math.abs(dy)) ? 'h' : 'v';
+      }
+    }
+
+    if (locked === 'h'){
+      // důležité: zabrání scrollu, aby gesto nezmizelo
+      ev.preventDefault();
+    }
+  }
+
+  function end(x,y, ev){
+    if (!tracking) return;
+    tracking=false;
+
+    const dx = x - sx;
+    const dy = y - sy;
+    const dt = Date.now() - startTime;
+
+    const isSwipe = Math.abs(dx) > THRESH_SWIPE_X && Math.abs(dy) < THRESH_SWIPE_Y && dt < THRESH_TIME;
+
+    if (isSwipe){
+      ev.preventDefault();
+      justSwipedTs = Date.now();
+      if (dx < 0) goNextSong(); else goPrevSong();
+    }
+    locked=null;
+    pid=null;
+  }
+
+  // Preferuj Pointer Events (Android / Samsung stabilnější)
+  if (window.PointerEvent){
+    view.addEventListener('pointerdown', (e)=>{
+      if (e.pointerType !== 'touch') return;
+      // ignoruj systémové edge-gesto
+      if (e.clientX <= EDGE || e.clientX >= (window.innerWidth - EDGE)) return;
+
+      start(e.clientX, e.clientY, e.pointerId);
+      try { view.setPointerCapture(e.pointerId); } catch {}
+    }, { passive:true });
+
+    view.addEventListener('pointermove', (e)=>{
+      if (!tracking || e.pointerId !== pid) return;
+      move(e.clientX, e.clientY, e);
+    }, { passive:false });
+
+    view.addEventListener('pointerup', (e)=>{
+      if (e.pointerType !== 'touch') return;
+      end(e.clientX, e.clientY, e);
+    }, { passive:false });
+
+    view.addEventListener('pointercancel', ()=>{
+      tracking=false; locked=null; pid=null;
+    }, { passive:true });
+
+    return;
+  }
+
+  // Fallback pro starší: touch events
+  view.addEventListener('touchstart', (e)=>{
+    if (!e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    if (t.clientX <= EDGE || t.clientX >= (window.innerWidth - EDGE)) return;
+    start(t.clientX, t.clientY, null);
+  }, { passive:true });
+
+  view.addEventListener('touchmove', (e)=>{
+    if (!tracking || !e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    move(t.clientX, t.clientY, e);
+  }, { passive:false });
+
   view.addEventListener('touchend', (e)=>{
-    if(!startTime) return;
-    const t=e.changedTouches[0]; const dx=t.clientX-sx; const dy=t.clientY-sy; const dt=Date.now()-startTime;
-    const ABSX=Math.abs(dx), ABSY=Math.abs(dy); const isSwipe=ABSX>70 && ABSY<60 && dt<600;
-    if(isSwipe){ e.preventDefault(); justSwipedTs=Date.now(); if(dx<0) goNextSong(); else goPrevSong(); }
-    startTime=0;
-  }, {passive:false});
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    end(t.clientX, t.clientY, e);
+  }, { passive:false });
 }
+
 function goNextSong(){
   if (SONGS_LIST.length < 2 || SONG_INDEX < 0) return;
   const next=(SONG_INDEX+1)%SONGS_LIST.length;
