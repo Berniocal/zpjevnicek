@@ -275,6 +275,22 @@ function updateAutoBtnVisibility(){
     floater.setAttribute('aria-hidden', AUTO_BTN_VISIBLE ? 'false' : 'true');
   }
 }
+async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
+  const t0 = performance.now();
+  while (performance.now() - t0 < timeoutMs){
+    // vynucení layoutu po reflow (sloupce + akordy)
+    updateChromeHeight();
+    relayoutChords();
+
+    const s = getViewScrollState();
+    if (s && s.max >= minMax) return s;
+
+    // počkej 1 frame
+    await new Promise(r => requestAnimationFrame(r));
+  }
+  return getViewScrollState(); // vrať co je, i kdyby bylo malé
+}
+  
 function setAutoIcon(state){
   const btn = document.getElementById('autoScroll');
   if (!btn) return;
@@ -292,10 +308,12 @@ function stopAutoScroll(){
 function startAutoScroll(){
   if (autoRunning || _autoDelayTO) return;
 
-  const begin = () => {
+  const begin = async () => {
     autoRunning = true;
     _lastTs = 0;
     setAutoIcon('running');
+// počkej, až bude #view opravdu scrollovatelný (PC/tablet často dopočítává layout později)
+await waitForScrollableView(20, 1500);
 
     const tick = (ts) => {
       if (!autoRunning) return;
@@ -314,10 +332,18 @@ if (!state || state.max <= 0){
 }
 
 
-      if (state.scrollTop >= state.max - 1){
-        stopAutoScroll();
-        return;
-      }
+ // když je max maličké (typicky ještě nedopočítaný layout), neukončuj, jen čekej
+if (state.max < 20){
+  _autoRaf = requestAnimationFrame(tick);
+  return;
+}
+
+// konec – až když jsme opravdu na konci
+if (state.scrollTop >= state.max - 2){
+  stopAutoScroll();
+  return;
+}
+
 
 const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
 setViewScrollTop(next);
