@@ -900,5 +900,16 @@
     "books": {
       "Zpjěvníček 1": 82
     }
+  },
+  {
+    "id": "songs/083-cerni-andele-lucie.pro",
+    "file": "songs/083-cerni-andele-lucie.pro",
+    "title": "Černí andělé",
+    "author": "Lucie",
+    "number": 83,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 83
+    }
   }
 ]
