@@ -216,6 +216,12 @@ document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
 /* --- Auto scroll --- */
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
+function getScrollContainer(){
+  const view = document.getElementById('view');
+  if (view && (view.scrollHeight - view.clientHeight) > 1) return view;
+  const doc = document.scrollingElement || document.documentElement || document.body;
+  return (doc && (doc.scrollHeight - doc.clientHeight) > 1) ? doc : view;
+}
 
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
@@ -244,9 +250,8 @@ function stopAutoScroll(){
 }
 function startAutoScroll(){
   if (autoRunning || _autoDelayTO) { return; }
-  const view=document.getElementById('view');
-  if (!view) return;
-
+  const scroller = getScrollContainer();
+  if (!scroller) return;
   if (AUTO_DELAY > 0){
     setAutoIcon('waiting');
     _autoDelayTO = setTimeout(()=>{
