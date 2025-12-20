@@ -43,6 +43,9 @@
   .cp .ch{ position:absolute; left:0; top:0; font-weight:700; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:calc(1em * var(--chordScale)); color:var(--chordColor); }
   .cp .ly{ visibility:visible; display:inline-block; white-space:pre-wrap; }
   .cp.nochords .ch{ display:none } .cp.nochords .seg{ padding-top:var(--cp-pad-nochords) }
+  /* když jsou akordy skryté, úplně smaž “prázdné držáky akordů”, aby nevznikaly mezery v textu */
+.cp.nochords .ch-only{ display:none; }
+
 
   .sheet{ padding:0; background:transparent; border:none; box-shadow:none; }
 
@@ -389,27 +392,63 @@ function renderChordPro(text, transposeSemi=0){
         const close=raw.indexOf(']', i+1);
         if(close!==-1){
           const token=raw.slice(i+1, close); i=close+1;
-          if(i>=raw.length || raw[i]=='['){
-            const seg=document.createElement('span'); seg.className='seg';
-            const ch=document.createElement('span'); ch.className='ch'; ch.textContent=transposeChord(token, transposeSemi);
-            const ly=document.createElement('span'); ly.className='ly'; ly.textContent=' ';
-            seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg); pending=null; continue;
-          }else{ pending=token; continue; }
+if(i>=raw.length || raw[i]=='['){
+  const seg=document.createElement('span'); 
+  seg.className='seg ch-only'; // <<< důležité
+  const ch=document.createElement('span'); 
+  ch.className='ch'; 
+  ch.textContent=transposeChord(token, transposeSemi);
+
+  const ly=document.createElement('span'); 
+  ly.className='ly'; 
+  ly.textContent='\u00A0'; // šířka pro akord (NBSP), ale při nochords seg zmizí
+
+  seg.appendChild(ch); 
+  seg.appendChild(ly); 
+  line.appendChild(seg); 
+  pending=null; 
+  continue;
+}
+
+          else{ pending=token; continue; }
         }
       }
       let j=i; while(j<raw.length && raw[j]!='[') j++;
-      const lyr=raw.slice(i,j)||' ';
+      const lyr = raw.slice(i, j);
+      // když je pending akord a mezi ním a dalším tokenem není žádný text,
+// vytvoříme držák akordu, který při skrytí akordů úplně zmizí
+if (pending && lyr === '') {
+  const seg=document.createElement('span');
+  seg.className='seg ch-only';
+  const ch=document.createElement('span'); ch.className='ch'; ch.textContent=transposeChord(pending, transposeSemi);
+  const ly=document.createElement('span'); ly.className='ly'; ly.textContent='\u00A0';
+  seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
+  pending=null; i=j;
+  continue;
+}
+
       const seg=document.createElement('span'); seg.className='seg';
       const ch=document.createElement('span'); ch.className='ch'; ch.textContent=pending?transposeChord(pending, transposeSemi):'';
       const ly=document.createElement('span'); ly.className='ly'; ly.textContent=lyr;
       seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg); pending=null; i=j;
     }
-    if(pending){
-      const seg=document.createElement('span'); seg.className='seg';
-      const ch=document.createElement('span'); ch.className='ch'; ch.textContent=transposeChord(pending, transposeSemi);
-      const ly=document.createElement('span'); ly.className='ly'; ly.textContent=' ';
-      seg.appendChild(ch); seg.appendChild(ly); line.appendChild(seg);
-    }
+if(pending){
+  const seg=document.createElement('span'); 
+  seg.className='seg ch-only';
+  const ch=document.createElement('span'); 
+  ch.className='ch'; 
+  ch.textContent=transposeChord(pending, transposeSemi);
+
+  const ly=document.createElement('span'); 
+  ly.className='ly'; 
+  ly.textContent='\u00A0';
+
+  seg.appendChild(ch); 
+  seg.appendChild(ly); 
+  line.appendChild(seg);
+}
+
+    
     cont.appendChild(line);
   }
   return cont;
