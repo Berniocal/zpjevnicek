@@ -73,9 +73,8 @@
            var(--song-pad-x);
   scrollbar-width: thin; scrollbar-color:#2c3b60 transparent;
   touch-action: pan-y;
-overscroll-behavior-x: contain;
-
-  
+overscroll-behavior: contain;
+ 
 }
 
   #view::-webkit-scrollbar{ width:var(--scrollbarW); }
@@ -691,40 +690,6 @@ function applyColumns(){
   relayoutChords();
 }
 
- function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
-function setScale(s){
-  const c = Math.min(3, Math.max(0.5, s));
-  BASE_SCALE = c;
-  AUTO_SCALE_ACTIVE = false;
-  document.documentElement.style.setProperty('--song-scale', String(c));
-  localStorage.setItem(ZPJ_FONT_KEY, String(c));
-  relayoutChords();
-}
-
-function updateColsIcon(){
-  const ico = document.getElementById('colsIcon');
-  const btn = document.getElementById('toggleCols');
-  if (ico) ico.textContent = String(COLS);
-  if (btn) btn.setAttribute('aria-pressed', COLS === 2 ? 'true' : 'false');
-}
-
-function applyColumns(){
-  document.documentElement.style.setProperty('--col-count', String(COLS));
-  updateColsIcon();
-
-  // když 1 sloupec, vrať base velikost (uživatelskou)
-  if (COLS === 1){
-    document.documentElement.style.setProperty('--song-scale', String(BASE_SCALE));
-    AUTO_SCALE_ACTIVE = false;
-    relayoutChords();
-    return;
-  }
-
-}
-
-
-
-
 async function load(){
   // 1) Načti seznam písní
   const data = await fetch('/zpjevnicek/data/songs.json', { cache:'no-store' })
@@ -941,9 +906,10 @@ document.getElementById('toggleChords').onclick = ()=>{
   });
 
   // 8) Ostatní drátování
-  wireDoubleToggle();
-  wireSwipeNavigation();
-  updateChromeHeight();
+try { wireDoubleToggle(); } catch(e){ console.warn('wireDoubleToggle failed', e); }
+try { wireSwipeNavigation(); } catch(e){ console.warn('wireSwipeNavigation failed', e); }
+updateChromeHeight();
+
 }
 
 
