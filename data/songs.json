@@ -889,5 +889,16 @@
     "books": {
       "Zpjěvníček 1": 81
     }
+  },
+  {
+    "id": "songs/082-atentat-krystof.pro",
+    "file": "songs/082-atentat-krystof.pro",
+    "title": "Atentát",
+    "author": "Kryštof",
+    "number": 82,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 82
+    }
   }
 ]
