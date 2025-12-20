@@ -222,6 +222,26 @@ function getScrollContainer(){
   const doc = document.scrollingElement || document.documentElement || document.body;
   return (doc && (doc.scrollHeight - doc.clientHeight) > 1) ? doc : view;
 }
+function readScrollState(target){
+  const doc = document.scrollingElement || document.documentElement || document.body;
+  const isDoc = target === doc || target === document.body || target === document.documentElement;
+  const scrollTop = isDoc
+    ? (doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0)
+    : target?.scrollTop || 0;
+  const max = isDoc
+    ? Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0)
+    : Math.max((target?.scrollHeight || 0) - (target?.clientHeight || 0), 0);
+  return { target: isDoc ? doc : target, scrollTop, max, isDoc };
+}
+function setScrollTop(state, value){
+  if (!state.target) return;
+  if (state.isDoc) {
+    window.scrollTo({ top: value, behavior: 'auto' });
+  } else {
+    state.target.scrollTop = value;
+  }
+}
+
 
 function updateAutoBtnVisibility(){
   const ico = document.getElementById('autoBtnIcon');
