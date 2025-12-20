@@ -944,5 +944,16 @@
     "books": {
       "Zpjěvníček 1": 86
     }
+  },
+  {
+    "id": "songs/087-jestli-to-nebude-laska-pohadkova.pro",
+    "file": "songs/087-jestli-to-nebude-laska-pohadkova.pro",
+    "title": "Jestli to nebude láska",
+    "author": "Pohádková",
+    "number": 87,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 87
+    }
   }
 ]
