@@ -207,6 +207,9 @@ const book = params.get('book') || '';
 
 let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
+  let CP_TEXT = '';      // uložíme si původní ChordPro text pro re-render
+let CP_TRANS = 0;      // aktuální transpozice pro re-render
+
 let justSwipedTs = 0;
 let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
 if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
@@ -453,6 +456,32 @@ if(pending){
   }
   return cont;
 }
+function renderChordProPlain(text){
+  const { lines } = parseChordPro(text);
+  const cont = document.createElement('div');
+  cont.className = 'cp nochords'; // nochords kvůli CSS (padding apod.)
+
+  for (const raw of lines){
+    if(!raw.trim()){
+      cont.appendChild(document.createElement('br'));
+      continue;
+    }
+
+    // Odstraň akordy [C], [Am7/G] apod. a nech jen text
+    const plain = raw.replace(/\[[^\]]*\]/g, '');
+
+    const line = document.createElement('div');
+    line.className = 'line';
+
+    // Tady už je to jeden textový uzel => slova se nikdy nerozseknou “zatáčk y”
+    line.textContent = plain;
+
+    cont.appendChild(line);
+  }
+  return cont;
+}
+
+  
 const MIN_CHORD_GAP=4;
 function fixChordOverlaps(root){
   const lines=root.querySelectorAll('.line');
@@ -647,27 +676,64 @@ async function load(){
   if (song.type === 'chordpro' || /\.pro$|\.cho$/i.test(song.file)) {
     document.getElementById('controls-cp').style.display='flex';
     const text = await fetch(song.file).then(r=>r.text());
-    let trans=0;
-    const render = ()=>{
-      const view=document.getElementById('view');
-      const el=renderChordPro(text, trans);
-      view.innerHTML=''; view.appendChild(el);
-      requestAnimationFrame(()=>fixChordOverlaps(el));
-      applyChordVisibility(); updateChromeHeight();
-    };
-    render();
-    document.getElementById('up').onclick   = ()=>{ trans+=1; render(); };
-    document.getElementById('down').onclick = ()=>{ trans-=1; render(); };
+CP_TEXT = text;
+let trans = 0;
+CP_TRANS = 0;
+
+const render = ()=>{
+  CP_TRANS = trans; // uložit pro případné re-render při vypnutí akordů
+  const view = document.getElementById('view');
+
+  // Když jsou akordy skryté: renderuj čistý text bez segmentů => žádné “zatáčk y”
+  if (HIDE_CHORDS){
+    const el = renderChordProPlain(text);
+    view.innerHTML = '';
+    view.appendChild(el);
+    applyChordVisibility();
+    updateChromeHeight();
+    return;
+  }
+
+  // Akordy zapnuté: klasický render se segmenty + vyrovnání
+  const el = renderChordPro(text, trans);
+  view.innerHTML='';
+  view.appendChild(el);
+  requestAnimationFrame(()=>fixChordOverlaps(el));
+  applyChordVisibility();
+  updateChromeHeight();
+};
+
+render();
+
+document.getElementById('up').onclick   = ()=>{ trans += 1; render(); };
+document.getElementById('down').onclick = ()=>{ trans -= 1; render(); };
+
 
     let scale = getScale();
     document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); };
     document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); };
 
-    document.getElementById('toggleChords').onclick = ()=>{
-      HIDE_CHORDS = !HIDE_CHORDS;
-      localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
-      applyChordVisibility(); relayoutChords();
-    };
+document.getElementById('toggleChords').onclick = ()=>{
+  HIDE_CHORDS = !HIDE_CHORDS;
+  localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
+
+  // re-render podle stavu (plain vs segmenty)
+  const view = document.getElementById('view');
+  if (HIDE_CHORDS){
+    view.innerHTML = '';
+    view.appendChild(renderChordProPlain(CP_TEXT));
+    applyChordVisibility();
+    updateChromeHeight();
+  } else {
+    view.innerHTML = '';
+    const el = renderChordPro(CP_TEXT, CP_TRANS);
+    view.appendChild(el);
+    requestAnimationFrame(()=>fixChordOverlaps(el));
+    applyChordVisibility();
+    updateChromeHeight();
+  }
+};
+
   } else {
     document.getElementById('controls-score').style.display='flex';
     const el=document.getElementById('view');
