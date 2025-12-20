@@ -521,14 +521,7 @@ function applyColumns(){
   relayoutChords();
 }
 
-  /* --- sloupce --- */
-const ZPJ_COLS_KEY = 'zpj-cols'; // "1" nebo "2"
-let COLS = parseInt(localStorage.getItem(ZPJ_COLS_KEY) || '1', 10);
-if (![1,2].includes(COLS)) COLS = 1;
-
-
-
-function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
+ function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
 function setScale(s){
   const c = Math.min(3, Math.max(0.5, s));
   BASE_SCALE = c;
