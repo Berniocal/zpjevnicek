@@ -245,39 +245,40 @@ document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
 /* --- Auto scroll --- */
 let autoRunning = false;
 let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
+
 function resolveScrollState(){
   const view = document.getElementById('view');
-  const doc = document.scrollingElement || document.documentElement || document.body;
 
-  const candidates = [];
+  // 1) preferuj #view (to je náš hlavní scroller)
   if (view){
-    candidates.push({
-      target: view,
-      scrollTop: view.scrollTop || 0,
-      max: Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0),
-      isDoc: false,
-    });
-  }
-  if (doc){
-    const docScrollTop = doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0;
-    candidates.push({
-      target: doc,
-      scrollTop: docScrollTop,
-      max: Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0),
-      isDoc: true,
-    });
-  }
-
-  let best = null;
-  for (const c of candidates){
-    if (!best) { best = c; continue; }
-    const diff = c.max - best.max;
-    if (diff > 0.5 || (Math.abs(diff) <= 0.5 && c.scrollTop > best.scrollTop)){
-      best = c;
+    const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
+    if (max > 0.5){
+      return {
+        target: view,
+        scrollTop: view.scrollTop || 0,
+        max,
+        isDoc: false,
+      };
     }
   }
-  return best;
+
+  // 2) fallback: dokument (kdyby někdy #view nebyl scrollovatelný)
+  const doc = document.scrollingElement || document.documentElement || document.body;
+  if (doc){
+    const docScrollTop = doc?.scrollTop ?? window.pageYOffset ?? document.body.scrollTop ?? 0;
+    const max = Math.max((doc?.scrollHeight || 0) - (doc?.clientHeight || window.innerHeight || 0), 0);
+    return {
+      target: doc,
+      scrollTop: docScrollTop,
+      max,
+      isDoc: true,
+    };
+  }
+
+  return null;
 }
+
+  
 function setScrollTop(state, value){
   if (!state || !state.target) return;
   if (state.isDoc) {
@@ -350,17 +351,64 @@ function startAutoScroll(){
   const initial = resolveScrollState();
   if (!initial || initial.max <= 0) return;
 
-  if (AUTO_DELAY > 0){
-    setAutoIcon('waiting');
-    _autoDelayTO = setTimeout(() => {
-      _autoDelayTO = 0;
-      begin();
-    }, AUTO_DELAY * 1000);
-  } else {
+if (AUTO_DELAY > 0){
+  const btn = document.getElementById('autoScroll');
+  let remaining = AUTO_DELAY;
+  setAutoIcon('waiting');
+  if (btn) btn.textContent = Math.ceil(remaining);
+
+  const tickCountdown = () => {
+    if (!_autoDelayTO) return;
+    remaining -= 0.25;
+    if (btn) btn.textContent = String(Math.max(0, Math.ceil(remaining)));
+  };
+
+  const iv = setInterval(tickCountdown, 250);
+
+  _autoDelayTO = setTimeout(() => {
+    clearInterval(iv);
+    _autoDelayTO = 0;
     begin();
-  }
+  }, AUTO_DELAY * 1000);
+
+} else {
+  begin();
 }
 
+}
+
+function wireAutoScrollDesktopControls(){
+  const view = document.getElementById('view');
+  if (!view) return;
+
+  // když uživatel scrolluje ručně (kolečko/trackpad), autoscroll zastav
+  view.addEventListener('wheel', () => {
+    if (autoRunning || _autoDelayTO) stopAutoScroll();
+  }, { passive:true });
+
+  // když uživatel začne tahat / scrollovat dotykem, autoscroll zastav
+  view.addEventListener('touchstart', () => {
+    if (autoRunning || _autoDelayTO) stopAutoScroll();
+  }, { passive:true });
+
+  // klik do textu (myš / touch) může taky autoscroll stopnout
+  view.addEventListener('pointerdown', () => {
+    if (autoRunning || _autoDelayTO) stopAutoScroll();
+  }, { passive:true });
+
+  // mezerník = start/stop (na PC fakt příjemné)
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+
+    // když píšeš do inputu v panelu nastavení, neřeš
+    const tag = (document.activeElement?.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    e.preventDefault();
+    if (autoRunning || _autoDelayTO) stopAutoScroll();
+    else startAutoScroll();
+  });
+}
 
 
 /* --- CZ noty + transpozice --- */
@@ -908,6 +956,7 @@ document.getElementById('toggleChords').onclick = ()=>{
   // 8) Ostatní drátování
 try { wireDoubleToggle(); } catch(e){ console.warn('wireDoubleToggle failed', e); }
 try { wireSwipeNavigation(); } catch(e){ console.warn('wireSwipeNavigation failed', e); }
+wireAutoScrollDesktopControls();
 updateChromeHeight();
 
 }
