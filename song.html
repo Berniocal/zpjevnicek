@@ -353,6 +353,7 @@ function startAutoScroll(){
 }
 
 
+
 /* --- CZ noty + transpozice --- */
 const NOTES_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
 const ALT = { 'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','A#':'B','Bb':'B','Hb':'B','Cb':'H','B#':'C','H#':'C','E#':'F','Fb':'E' };
@@ -491,15 +492,41 @@ function goPrevSong(){
 
 /* --- velikost textu napříč PWA --- */
 const ZPJ_FONT_KEY = 'zpj-fontScale';
+
+  function getScale(){
+  const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale')) || 1;
+  return s > 0 ? s : 1;
+}
+function setScale(s){
+  const c = Math.min(3, Math.max(0.5, s));
+  document.documentElement.style.setProperty('--song-scale', String(c));
+  localStorage.setItem(ZPJ_FONT_KEY, String(c));
+  relayoutChords();
+}
+/* --- sloupce (bez přepočtu velikosti) --- */
+const ZPJ_COLS_KEY = 'zpj-cols'; // "1" nebo "2"
+let COLS = parseInt(localStorage.getItem(ZPJ_COLS_KEY) || '1', 10);
+if (![1,2].includes(COLS)) COLS = 1;
+
+function updateColsIcon(){
+  const ico = document.getElementById('colsIcon');
+  const btn = document.getElementById('toggleCols');
+  if (ico) ico.textContent = String(COLS);
+  if (btn) btn.setAttribute('aria-pressed', COLS === 2 ? 'true' : 'false');
+}
+
+function applyColumns(){
+  document.documentElement.style.setProperty('--col-count', String(COLS));
+  updateColsIcon();
+  relayoutChords();
+}
+
   /* --- sloupce --- */
 const ZPJ_COLS_KEY = 'zpj-cols'; // "1" nebo "2"
 let COLS = parseInt(localStorage.getItem(ZPJ_COLS_KEY) || '1', 10);
 if (![1,2].includes(COLS)) COLS = 1;
 
-let BASE_SCALE = parseFloat(localStorage.getItem(ZPJ_FONT_KEY));
-if (isNaN(BASE_SCALE) || BASE_SCALE <= 0) BASE_SCALE = 1;
 
-let AUTO_SCALE_ACTIVE = false;
 
 function getScale(){ const s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--song-scale'))||1; return s>0?s:1; }
 function setScale(s){
@@ -510,12 +537,7 @@ function setScale(s){
   localStorage.setItem(ZPJ_FONT_KEY, String(c));
   relayoutChords();
 }
-function setAutoScale(s){
-  const c = Math.min(3, Math.max(0.5, s));
-  AUTO_SCALE_ACTIVE = true;
-  document.documentElement.style.setProperty('--song-scale', String(c));
-  relayoutChords();
-}
+
 function updateColsIcon(){
   const ico = document.getElementById('colsIcon');
   const btn = document.getElementById('toggleCols');
@@ -535,79 +557,9 @@ function applyColumns(){
     return;
   }
 
-  // 2 sloupce => dopočítej scale
-  fitScaleForTwoColumns();
 }
 
-function fitScaleForTwoColumns(){
-  const view = document.getElementById('view');
-  const cp = view?.querySelector('.cp');
-  if (!view || !cp) return;
 
-  // šířka jednoho sloupce (minus mezera)
-  const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--col-gap')) || 14;
-  const colW = (view.clientWidth - gap) / 2;
-
-  // vytvoř offscreen klon jen pro měření "nejdelšího řádku"
-  const probeWrap = document.createElement('div');
-  probeWrap.style.position = 'fixed';
-  probeWrap.style.left = '-99999px';
-  probeWrap.style.top = '0';
-  probeWrap.style.visibility = 'hidden';
-  probeWrap.style.pointerEvents = 'none';
-  probeWrap.style.width = '20000px';
-  probeWrap.style.padding = '0';
-  probeWrap.style.margin = '0';
-
-  const clone = cp.cloneNode(true);
-
-  // pro měření: vypni akordy a zruš padding, ať měříme text
-  clone.classList.add('nochords');
-  clone.style.columnCount = '1';
-  clone.style.columnGap = '0px';
-
-  // nastav "no wrap" na řádky, aby scrollWidth ukázal skutečnou délku
-  clone.querySelectorAll('.line').forEach(line => {
-    line.style.whiteSpace = 'pre';
-  });
-  clone.querySelectorAll('.seg').forEach(seg => {
-    seg.style.paddingTop = '0';
-    seg.style.marginLeft = '0';
-  });
-
-  probeWrap.appendChild(clone);
-  document.body.appendChild(probeWrap);
-
-  // zjisti největší šířku řádku
-  let maxLineW = 0;
-  clone.querySelectorAll('.line').forEach(line => {
-    maxLineW = Math.max(maxLineW, line.scrollWidth || 0);
-  });
-
-  document.body.removeChild(probeWrap);
-
-  if (maxLineW <= 0) return;
-
-  // aktuální scale (může být base nebo už auto)
-  const currentScale = getScale();
-
-  // faktor zmenšení: aby nejdelší řádek vešel do colW s malou rezervou
-  const factor = (colW / maxLineW) * 0.98;
-  const neededScale = currentScale * factor;
-
-  const target = Math.min(BASE_SCALE, neededScale);
-
-  // pokud by vyšlo větší než base, nech base
-  if (target >= BASE_SCALE){
-    document.documentElement.style.setProperty('--song-scale', String(BASE_SCALE));
-    AUTO_SCALE_ACTIVE = false;
-  } else {
-    setAutoScale(target);
-  }
-
-  // po změně velikosti znovu přerovnat akordy (když jsou zapnuté)
-  relayoutChords();
-}
 
 
 async function load(){
@@ -706,7 +658,9 @@ async function load(){
   if (autoBtn) autoBtn.onclick=()=>{ if (autoRunning || _autoDelayTO) stopAutoScroll(); else startAutoScroll(); };
   updateAutoBtnVisibility();
   setAutoIcon('idle');
-    // 6.5) Sloupce 1/2
+
+  
+  // 6.5) Sloupce 1/2
   const colsBtn = document.getElementById('toggleCols');
   if (colsBtn) colsBtn.onclick = ()=>{
     COLS = (COLS === 1) ? 2 : 1;
@@ -803,7 +757,6 @@ function applyChordVisibility(){
 let _resizeTO;
 function onResizeReflow(){
   updateChromeHeight();
-  if (COLS === 2) fitScaleForTwoColumns();
   relayoutChords();
 }
 
