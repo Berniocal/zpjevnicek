@@ -878,5 +878,16 @@
     "books": {
       "Zpjěvníček 1": 80
     }
+  },
+  {
+    "id": "songs/081-mravenci-ukolebavka-sverak-a-uhlir.pro",
+    "file": "songs/081-mravenci-ukolebavka-sverak-a-uhlir.pro",
+    "title": "Mravenčí ukolébavka",
+    "author": "Svěrák a Uhlíř",
+    "number": 81,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 81
+    }
   }
 ]
