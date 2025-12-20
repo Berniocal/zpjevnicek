@@ -911,5 +911,16 @@
     "books": {
       "Zpjěvníček 1": 83
     }
+  },
+  {
+    "id": "songs/084-u-vcelina-divokej-bill.pro",
+    "file": "songs/084-u-vcelina-divokej-bill.pro",
+    "title": "U včelína",
+    "author": "Divokej Bill",
+    "number": 84,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 84
+    }
   }
 ]
