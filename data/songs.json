@@ -1021,5 +1021,16 @@
     "books": {
       "Zpjěvníček 1": 93
     }
+  },
+  {
+    "id": "songs/094-saman-kabat.pro",
+    "file": "songs/094-saman-kabat.pro",
+    "title": "Šaman",
+    "author": "Kabát",
+    "number": 94,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 94
+    }
   }
 ]
