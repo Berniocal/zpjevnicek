@@ -999,5 +999,16 @@
     "books": {
       "Zpjěvníček 1": 91
     }
+  },
+  {
+    "id": "songs/092-mala-dama-kabat.pro",
+    "file": "songs/092-mala-dama-kabat.pro",
+    "title": "Malá dáma",
+    "author": "Kabát",
+    "number": 92,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 92
+    }
   }
 ]
