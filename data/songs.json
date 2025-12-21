@@ -966,5 +966,16 @@
     "books": {
       "Zpjěvníček 1": 88
     }
+  },
+  {
+    "id": "songs/089-na-kolena-ivan-hlas.pro",
+    "file": "songs/089-na-kolena-ivan-hlas.pro",
+    "title": "Na kolena",
+    "author": "Ivan Hlas",
+    "number": 89,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 89
+    }
   }
 ]
