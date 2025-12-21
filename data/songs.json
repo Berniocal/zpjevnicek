@@ -1032,5 +1032,16 @@
     "books": {
       "Zpjěvníček 1": 94
     }
+  },
+  {
+    "id": "songs/095-v-pekle-sudy-valej-kabat.pro",
+    "file": "songs/095-v-pekle-sudy-valej-kabat.pro",
+    "title": "V pekle sudy válej",
+    "author": "Kabát",
+    "number": 95,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 95
+    }
   }
 ]
