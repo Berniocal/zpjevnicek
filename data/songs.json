@@ -955,5 +955,16 @@
     "books": {
       "Zpjěvníček 1": 87
     }
+  },
+  {
+    "id": "songs/088-kac-kac-kac-kacena-lidova.pro",
+    "file": "songs/088-kac-kac-kac-kacena-lidova.pro",
+    "title": "Kač, kač, kač kačena",
+    "author": "Lidová",
+    "number": 88,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 88
+    }
   }
 ]
