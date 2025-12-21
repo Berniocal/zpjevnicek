@@ -988,5 +988,16 @@
     "books": {
       "Zpjěvníček 1": 90
     }
+  },
+  {
+    "id": "songs/091-silny-refren-jako-hovado-horkyze-slize.pro",
+    "file": "songs/091-silny-refren-jako-hovado-horkyze-slize.pro",
+    "title": "Silný refrén jako hovado",
+    "author": "Horkýže slíže",
+    "number": 91,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 91
+    }
   }
 ]
