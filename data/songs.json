@@ -1010,5 +1010,16 @@
     "books": {
       "Zpjěvníček 1": 92
     }
+  },
+  {
+    "id": "songs/093-na-sever-kabat.pro",
+    "file": "songs/093-na-sever-kabat.pro",
+    "title": "Na sever",
+    "author": "Kabát",
+    "number": 93,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 93
+    }
   }
 ]
