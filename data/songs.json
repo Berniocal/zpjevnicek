@@ -977,5 +977,16 @@
     "books": {
       "Zpjěvníček 1": 89
     }
+  },
+  {
+    "id": "songs/090-tanci-dokud-muzes-mandrage.pro",
+    "file": "songs/090-tanci-dokud-muzes-mandrage.pro",
+    "title": "Tanči dokud můžeš",
+    "author": "Mandrage",
+    "number": 90,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 90
+    }
   }
 ]
