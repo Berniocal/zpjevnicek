@@ -117,6 +117,42 @@
 </style>
 </head>
 <body>
+  <script>
+(function () {
+  const PASSWORD = "hutisko"; // ← změň heslo
+  const KEY = "zpevnik_access_granted";
+
+  // Zabraň zobrazení obsahu, dokud se nerozhodne
+  document.documentElement.style.display = "none";
+
+  function deny() {
+    document.documentElement.innerHTML = `
+      <head><title>Přístup odepřen</title></head>
+      <body style="font-family:sans-serif;text-align:center;padding:2rem">
+        <h2>Přístup odepřen</h2>
+        <p>Tento zpěvník je určen pouze pro uzavřenou skupinu.</p>
+      </body>`;
+    document.documentElement.style.display = "block";
+    throw new Error("Access denied");
+  }
+
+  // už jednou ověřený přístup
+  if (localStorage.getItem(KEY) === "yes") {
+    document.documentElement.style.display = "block";
+    return;
+  }
+
+  const entered = prompt("Zadej heslo pro přístup ke zpěvníčku:");
+
+  if (entered === null || entered !== PASSWORD) {
+    deny();
+  }
+
+  // správné heslo
+  localStorage.setItem(KEY, "yes");
+  document.documentElement.style.display = "block";
+})();
+</script>
   <div class="container">
     <div class="sheet">
       <div id="chrome">
