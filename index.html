@@ -64,6 +64,22 @@
 </style>
 </head>
 <body>
+  <script>
+(function () {
+  const PASSWORD = "hutisko";
+  const KEY = "zpevnik_access";
+
+  if (localStorage.getItem(KEY) !== PASSWORD) {
+    const entered = prompt("Zadej heslo pro přístup ke zpěvníčku:");
+    if (entered !== PASSWORD) {
+      document.body.innerHTML = "<h2>Přístup odepřen</h2>";
+      throw new Error("Access denied");
+    }
+    localStorage.setItem(KEY, PASSWORD);
+  }
+})();
+</script>
+
 <div class="container">
   <div class="header">
     <div class="brand">
