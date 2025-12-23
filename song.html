@@ -1034,14 +1034,16 @@ load();
     collection, query, orderBy, serverTimestamp, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-  const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
-    // apiKey: "…",
-    // authDomain: "…",
-    // projectId: "…",
-    // storageBucket: "…",
-    // messagingSenderId: "…",
-    // appId: "…",
-  };
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
+  apiKey: "AIzaSyCwukp1IylOurKvEsKc7uCnyUJLoCtWI2o",
+  authDomain: "zpjevnicek.firebaseapp.com",
+  projectId: "zpjevnicek",
+  storageBucket: "zpjevnicek.firebasestorage.app",
+  messagingSenderId: "842022440214",
+  appId: "1:842022440214:web:0dbddb0a435c3cd9705437",
+  measurementId: "G-HJ5NNLMJKR"
+};
+
   const HAS_CONFIG = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId);
 
   const btnShare = document.getElementById('btnShare');
@@ -1099,15 +1101,36 @@ load();
   let app, db;
   if (HAS_CONFIG){ app = initializeApp(FIREBASE_CONFIG); db = getFirestore(app); }
 
-  let unsubSession=null, unsubMembers=null, unsubMe=null, heartbeatTimer=null;
-  function cleanupSubs(){
-    if (unsubSession) try{unsubSession();}catch(_){ }
-    if (unsubMembers) try{unsubMembers();}catch(_){ }
-    if (unsubMe) try{unsubMe();}catch(_){ }
-    unsubSession = unsubMembers = unsubMe = null;
-    if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer=null; }
+let unsubSession=null, unsubMembers=null, unsubMe=null, unsubNav=null, heartbeatTimer=null;
+function cleanupSubs(){
+  if (unsubSession) try{unsubSession();}catch(_){ }
+  if (unsubMembers) try{unsubMembers();}catch(_){ }
+  if (unsubMe) try{unsubMe();}catch(_){ }
+  if (unsubNav) try{unsubNav();}catch(_){ }
+  unsubSession = unsubMembers = unsubMe = unsubNav = null;
+  if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer=null; }
+}
+
   }
   function getLocalSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(_){ return null; } }
+function applySessionUI(){
+  const local = getLocalSession();
+
+  // default barva
+  paintShare('');
+
+  // nic v localStorage -> nech přihlášení viditelné
+  if (!local?.code) return;
+
+  // zabarvi tlačítko podle role (host/client)
+  paintShare(local.role === 'host' ? 'host' : 'client');
+
+  // v dialogu schovej join a zamkni inputy, protože už jsi připojený
+  if (shareCode) { shareCode.value = local.code; shareCode.disabled = true; }
+  if (shareNick) { shareNick.disabled = true; }
+  if (shareJoin) { shareJoin.style.display = 'none'; }
+}
+
   function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
   function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
   function sessionDoc(code){ return doc(db, 'zpevnikShare', code); }
@@ -1126,6 +1149,26 @@ load();
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   }
+  function isInternalZpjevnicekLink(href){
+  if (!href) return false;
+  if (href.startsWith('#')) return false;
+  if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+  if (href.includes('://') && !href.startsWith(location.origin)) return false;
+  return href.includes('/zpjevnicek/');
+}
+
+function canonicalPath(href){
+  try{
+    const u = new URL(href, location.origin);
+    return u.pathname + u.search + u.hash;
+  }catch(_){
+    return href || '';
+  }
+}
+function herePath(){
+  return location.pathname + location.search + location.hash;
+}
+
 
   function renderHostMembers(code, gen){
     hostMembers.innerHTML = '<li class="badge" style="opacity:.8">Načítám…</li>';
@@ -1215,6 +1258,62 @@ load();
     hostPanel.style.display='none'; clientPanel.style.display='none';
     setMsg('Sdílení zrušeno. Kód je volný.', 'info');
   }
+function interceptNavigationForHost(){
+  document.addEventListener('click', async (e)=>{
+    const a = e.target?.closest?.('a');
+    if (!a) return;
+
+    const hrefRaw = a.getAttribute('href') || '';
+    if (!isInternalZpjevnicekLink(hrefRaw)) return;
+
+    const local = getLocalSession();
+    if (!HAS_CONFIG || !local?.code || local.role !== 'host') return;
+
+    if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+    const target = canonicalPath(hrefRaw);
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    try{
+      await updateDoc(sessionDoc(local.code), {
+        current: { path: target, at: serverTimestamp() },
+        lastActive: serverTimestamp(),
+        expiresAt: new Date(Date.now() + 60*60*1000),
+        generation: local.generation,
+      });
+    }catch(_){}
+
+    location.href = target;
+  }, true);
+}
+function attachNavigationSync(){
+  const local = getLocalSession();
+  if (!HAS_CONFIG || !local?.code || local.role !== 'client') return;
+
+  if (unsubNav) try{unsubNav();}catch(_){}
+  unsubNav = onSnapshot(sessionDoc(local.code), async (snap)=>{
+    if (!snap.exists()) return;
+    const s = snap.data() || {};
+    if (s.generation !== local.generation) return;
+
+    const cur = s.current;
+    if (!cur?.path) return;
+
+    // jen když je client active
+    try{
+      const meSnap = await getDoc(memberDoc(local.code, uid));
+      const me = meSnap.data() || {};
+      if (me.generation !== local.generation) return;
+      if (me.status !== 'active') return;
+    }catch(_){ return; }
+
+    const target = canonicalPath(cur.path);
+    const here = herePath();
+    if (here !== target) location.href = target;
+  });
+}
 
   function attach(code){
     if (!HAS_CONFIG) return;
@@ -1365,122 +1464,20 @@ load();
   };
 
   // boot
-  (function boot(){
-    const local=getLocalSession();
-    if (!HAS_CONFIG){ paintShare(''); return; }
-    if (local?.code){
-      paintShare(local.role==='host' ? 'host' : '');
-      attach(local.code);
-    }
-  })();
+(function boot(){
+  const local=getLocalSession();
+  if (!HAS_CONFIG){ paintShare(''); return; }
+  if (local?.code){
+    paintShare(local.role === 'host' ? 'host' : 'client');
+    attach(local.code);
+    attachNavigationSync();       // klient poslouchá current
+    interceptNavigationForHost(); // host zapisuje current
+  }
+})();
+
 
 </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import {
-    getFirestore, doc, getDoc, updateDoc, onSnapshot,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-  const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyCwukp1IylOurKvEsKc7uCnyUJLoCtWI2o",
-    authDomain: "zpjevnicek.firebaseapp.com",
-    projectId: "zpjevnicek",
-    storageBucket: "zpjevnicek.firebasestorage.app",
-    messagingSenderId: "842022440214",
-    appId: "1:842022440214:web:0dbddb0a435c3cd9705437"
-  };
-
-  const SESSION_KEY = 'zpj_share_session';
-  const UID_KEY = 'zpj_share_uid';
-
-  const uid = localStorage.getItem(UID_KEY);
-  const local = (()=>{ try { return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); } catch { return null; } })();
-  if (!uid || !local?.code || !local?.generation) {
-    // nejsme v session → nic nedělej
-    // (song.html normálně funguje)
-  } else {
-    const app = initializeApp(FIREBASE_CONFIG);
-    const db = getFirestore(app);
-
-    const sessionRef = doc(db, 'zpevnikShare', local.code);
-    const meRef = doc(db, 'zpevnikShare', local.code, 'members', uid);
-
-    function isInternalZpjevnicekLink(href){
-      if (!href) return false;
-      if (href.startsWith('#')) return false;
-      if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
-      if (href.includes('://') && !href.startsWith(location.origin)) return false;
-      return href.includes('/zpjevnicek/');
-    }
-
-    function canonicalPath(href){
-  try{
-    const u = new URL(href, location.origin);
-    return u.pathname + u.search + u.hash;
-  }catch(_){
-    return href || '';
-  }
-}
-function herePath(){
-  return location.pathname + location.search + location.hash;
-}
-
-    // HOST: zapisuje current při jakékoliv navigaci
-    if (local.role === 'host') {
-      document.addEventListener('click', async (e)=>{
-        const a = e.target?.closest?.('a');
-        if (!a) return;
-        const href = a.getAttribute('href') || '';
-        const target = canonicalPath(href);
-        if (!isInternalZpjevnicekLink(href)) return;
-
-        if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        try{
-          await updateDoc(sessionRef, {
-            current: { path: target, at: serverTimestamp() },
-            lastActive: serverTimestamp(),
-            expiresAt: new Date(Date.now() + 60*60*1000),
-            generation: local.generation,
-          });
-        }catch(err){
-          console.error("HOST current update failed:", err);
-        }
-
-        location.href = target;
-      }, true);
-    }
-
-    // CLIENT: poslouchá current a přesměruje se
-    if (local.role === 'client') {
-      onSnapshot(sessionRef, async (snap)=>{
-        if (!snap.exists()) return;
-        const s = snap.data() || {};
-        if (s.generation !== local.generation) return;
-
-        const cur = s.current;
-        if (!cur || !cur.path) return;
-
-        // jen když je client active
-        try{
-          const meSnap = await getDoc(meRef);
-          const me = meSnap.data() || {};
-          if (me.generation !== local.generation) return;
-          if (me.status !== 'active') return;
-        }catch(_){ return; }
-
-const target = canonicalPath(cur.path);
-const here = herePath();
-if (here !== target) location.href = target;
-
-      });
-    }
-  }
-</script>
 <dialog id="dlgShare">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
     <strong id="shareTitle">Sdílení</strong>
