@@ -33,6 +33,8 @@
     --scrollbarW: 3px;
         --col-count: 1;
     --col-gap: 14px; /* mezera mezi sloupci */
+    --ink:#e6eef8; 
+    --card:#0f1722;
 
   }
 
@@ -1479,7 +1481,46 @@ if (here !== target) location.href = target;
     }
   }
 </script>
+<dialog id="dlgShare">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+    <strong id="shareTitle">Sdílení</strong>
+    <button id="dlgShareClose">Zavřít</button>
+  </div>
 
+  <div id="shareBody">
+    <div style="display:grid;gap:10px">
+      <label style="display:grid;gap:6px">Přezdívka
+        <input id="shareNick" placeholder="Třeba Jenda" autocomplete="nickname" />
+      </label>
+      <label style="display:grid;gap:6px">Pětičíselný kód
+        <input id="shareCode" inputmode="numeric" pattern="[0-9]*" placeholder="12345" maxlength="5" />
+      </label>
+      <button id="shareJoin" style="width:100%">Vytvořit / přihlásit</button>
+      <div id="shareMsg" class="badge" style="display:none"></div>
+    </div>
+
+    <hr class="sep" />
+
+    <div id="hostPanel" style="display:none">
+      <div class="badge" style="margin-bottom:8px">Jsi <strong>hlavní</strong>. Příchozí žádosti musíš potvrdit.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button id="hostStop">Zrušit sdílení (odpojit všechny)</button>
+        <button id="hostRefresh">Obnovit seznam</button>
+      </div>
+      <div style="font-weight:600;margin:6px 0">Připojení</div>
+      <ul id="hostMembers" style="list-style:none;margin:0;padding:0;max-height:50vh;overflow:auto"></ul>
+    </div>
+
+    <div id="clientPanel" style="display:none">
+      <div id="clientState" class="badge" style="margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="clientPause">Pauznout</button>
+        <button id="clientResume">Obnovit</button>
+        <button id="clientLeave">Odpojit se</button>
+      </div>
+    </div>
+  </div>
+</dialog>
   
 </body>
 </html>
