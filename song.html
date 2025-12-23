@@ -1111,7 +1111,6 @@ function cleanupSubs(){
   if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer=null; }
 }
 
-  }
   function getLocalSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(_){ return null; } }
 function applySessionUI(){
   const local = getLocalSession();
