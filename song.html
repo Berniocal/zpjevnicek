@@ -114,6 +114,10 @@
   .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
 
   .container{ padding-right:0 !important; padding-left:0 !important; padding-top:0 !important; }
+
+  /* Dialog sdílení */
+  dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
+  dialog::backdrop{ background:rgba(0,0,0,.4); }
 </style>
 </head>
 <body>
@@ -158,7 +162,10 @@
       <div id="chrome">
 <div class="chrome-row">
   <a id="backLink" href="#">← Zpět</a>
-  <button id="btnSettings" class="ghost" title="Nastavení posuvu a akordů">⚙️</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="btnShare" class="ghost" title="Sdílení ovládání (host / připojit se)">Sdílení</button>
+    <button id="btnSettings" class="ghost" title="Nastavení posuvu a akordů">⚙️</button>
+  </div>
 </div>
 
 <div class="title-row">
@@ -233,6 +240,48 @@
       <div id="view"></div>
     </div>
   </div>
+
+  <!-- Dialog pro SDÍLENÍ (host/připojit) – stejné jako na hlavní stránce -->
+  <dialog id="dlgShare">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+      <strong id="shareTitle">Sdílení</strong>
+      <button id="dlgShareClose">Zavřít</button>
+    </div>
+
+    <div id="shareBody">
+      <div style="display:grid;gap:10px">
+        <label style="display:grid;gap:6px">Přezdívka
+          <input id="shareNick" placeholder="Třeba Jenda" autocomplete="nickname" />
+        </label>
+        <label style="display:grid;gap:6px">Pětičíselný kód
+          <input id="shareCode" inputmode="numeric" pattern="[0-9]*" placeholder="12345" maxlength="5" />
+        </label>
+        <button id="shareJoin" style="width:100%">Vytvořit / přihlásit</button>
+        <div id="shareMsg" class="badge" style="display:none"></div>
+      </div>
+
+      <hr class="sep" />
+
+      <div id="hostPanel" style="display:none">
+        <div class="badge" style="margin-bottom:8px">Jsi <strong>hlavní</strong>. Příchozí žádosti musíš potvrdit.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button id="hostStop">Zrušit sdílení (odpojit všechny)</button>
+          <button id="hostRefresh">Obnovit seznam</button>
+        </div>
+        <div style="font-weight:600;margin:6px 0">Připojení</div>
+        <ul id="hostMembers" style="list-style:none;margin:0;padding:0;max-height:50vh;overflow:auto"></ul>
+      </div>
+
+      <div id="clientPanel" style="display:none">
+        <div id="clientState" class="badge" style="margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="clientPause">Pauznout</button>
+          <button id="clientResume">Obnovit</button>
+          <button id="clientLeave">Odpojit se</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
 <button id="autoScroll" class="auto-scroll" title="Auto posuv">∨</button>
 
@@ -971,5 +1020,466 @@ window.addEventListener('popstate', (e) => {
 
 load();
 </script>
+
+<!-- ======================== SDÍLENÍ OVÁDÁNÍ (Firebase) ========================
+  Stejná logika jako v index.html. Doplň FIREBASE_CONFIG buď globálně do window.FIREBASE_CONFIG,
+  nebo přímo v tomto souboru (viz níže).
+============================================================================= -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot,
+    collection, query, orderBy, serverTimestamp, runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+  const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
+    // apiKey: "…",
+    // authDomain: "…",
+    // projectId: "…",
+    // storageBucket: "…",
+    // messagingSenderId: "…",
+    // appId: "…",
+  };
+  const HAS_CONFIG = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId);
+
+  const btnShare = document.getElementById('btnShare');
+  const dlgShare = document.getElementById('dlgShare');
+  const dlgShareClose = document.getElementById('dlgShareClose');
+  const shareJoin = document.getElementById('shareJoin');
+  const shareNick = document.getElementById('shareNick');
+  const shareCode = document.getElementById('shareCode');
+  const shareMsg  = document.getElementById('shareMsg');
+  const hostPanel = document.getElementById('hostPanel');
+  const hostMembers = document.getElementById('hostMembers');
+  const hostStop = document.getElementById('hostStop');
+  const hostRefresh = document.getElementById('hostRefresh');
+  const clientPanel = document.getElementById('clientPanel');
+  const clientState = document.getElementById('clientState');
+  const clientPause = document.getElementById('clientPause');
+  const clientResume = document.getElementById('clientResume');
+  const clientLeave = document.getElementById('clientLeave');
+
+  const UID_KEY = 'zpj_share_uid';
+  const SESSION_KEY = 'zpj_share_session';
+  const uid = (localStorage.getItem(UID_KEY) || (()=>{
+    const v = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(UID_KEY, v); return v;
+  })());
+
+  function normCode(x){
+    const s = String(x||'').replace(/\D/g,'').slice(0,5);
+    return s.length === 5 ? s : '';
+  }
+  function setMsg(text, kind='info'){
+    if (!text){ shareMsg.style.display='none'; shareMsg.textContent=''; return; }
+    shareMsg.style.display='inline-flex';
+    shareMsg.textContent = text;
+    shareMsg.style.borderColor = (kind==='err') ? '#7f1d1d' : '#273142';
+    shareMsg.style.background  = (kind==='err') ? '#2b1b1b' : 'transparent';
+  }
+
+  function paintShare(state){
+    btnShare.style.background = 'transparent';
+    btnShare.style.borderColor = '#2c3b60';
+    btnShare.style.color = 'var(--ink)';
+    if (state === 'host') {
+      btnShare.style.background = '#123b1f';
+      btnShare.style.borderColor = '#22c55e';
+    } else if (state === 'client') {
+      btnShare.style.background = '#2a1a3d';
+      btnShare.style.borderColor = '#a855f7';
+    } else if (state === 'paused') {
+      btnShare.style.background = '#3a2a12';
+      btnShare.style.borderColor = '#f59e0b';
+    }
+  }
+
+  let app, db;
+  if (HAS_CONFIG){ app = initializeApp(FIREBASE_CONFIG); db = getFirestore(app); }
+
+  let unsubSession=null, unsubMembers=null, unsubMe=null, heartbeatTimer=null;
+  function cleanupSubs(){
+    if (unsubSession) try{unsubSession();}catch(_){ }
+    if (unsubMembers) try{unsubMembers();}catch(_){ }
+    if (unsubMe) try{unsubMe();}catch(_){ }
+    unsubSession = unsubMembers = unsubMe = null;
+    if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer=null; }
+  }
+  function getLocalSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(_){ return null; } }
+  function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
+  function sessionDoc(code){ return doc(db, 'zpevnikShare', code); }
+  function memberDoc(code, memberUid){ return doc(db, 'zpevnikShare', code, 'members', memberUid); }
+
+  async function touch(code, gen, role){
+    const exp = new Date(Date.now() + 60*60*1000);
+    try{ await updateDoc(sessionDoc(code), { lastActive: serverTimestamp(), expiresAt: exp, generation: gen }); }catch(_){ }
+    try{ await updateDoc(memberDoc(code, uid), { lastSeen: serverTimestamp(), generation: gen, role }); }catch(_){ }
+  }
+  function startHeartbeat(code, gen, role){
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(()=>touch(code, gen, role), 25*1000);
+  }
+
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  }
+
+  function renderHostMembers(code, gen){
+    hostMembers.innerHTML = '<li class="badge" style="opacity:.8">Načítám…</li>';
+    const qMembers = query(collection(db, 'zpevnikShare', code, 'members'), orderBy('joinedAt','asc'));
+    if (unsubMembers) try{unsubMembers();}catch(_){ }
+    unsubMembers = onSnapshot(qMembers, (snap)=>{
+      const items=[];
+      snap.forEach(d=>{ const m=d.data()||{}; if (m.generation!==gen) return; items.push({id:d.id,...m}); });
+      hostMembers.innerHTML = items.map(m=>{
+        const nick=(m.nick||m.id); const st=(m.status||'').toUpperCase();
+        const isMe=(m.id===uid); const isHost=(m.role==='host');
+        const badge=isHost?'HOST':st;
+        const canAccept=(!isHost && m.status==='pending');
+        const canKick=(!isHost && m.status!=='pending');
+        return `
+          <li style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #1f2b46">
+            <div style="flex:1;min-width:0">
+              <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(nick)}${isMe?' <span class=\"badge\" style=\"margin-left:6px\">TY</span>':''}</div>
+              <small class="badge" style="opacity:.85">${escapeHtml(badge)}</small>
+            </div>
+            ${canAccept ? `
+              <button data-acc="${m.id}">Přijmout</button>
+              <button data-den="${m.id}">Odmítnout</button>
+            ` : ''}
+            ${canKick ? `<button data-kick="${m.id}" title="Odpojit">⛔</button>` : ''}
+          </li>
+        `;
+      }).join('') || '<li class="badge" style="opacity:.8">Nikdo připojený.</li>';
+
+      hostMembers.querySelectorAll('[data-acc]').forEach(btn=>btn.onclick=()=>updateDoc(memberDoc(code, btn.dataset.acc), { status:'active', acceptedAt: serverTimestamp(), generation: gen }));
+      hostMembers.querySelectorAll('[data-den]').forEach(btn=>btn.onclick=()=>updateDoc(memberDoc(code, btn.dataset.den), { status:'denied', deniedAt: serverTimestamp(), generation: gen }));
+      hostMembers.querySelectorAll('[data-kick]').forEach(btn=>btn.onclick=()=>{
+        if (!confirm('Odpojit tohoto uživatele?')) return;
+        updateDoc(memberDoc(code, btn.dataset.kick), { status:'kicked', kickedAt: serverTimestamp(), generation: gen });
+      });
+    });
+  }
+
+  async function becomeHost(code, nick){
+    const gen = 'g_' + Math.random().toString(36).slice(2,10);
+    const exp = new Date(Date.now() + 60*60*1000);
+    await setDoc(sessionDoc(code), {
+      hostUid: uid, hostNick: nick, createdAt: serverTimestamp(), lastActive: serverTimestamp(), expiresAt: exp,
+      generation: gen, current: null,
+    }, { merge:true });
+    await setDoc(memberDoc(code, uid), { uid, nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp(), generation: gen }, { merge:true });
+    setLocalSession({ code, role:'host', generation: gen });
+    attach(code);
+  }
+
+  async function joinAsClient(code, nick){
+    const sref = sessionDoc(code);
+    const snap = await getDoc(sref);
+    if (!snap.exists()) { await becomeHost(code, nick); return; }
+    const data = snap.data() || {};
+    const exp = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
+    const isExpired = exp ? (exp.getTime() < Date.now()) : false;
+    if (isExpired) {
+      await runTransaction(db, async (tx)=>{
+        const s2 = await tx.get(sref);
+        const d2 = s2.data() || {};
+        const exp2 = d2.expiresAt?.toDate ? d2.expiresAt.toDate() : null;
+        if (exp2 && exp2.getTime() >= Date.now()) return;
+        const gen = 'g_' + Math.random().toString(36).slice(2,10);
+        const expNew = new Date(Date.now() + 60*60*1000);
+        tx.set(sref, { hostUid: uid, hostNick: nick, createdAt: serverTimestamp(), lastActive: serverTimestamp(), expiresAt: expNew, generation: gen, current: null }, { merge:true });
+        tx.set(memberDoc(code, uid), { uid, nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp(), generation: gen }, { merge:true });
+        setLocalSession({ code, role:'host', generation: gen });
+      });
+      attach(code);
+      return;
+    }
+    const gen = data.generation || ('g_' + Math.random().toString(36).slice(2,10));
+    await setDoc(memberDoc(code, uid), { uid, nick, role:'client', status:'pending', joinedAt: serverTimestamp(), lastSeen: serverTimestamp(), generation: gen }, { merge:true });
+    setLocalSession({ code, role:'client', generation: gen });
+    attach(code);
+  }
+
+  async function hostStopSharing(code){
+    if (!confirm('Opravdu zrušit sdílení? Tím odpojíš všechny připojené.')) return;
+    const newGen = 'g_' + Math.random().toString(36).slice(2,10);
+    const exp = new Date(Date.now() + 60*60*1000);
+    await updateDoc(sessionDoc(code), { generation: newGen, current: null, lastActive: serverTimestamp(), expiresAt: exp, closedAt: serverTimestamp() });
+    cleanupSubs();
+    clearLocalSession();
+    paintShare('');
+    hostPanel.style.display='none'; clientPanel.style.display='none';
+    setMsg('Sdílení zrušeno. Kód je volný.', 'info');
+  }
+
+  function attach(code){
+    if (!HAS_CONFIG) return;
+    cleanupSubs();
+    const local = getLocalSession();
+    if (!local || local.code !== code) return;
+    const genLocal = local.generation;
+    const roleLocal = local.role;
+
+    unsubSession = onSnapshot(sessionDoc(code), async (snap)=>{
+      if (!snap.exists()){
+        cleanupSubs(); clearLocalSession(); paintShare('');
+        setMsg('Sdílení skončilo (kód už neexistuje).', 'err');
+        hostPanel.style.display='none'; clientPanel.style.display='none';
+        return;
+      }
+      const s = snap.data() || {};
+      if (s.generation && genLocal && s.generation !== genLocal){
+        cleanupSubs(); clearLocalSession(); paintShare('');
+        setMsg('Sdílení bylo ukončeno hlavním telefonem.', 'info');
+        hostPanel.style.display='none'; clientPanel.style.display='none';
+        return;
+      }
+
+      if (roleLocal === 'host'){
+        paintShare('host');
+        hostPanel.style.display='block'; clientPanel.style.display='none';
+        renderHostMembers(code, genLocal);
+        startHeartbeat(code, genLocal, 'host');
+
+        // host drží aktuální stránku jako „current“
+        try{
+          await updateDoc(sessionDoc(code), {
+            current: { path: (location.pathname + location.search), at: serverTimestamp() },
+            lastActive: serverTimestamp(),
+            expiresAt: new Date(Date.now() + 60*60*1000),
+            generation: genLocal,
+          });
+        }catch(_){ }
+      } else {
+        hostPanel.style.display='none'; clientPanel.style.display='block';
+        startHeartbeat(code, genLocal, 'client');
+
+        // client: pokud je active a není paused, skákej podle current
+        const cur = s.current;
+        if (cur && cur.path){
+          try{
+            const meSnap = await getDoc(memberDoc(code, uid));
+            const me = meSnap.data() || {};
+            if (me.generation !== genLocal) return;
+            if (me.status !== 'active') return;
+            const here = location.pathname + location.search;
+            if (here !== cur.path) location.href = cur.path;
+          }catch(_){ }
+        }
+      }
+    });
+
+    unsubMe = onSnapshot(memberDoc(code, uid), (snap)=>{
+      if (!snap.exists()) return;
+      const me = snap.data() || {};
+      if (me.generation !== genLocal) return;
+      if (roleLocal === 'client'){
+        const st = me.status;
+        if (st === 'pending'){
+          paintShare(''); clientState.textContent='Čekáš na přijetí hlavním telefonem…';
+        } else if (st === 'active'){
+          paintShare('client'); clientState.textContent='Připojeno (ovládá tě hlavní telefon).';
+        } else if (st === 'paused'){
+          paintShare('paused'); clientState.textContent='Pauza – hlavní telefon tě teď neovládá.';
+        } else if (st === 'denied' || st === 'kicked'){
+          paintShare(''); clientState.textContent = (st==='denied') ? 'Byl(a) jsi odmítnut(a).' : 'Byl(a) jsi odpojen(a) hlavním telefonem.';
+          clearLocalSession();
+        }
+      }
+    });
+  }
+
+  dlgShareClose.onclick = ()=> dlgShare.close();
+
+  btnShare.onclick = ()=>{
+    dlgShare.showModal();
+    setMsg('');
+    const local = getLocalSession();
+    if (!HAS_CONFIG){
+      setMsg('Firebase není nastavený. Doplň FIREBASE_CONFIG.', 'err');
+      hostPanel.style.display='none'; clientPanel.style.display='none';
+      return;
+    }
+    if (local?.code){
+      shareCode.value = local.code;
+      shareCode.disabled = true;
+      shareNick.disabled = true;
+      shareJoin.style.display='none';
+      if (local.role === 'host'){ hostPanel.style.display='block'; clientPanel.style.display='none'; }
+      else { hostPanel.style.display='none'; clientPanel.style.display='block'; }
+      attach(local.code);
+      return;
+    }
+    shareCode.disabled = false;
+    shareNick.disabled = false;
+    shareJoin.style.display='';
+    hostPanel.style.display='none'; clientPanel.style.display='none';
+    shareNick.value = (localStorage.getItem('zpj_share_nick') || '');
+    shareCode.value = '';
+    shareNick.focus();
+  };
+
+  shareCode.addEventListener('input', ()=>{ shareCode.value = shareCode.value.replace(/\D/g,'').slice(0,5); });
+
+  shareJoin.onclick = async ()=>{
+    setMsg('');
+    const nick = (shareNick.value||'').trim().slice(0,24);
+    const code = normCode(shareCode.value);
+    if (!nick){ setMsg('Zadej přezdívku.', 'err'); return; }
+    if (!code){ setMsg('Kód musí mít 5 číslic.', 'err'); return; }
+    localStorage.setItem('zpj_share_nick', nick);
+    try{
+      const sref = sessionDoc(code);
+      const snap = await getDoc(sref);
+      if (!snap.exists()) await becomeHost(code, nick);
+      else {
+        const data = snap.data() || {};
+        if (data.hostUid === uid){ setLocalSession({ code, role:'host', generation: data.generation }); attach(code); }
+        else await joinAsClient(code, nick);
+      }
+      shareCode.disabled=true; shareNick.disabled=true; shareJoin.style.display='none';
+      const local = getLocalSession();
+      if (local?.role === 'host'){ hostPanel.style.display='block'; clientPanel.style.display='none'; }
+      else { hostPanel.style.display='none'; clientPanel.style.display='block'; }
+      setMsg('Hotovo.', 'info');
+    }catch(e){ console.error(e); setMsg('Nepodařilo se připojit. Zkontroluj Firebase rules a config.', 'err'); }
+  };
+
+  hostStop.onclick = async ()=>{ const local=getLocalSession(); if (!local?.code) return; await hostStopSharing(local.code); };
+  hostRefresh.onclick = ()=>{ const local=getLocalSession(); if (!local?.code) return; attach(local.code); };
+  clientPause.onclick = async ()=>{ const local=getLocalSession(); if (!local?.code) return; await updateDoc(memberDoc(local.code, uid), { status:'paused', pausedAt: serverTimestamp(), generation: local.generation }); };
+  clientResume.onclick = async ()=>{ const local=getLocalSession(); if (!local?.code) return; await updateDoc(memberDoc(local.code, uid), { status:'active', resumedAt: serverTimestamp(), generation: local.generation }); };
+  clientLeave.onclick = async ()=>{
+    const local=getLocalSession();
+    if (!local?.code) return;
+    if (!confirm('Odpojit se od hlavního telefonu?')) return;
+    try{ await updateDoc(memberDoc(local.code, uid), { status:'left', leftAt: serverTimestamp(), generation: local.generation }); }catch(_){ }
+    cleanupSubs(); clearLocalSession(); paintShare('');
+    hostPanel.style.display='none'; clientPanel.style.display='none';
+    shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
+    setMsg('Odpojeno.', 'info');
+  };
+
+  // boot
+  (function boot(){
+    const local=getLocalSession();
+    if (!HAS_CONFIG){ paintShare(''); return; }
+    if (local?.code){
+      paintShare(local.role==='host' ? 'host' : '');
+      attach(local.code);
+    }
+  })();
+
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, updateDoc, onSnapshot,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCwukp1IylOurKvEsKc7uCnyUJLoCtWI2o",
+    authDomain: "zpjevnicek.firebaseapp.com",
+    projectId: "zpjevnicek",
+    storageBucket: "zpjevnicek.firebasestorage.app",
+    messagingSenderId: "842022440214",
+    appId: "1:842022440214:web:0dbddb0a435c3cd9705437"
+  };
+
+  const SESSION_KEY = 'zpj_share_session';
+  const UID_KEY = 'zpj_share_uid';
+
+  const uid = localStorage.getItem(UID_KEY);
+  const local = (()=>{ try { return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); } catch { return null; } })();
+  if (!uid || !local?.code || !local?.generation) {
+    // nejsme v session → nic nedělej
+    // (song.html normálně funguje)
+  } else {
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db = getFirestore(app);
+
+    const sessionRef = doc(db, 'zpevnikShare', local.code);
+    const meRef = doc(db, 'zpevnikShare', local.code, 'members', uid);
+
+    function isInternalZpjevnicekLink(href){
+      if (!href) return false;
+      if (href.startsWith('#')) return false;
+      if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+      if (href.includes('://') && !href.startsWith(location.origin)) return false;
+      return href.includes('/zpjevnicek/');
+    }
+
+    function canonicalPath(href){
+  try{
+    const u = new URL(href, location.origin);
+    return u.pathname + u.search + u.hash;
+  }catch(_){
+    return href || '';
+  }
+}
+function herePath(){
+  return location.pathname + location.search + location.hash;
+}
+
+    // HOST: zapisuje current při jakékoliv navigaci
+    if (local.role === 'host') {
+      document.addEventListener('click', async (e)=>{
+        const a = e.target?.closest?.('a');
+        if (!a) return;
+        const href = a.getAttribute('href') || '';
+        const target = canonicalPath(href);
+        if (!isInternalZpjevnicekLink(href)) return;
+
+        if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        try{
+          await updateDoc(sessionRef, {
+            current: { path: target, at: serverTimestamp() },
+            lastActive: serverTimestamp(),
+            expiresAt: new Date(Date.now() + 60*60*1000),
+            generation: local.generation,
+          });
+        }catch(err){
+          console.error("HOST current update failed:", err);
+        }
+
+        location.href = target;
+      }, true);
+    }
+
+    // CLIENT: poslouchá current a přesměruje se
+    if (local.role === 'client') {
+      onSnapshot(sessionRef, async (snap)=>{
+        if (!snap.exists()) return;
+        const s = snap.data() || {};
+        if (s.generation !== local.generation) return;
+
+        const cur = s.current;
+        if (!cur || !cur.path) return;
+
+        // jen když je client active
+        try{
+          const meSnap = await getDoc(meRef);
+          const me = meSnap.data() || {};
+          if (me.generation !== local.generation) return;
+          if (me.status !== 'active') return;
+        }catch(_){ return; }
+
+const target = canonicalPath(cur.path);
+const here = herePath();
+if (here !== target) location.href = target;
+
+      });
+    }
+  }
+</script>
+
+  
 </body>
 </html>
