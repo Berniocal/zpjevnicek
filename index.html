@@ -617,12 +617,10 @@ load();
 ============================================================================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
-  getDatabase, ref, set, update, onValue, onDisconnect, off
+  getDatabase, ref, set, update, onValue, onDisconnect, off, get
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-
-
 
   // 1) VLOŽ SVŮJ KONFIG (Firebase Console → Project settings → Your apps → Config)
   //    Tip: nech to v JS jako objekt, nic neobaluj uvozovkami navíc.
@@ -638,66 +636,10 @@ import {
 
   const HAS_CONFIG = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId);
 
-  const app = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-let uid = null;
-
-async function ensureAuth(){
-  // přihlásí anonymně, pokud ještě nejsi
-  if (!auth.currentUser){
-    await signInAnonymously(auth);
-  }
-  uid = auth.currentUser.uid;
-  return uid;
-}
-async function joinSession(code, name = "") {
-  await ensureAuth();
-
-  const meRef = ref(db, `zpevnikShare/${code}/members/${uid}`);
-
-  // Označ jako online
-  await set(meRef, {
-    name,
-    online: true,
-    lastSeen: Date.now()
-  });
-
-  // Při odpojení automaticky nastav offline
-  await onDisconnect(meRef).update({
-    online: false,
-    lastSeen: Date.now()
-  });
-}
-
-let stopCurrent = null;
-
-async function listenCurrent(code) {
-  await ensureAuth();
-
-  const curRef = ref(db, `zpevnikShare/${code}/current`);
-
-  // Uložíme si callback, abychom ho mohli odpojit
-  const cb = (snap) => {
-    const cur = snap.val();
-    if (!cur || !cur.path) return;
-
-    const here = location.pathname + location.search;
-
-    // cur.path ukládej jako stejné "pathname+search"
-    // Např. "/zpjevnicek/song.html?id=123"
-    if (here !== cur.path) {
-      location.href = cur.path;
-    }
-  };
-
-onValue(curRef, cb);
-stopCurrent = () => off(curRef, "value", cb);
- // <- tohle funguje jen v compat API; proto níže dávám správnou v10 variantu
-  };
-}
-
+  // Firebase init (pokud je config)
+  const app = HAS_CONFIG ? initializeApp(FIREBASE_CONFIG) : null;
+  const auth = app ? getAuth(app) : null;
+  const db   = app ? getDatabase(app) : null;
 
   // --- UI prvky ---
   const btnShare = document.getElementById('btnShare');
@@ -717,13 +659,14 @@ stopCurrent = () => off(curRef, "value", cb);
   const clientResume = document.getElementById('clientResume');
   const clientLeave = document.getElementById('clientLeave');
 
-  // --- lokální identita zařízení ---
-  const UID_KEY = 'zpj_share_uid';
+  // Session stav (localStorage)
   const SESSION_KEY = 'zpj_share_session';
-  const uid = (localStorage.getItem(UID_KEY) || (()=>{
-    const v = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem(UID_KEY, v); return v;
-  })());
+
+  function getLocalSession(){
+    try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }catch(_){ return null; }
+  }
+  function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
 
   function normCode(x){
     const s = String(x||'').replace(/\D/g,'').slice(0,5);
@@ -736,6 +679,10 @@ stopCurrent = () => off(curRef, "value", cb);
     // jen jemné odlišení
     shareMsg.style.borderColor = (kind==='err') ? '#7f1d1d' : '#273142';
     shareMsg.style.background  = (kind==='err') ? '#2b1b1b' : 'transparent';
+  }
+
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>\"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   }
 
   // barvy tlačítka sdílení
@@ -757,309 +704,277 @@ stopCurrent = () => off(curRef, "value", cb);
     }
   }
 
-  // Firebase init (pokud je config)
-  let app, db;
-  if (HAS_CONFIG){
-    app = initializeApp(FIREBASE_CONFIG);
-    db = getFirestore(app);
+  // --- RTDB helpers ---
+  let uid = null;
+
+  async function ensureAuth(){
+    if (!auth) throw new Error('Auth not initialized');
+    if (!auth.currentUser){
+      await signInAnonymously(auth);
+    }
+    uid = auth.currentUser.uid;
+    return uid;
   }
 
-  // Session stav
-  let unsubSession = null;
-  let unsubMembers = null;
-  let unsubMe = null;
-  let unsubNav = null;
-  let heartbeatTimer = null;
+  function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
+  function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
+  function memberRef(code, memberUid){ return ref(db, `zpevnikShare/${code}/members/${memberUid}`); }
+  function membersRef(code){ return ref(db, `zpevnikShare/${code}/members`); }
 
-  function getLocalSession(){
-    try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }catch(_){ return null; }
+  function canonicalPath(href){
+    // převede relativní i absolutní href na jednotný tvar: /path?query#hash
+    try{
+      const u = new URL(href, location.origin);
+      return u.pathname + u.search + u.hash;
+    }catch(_){
+      return href || '';
+    }
   }
-  function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
-  function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
 
-function cleanupSubs(){
-  if (unsubSession) try{unsubSession();}catch(_){}
-  if (unsubMembers) try{unsubMembers();}catch(_){}
-  if (unsubMe) try{unsubMe();}catch(_){}
-  if (unsubNav) try{unsubNav();}catch(_){}
+  function herePath(){
+    return location.pathname + location.search + location.hash;
+  }
 
-  unsubSession = unsubMembers = unsubMe = unsubNav = null;
+  // --- subscriptions ---
+  let stopSessionListener = null;
+  let stopMembersListener = null;
+  let stopCurrentListener = null;
 
-  if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
-}
+  function cleanupSubs(){
+    if (stopSessionListener) { try{ stopSessionListener(); }catch(_){ } stopSessionListener=null; }
+    if (stopMembersListener) { try{ stopMembersListener(); }catch(_){ } stopMembersListener=null; }
+    if (stopCurrentListener) { try{ stopCurrentListener(); }catch(_){ } stopCurrentListener=null; }
+  }
 
-  function sessionDoc(code){ return doc(db, 'zpevnikShare', code); }
-  function memberDoc(code, memberUid){ return doc(db, 'zpevnikShare', code, 'members', memberUid); }
+  // --- core: join / host / client ---
+  async function joinSessionRTDB(code, nick){
+    if (!HAS_CONFIG) throw new Error('Firebase config missing');
+    await ensureAuth();
 
-  async function touch(code, gen, role){
-    // lastActive drží session živou (60 min)
+    const sref = sessionRef(code);
+    const snap = await get(sref);
     const now = Date.now();
-    const exp = new Date(now + 60*60*1000);
-    const sref = sessionDoc(code);
-    const mref = memberDoc(code, uid);
-    try{
-      await updateDoc(sref, { lastActive: serverTimestamp(), expiresAt: exp, generation: gen });
-    }catch(_){ /* ignore */ }
-    try{
-      await updateDoc(mref, { lastSeen: serverTimestamp(), generation: gen, role });
-    }catch(_){ /* ignore */ }
-  }
 
-  function startHeartbeat(code, gen, role){
-    if (heartbeatTimer) clearInterval(heartbeatTimer);
-    heartbeatTimer = setInterval(()=> touch(code, gen, role), 25*1000);
-  }
+    let role = 'client';
+    let hostUid = null;
 
-  // Host: render members + accept/deny + disconnect
-  function renderHostMembers(code, gen, hostUid){
-    hostMembers.innerHTML = '<li class="badge" style="opacity:.8">Načítám…</li>';
-    const qMembers = query(collection(db, 'zpevnikShare', code, 'members'), orderBy('joinedAt','asc'));
-    if (unsubMembers) try{unsubMembers();}catch(_){}
-    unsubMembers = onSnapshot(qMembers, (snap)=>{
-      const items = [];
-      snap.forEach(d=>{
-        const m = d.data() || {};
-        if (m.generation !== gen) return;
-        items.push({ id: d.id, ...m });
+    if (!snap.exists()){
+      role = 'host';
+    } else {
+      const s = snap.val() || {};
+      if (s.closed) {
+        // zavřená session -> nový host
+        role = 'host';
+      } else if (s.hostUid && s.hostUid === uid) {
+        role = 'host';
+      } else {
+        role = 'client';
+        hostUid = s.hostUid || null;
+      }
+    }
+
+    if (role === 'host'){
+      await update(sref, {
+        hostUid: uid,
+        hostNick: nick,
+        createdAt: now,
+        closed: false,
+        closedAt: null
       });
+
+      // host okamžitě nastav current na aktuální stránku
+      await set(currentRef(code), { path: herePath(), ts: now });
+    }
+
+    // member presence
+    const mref = memberRef(code, uid);
+    await update(mref, {
+      uid,
+      nick,
+      role,
+      online: true,
+      lastSeen: now,
+      paused: false
+    });
+
+    await onDisconnect(mref).update({
+      online: false,
+      lastSeen: Date.now()
+    });
+
+    setLocalSession({ code, role, nick, hostUid });
+
+    attachRTDB(code);
+    return role;
+  }
+
+  async function setCurrentRTDB(code, path){
+    await ensureAuth();
+    await set(currentRef(code), { path, ts: Date.now() });
+  }
+
+  function listenSessionClosed(code){
+    const sref = sessionRef(code);
+    const cb = (snap)=>{
+      const s = snap.val();
+      if (!s) return;
+      if (s.closed){
+        cleanupSubs();
+        clearLocalSession();
+        paintShare('');
+        hostPanel.style.display='none';
+        clientPanel.style.display='none';
+        setMsg('Sdílení bylo ukončeno (hlavní zrušil).', 'info');
+        // odemkni vstupy
+        shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
+      }
+    };
+    onValue(sref, cb);
+    return ()=> off(sref, "value", cb);
+  }
+
+  function listenMembersForHost(code){
+    const mref = membersRef(code);
+    const cb = (snap)=>{
+      const all = snap.val() || {};
+      const items = Object.values(all)
+        .filter(x=>x && x.online)
+        .sort((a,b)=> (a.role==='host'?-1:1) - (b.role==='host'?-1:1) || String(a.nick||'').localeCompare(String(b.nick||''), 'cs'));
+
       hostMembers.innerHTML = items.map(m=>{
-        const nick = (m.nick||m.id);
-        const st = (m.status||'').toUpperCase();
-        const isMe = (m.id === uid);
-        const isHost = (m.role === 'host');
-        const badge = isHost ? 'HOST' : st;
-        const canAccept = (!isHost && m.status === 'pending');
-        const canKick = (!isHost && m.status !== 'pending');
+        const nick = (m.nick || m.uid || '—');
+        const badge = (m.role === 'host') ? 'HOST' : (m.paused ? 'PAUSED' : 'ONLINE');
+        const isMe = (m.uid === uid);
         return `
           <li style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #1f2b46">
             <div style="flex:1;min-width:0">
-              <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(nick)}${isMe?' <span class=\"badge\" style=\"margin-left:6px\">TY</span>':''}</div>
+              <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(nick)}${isMe?' <span class="badge" style="margin-left:6px">TY</span>':''}</div>
               <small class="badge" style="opacity:.85">${escapeHtml(badge)}</small>
             </div>
-            ${canAccept ? `
-              <button data-acc="${m.id}">Přijmout</button>
-              <button data-den="${m.id}">Odmítnout</button>
-            ` : ''}
-            ${canKick ? `<button data-kick="${m.id}" title="Odpojit">⛔</button>` : ''}
           </li>
         `;
       }).join('') || '<li class="badge" style="opacity:.8">Nikdo připojený.</li>';
-
-      hostMembers.querySelectorAll('[data-acc]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const mid = btn.dataset.acc;
-          await updateDoc(memberDoc(code, mid), { status:'active', acceptedAt: serverTimestamp(), generation: gen });
-        };
-      });
-      hostMembers.querySelectorAll('[data-den]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const mid = btn.dataset.den;
-          await updateDoc(memberDoc(code, mid), { status:'denied', deniedAt: serverTimestamp(), generation: gen });
-        };
-      });
-      hostMembers.querySelectorAll('[data-kick]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const mid = btn.dataset.kick;
-          if (!confirm('Odpojit tohoto uživatele?')) return;
-          await updateDoc(memberDoc(code, mid), { status:'kicked', kickedAt: serverTimestamp(), generation: gen });
-        };
-      });
-    });
+    };
+    onValue(mref, cb);
+    return ()=> off(mref, "value", cb);
   }
 
-  function escapeHtml(s){
-    return String(s||'').replace(/[&<>\"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-  }
+  function listenCurrentForClient(code){
+    const cref = currentRef(code);
+    const cb = async (snap)=>{
+      const cur = snap.val();
+      if (!cur || !cur.path) return;
 
-  async function becomeHost(code, nick){
-    const gen = 'g_' + Math.random().toString(36).slice(2,10);
-    const sref = sessionDoc(code);
-    const now = Date.now();
-    const exp = new Date(now + 60*60*1000);
+      // pokud jsem pauznutý, nereaguj
+      const local = getLocalSession();
+      if (!local || local.code !== code || local.role !== 'client') return;
 
-    await setDoc(sref, {
-      hostUid: uid,
-      hostNick: nick,
-      role: 'host',
-      createdAt: serverTimestamp(),
-      lastActive: serverTimestamp(),
-      expiresAt: exp,
-      generation: gen,
-      current: null,
-    }, { merge:true });
-
-    await setDoc(memberDoc(code, uid), {
-      uid,
-      nick,
-      role: 'host',
-      status: 'active',
-      joinedAt: serverTimestamp(),
-      lastSeen: serverTimestamp(),
-      generation: gen,
-    }, { merge:true });
-
-    setLocalSession({ code, role:'host', generation: gen });
-    attach(code);
-  }
-
-  async function joinAsClient(code, nick){
-    const sref = sessionDoc(code);
-    const snap = await getDoc(sref);
-    if (!snap.exists()) {
-      await becomeHost(code, nick);
-      return;
-    }
-    const data = snap.data() || {};
-
-    // expirovaný kód → první kdo přijde, může převzít (transaction)
-    const exp = data.expiresAt?.toDate ? data.expiresAt.toDate() : (data.expiresAt instanceof Date ? data.expiresAt : null);
-    const isExpired = exp ? (exp.getTime() < Date.now()) : false;
-    if (isExpired) {
-      await runTransaction(db, async (tx)=>{
-        const s2 = await tx.get(sref);
-        const d2 = s2.data() || {};
-        const exp2 = d2.expiresAt?.toDate ? d2.expiresAt.toDate() : null;
-        if (exp2 && exp2.getTime() >= Date.now()) return; // mezitím obnoveno
-        const gen = 'g_' + Math.random().toString(36).slice(2,10);
-        const expNew = new Date(Date.now() + 60*60*1000);
-        tx.set(sref, {
-          hostUid: uid,
-          hostNick: nick,
-          createdAt: serverTimestamp(),
-          lastActive: serverTimestamp(),
-          expiresAt: expNew,
-          generation: gen,
-          current: null,
-        }, { merge:true });
-        tx.set(memberDoc(code, uid), {
-          uid, nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp(), generation: gen,
-        }, { merge:true });
-        setLocalSession({ code, role:'host', generation: gen });
-      });
-      attach(code);
-      return;
-    }
-
-    const gen = data.generation || ('g_' + Math.random().toString(36).slice(2,10));
-    await setDoc(memberDoc(code, uid), {
-      uid,
-      nick,
-      role: 'client',
-      status: 'pending',
-      joinedAt: serverTimestamp(),
-      lastSeen: serverTimestamp(),
-      generation: gen,
-    }, { merge:true });
-    setLocalSession({ code, role:'client', generation: gen });
-    attach(code);
-  }
-
-  async function hostStopSharing(code, gen){
-    if (!confirm('Opravdu zrušit sdílení? Tím odpojíš všechny připojené.')) return;
-    // Bez Cloud Functions neumíme bezpečně smazat celou subkolekci „members“.
-    // Uděláme "hard reset": zvýšíme generation + vyprázdníme current, tím se všichni odpojí.
-    const newGen = 'g_' + Math.random().toString(36).slice(2,10);
-    const exp = new Date(Date.now() + 60*60*1000);
-    await updateDoc(sessionDoc(code), { generation: newGen, current: null, lastActive: serverTimestamp(), expiresAt: exp, closedAt: serverTimestamp() });
-    // host sám se odpojí lokálně
-    cleanupSubs();
-    clearLocalSession();
-    paintShare('');
-    hostPanel.style.display='none';
-    clientPanel.style.display='none';
-    setMsg('Sdílení zrušeno. Kód je volný.', 'info');
-  }
-
-  function attach(code){
-    if (!HAS_CONFIG) return;
-    cleanupSubs();
-
-    const local = getLocalSession();
-    if (!local || local.code !== code) return;
-    const genLocal = local.generation;
-    const roleLocal = local.role;
-
-    // session listener
-    unsubSession = onSnapshot(sessionDoc(code), (snap)=>{
-      if (!snap.exists()){
-        // session zmizela
-        cleanupSubs();
-        clearLocalSession();
-        paintShare('');
-        setMsg('Sdílení skončilo (kód už neexistuje).', 'err');
-        hostPanel.style.display='none'; clientPanel.style.display='none';
-        return;
-      }
-      const s = snap.data() || {};
-      const gen = s.generation;
-      if (gen && genLocal && gen !== genLocal){
-        // byl reset (nová generace) → odpoj všechny staré
-        cleanupSubs();
-        clearLocalSession();
-        paintShare('');
-        setMsg('Sdílení bylo ukončeno hlavním telefonem.', 'info');
-        hostPanel.style.display='none'; clientPanel.style.display='none';
-        return;
-      }
-
-      // host vs client UI
-      if (roleLocal === 'host') {
-        paintShare('host');
-        hostPanel.style.display='block';
-        clientPanel.style.display='none';
-        renderHostMembers(code, genLocal, uid);
-        startHeartbeat(code, genLocal, 'host');
-        setMsg('Sdílení aktivní (hlavní).', 'info');
-      } else {
-        // client – detail stavu je podle member doc
-        hostPanel.style.display='none';
-        clientPanel.style.display='block';
-        startHeartbeat(code, genLocal, 'client');
-      }
-    });
-
-    // member listener (já)
-    unsubMe = onSnapshot(memberDoc(code, uid), (snap)=>{
-      if (!snap.exists()) return;
-      const me = snap.data() || {};
-      if (me.generation !== genLocal) return;
-      if (roleLocal === 'client'){
-        const st = me.status;
-        if (st === 'pending'){
-          paintShare('');
-          clientState.textContent = 'Čekáš na přijetí hlavním telefonem…';
-          setMsg('Čekáš na přijetí.', 'info');
-        } else if (st === 'active'){
-          paintShare('client');
-          clientState.textContent = 'Připojeno (ovládá tě hlavní telefon).';
-          setMsg('Připojeno.', 'info');
-        } else if (st === 'paused'){
+      // zjisti paused stav ze svého member uzlu
+      try{
+        const meSnap = await get(memberRef(code, uid));
+        const me = meSnap.val() || {};
+        if (me.paused) {
           paintShare('paused');
           clientState.textContent = 'Pauza – hlavní telefon tě teď neovládá.';
-          setMsg('Pauznuto.', 'info');
-        } else if (st === 'denied' || st === 'kicked'){
-          paintShare('');
-          clientState.textContent = (st === 'denied') ? 'Byl(a) jsi odmítnut(a).' : 'Byl(a) jsi odpojen(a) hlavním telefonem.';
-          setMsg(clientState.textContent, 'err');
-          clearLocalSession();
+          return;
         }
+      }catch(_){}
+
+      const target = canonicalPath(cur.path);
+      const here = herePath();
+      if (here !== target){
+        location.href = target;
       }
-    });
+    };
+    onValue(cref, cb);
+    return ()=> off(cref, "value", cb);
+  }
+
+  // --- Host: zachytí kliknutí na interní link a před navigací zapíše current ---
+  function isInternalZpjevnicekLink(href){
+    if (!href) return false;
+    if (href.startsWith('#')) return false;
+    if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+    if (href.includes('://') && !href.startsWith(location.origin)) return false;
+    return href.includes('/zpjevnicek/');
+  }
+
+  function interceptNavigationForHost(){
+    document.addEventListener('click', async (e)=>{
+      const a = e.target?.closest?.('a');
+      if (!a) return;
+
+      const href = a.getAttribute('href') || '';
+      if (!isInternalZpjevnicekLink(href)) return;
+
+      const local = getLocalSession();
+      if (!local?.code || local.role !== 'host') return;
+
+      // otevření do nové záložky nech být
+      if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      const target = canonicalPath(href);
+
+      // STOP navigaci – nejdřív zapiš current
+      e.preventDefault();
+      e.stopPropagation();
+
+      try{
+        await setCurrentRTDB(local.code, target);
+      }catch(err){
+        console.error("HOST current update failed:", err);
+      }
+
+      // Až potom přejdi
+      location.href = target;
+    }, true);
+  }
+
+  function attachRTDB(code){
+    cleanupSubs();
+    const local = getLocalSession();
+    if (!local || local.code !== code) return;
+
+    // session closed listener (host i client)
+    stopSessionListener = listenSessionClosed(code);
+
+    if (local.role === 'host'){
+      paintShare('host');
+      hostPanel.style.display='block';
+      clientPanel.style.display='none';
+      setMsg('Sdílení aktivní (hlavní).', 'info');
+
+      // list members (jen host)
+      stopMembersListener = listenMembersForHost(code);
+
+      // host zajišťuje, aby se zapisovalo current při kliknutí
+      interceptNavigationForHost();
+    } else {
+      paintShare('client');
+      hostPanel.style.display='none';
+      clientPanel.style.display='block';
+      clientState.textContent = 'Připojeno (ovládá tě hlavní telefon).';
+      setMsg('Připojeno.', 'info');
+
+      // client poslouchá current
+      stopCurrentListener = listenCurrentForClient(code);
+    }
   }
 
   // --- actions ---
   dlgShareClose.onclick = ()=> dlgShare.close();
 
   btnShare.onclick = async ()=>{
-    // když už běží sdílení, zelené/fialové tlačítko otevře správný panel
     dlgShare.showModal();
     setMsg('');
     const local = getLocalSession();
+
     if (!HAS_CONFIG){
       setMsg('Firebase není nastavený. Doplň FIREBASE_CONFIG v index.html.', 'err');
       hostPanel.style.display='none'; clientPanel.style.display='none';
       return;
     }
+
     if (local?.code){
       // už připojený: přepni UI podle role
       shareCode.value = local.code;
@@ -1069,12 +984,11 @@ function cleanupSubs(){
       if (local.role === 'host'){
         hostPanel.style.display='block';
         clientPanel.style.display='none';
-        attach(local.code);
       } else {
         hostPanel.style.display='none';
         clientPanel.style.display='block';
-        attach(local.code);
       }
+      attachRTDB(local.code);
       return;
     }
 
@@ -1102,72 +1016,78 @@ function cleanupSubs(){
     localStorage.setItem('zpj_share_nick', nick);
 
     try{
-      // zjisti, jestli existuje a jestli nejsi první
-      const sref = sessionDoc(code);
-      const snap = await getDoc(sref);
-      if (!snap.exists()){
-        await becomeHost(code, nick);
-      } else {
-        const data = snap.data() || {};
-        if (data.hostUid === uid){
-          // už jsi host (např. reload)
-          setLocalSession({ code, role:'host', generation: data.generation });
-          attach(code);
-        } else {
-          await joinAsClient(code, nick);
-        }
-      }
+      const role = await joinSessionRTDB(code, nick);
+
       // zamkni vstupy
       shareCode.disabled = true;
       shareNick.disabled = true;
       shareJoin.style.display = 'none';
-      const local = getLocalSession();
-      if (local?.role === 'host'){
+
+      if (role === 'host'){
         hostPanel.style.display='block'; clientPanel.style.display='none';
       } else {
         hostPanel.style.display='none'; clientPanel.style.display='block';
       }
-      if (local?.role === 'host') {
-  interceptNavigationForHost();
-} else if (local?.role === 'client') {
-  attachNavigationSync();
-}
-
       setMsg('Hotovo.', 'info');
     }catch(e){
       console.error(e);
-      setMsg('Nepodařilo se připojit. Zkontroluj Firebase rules a config.', 'err');
+      setMsg('Nepodařilo se připojit. Zkontroluj RTDB rules a zapnuté Anonymous Auth.', 'err');
     }
   };
 
   hostStop.onclick = async ()=>{
     const local = getLocalSession();
-    if (!local?.code) return;
-    await hostStopSharing(local.code, local.generation);
+    if (!local?.code || local.role !== 'host') return;
+    if (!confirm('Opravdu zrušit sdílení? Tím odpojíš všechny připojené.')) return;
+    try{
+      await update(sessionRef(local.code), { closed:true, closedAt: Date.now() });
+      try{ await set(currentRef(local.code), null); }catch(_){}
+    }catch(e){
+      console.error(e);
+    }
+    cleanupSubs();
+    clearLocalSession();
+    paintShare('');
+    hostPanel.style.display='none'; clientPanel.style.display='none';
+    shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
+    setMsg('Sdílení zrušeno. Kód je volný.', 'info');
   };
+
   hostRefresh.onclick = ()=>{
     const local = getLocalSession();
     if (!local?.code) return;
-    attach(local.code);
+    attachRTDB(local.code);
   };
 
   clientPause.onclick = async ()=>{
     const local = getLocalSession();
-    if (!local?.code) return;
-    await updateDoc(memberDoc(local.code, uid), { status:'paused', pausedAt: serverTimestamp(), generation: local.generation });
+    if (!local?.code || local.role !== 'client') return;
+    try{
+      await update(memberRef(local.code, uid), { paused:true, lastSeen: Date.now() });
+      paintShare('paused');
+      clientState.textContent = 'Pauza – hlavní telefon tě teď neovládá.';
+      setMsg('Pauznuto.', 'info');
+    }catch(e){ console.error(e); }
   };
+
   clientResume.onclick = async ()=>{
     const local = getLocalSession();
-    if (!local?.code) return;
-    await updateDoc(memberDoc(local.code, uid), { status:'active', resumedAt: serverTimestamp(), generation: local.generation });
+    if (!local?.code || local.role !== 'client') return;
+    try{
+      await update(memberRef(local.code, uid), { paused:false, lastSeen: Date.now() });
+      paintShare('client');
+      clientState.textContent = 'Připojeno (ovládá tě hlavní telefon).';
+      setMsg('Obnoveno.', 'info');
+    }catch(e){ console.error(e); }
   };
+
   clientLeave.onclick = async ()=>{
     const local = getLocalSession();
-    if (!local?.code) return;
+    if (!local?.code || local.role !== 'client') return;
     if (!confirm('Odpojit se od hlavního telefonu?')) return;
     try{
-      await updateDoc(memberDoc(local.code, uid), { status:'left', leftAt: serverTimestamp(), generation: local.generation });
-    }catch(_){ }
+      await update(memberRef(local.code, uid), { online:false, lastSeen: Date.now(), paused:false });
+    }catch(_){}
     cleanupSubs();
     clearLocalSession();
     paintShare('');
@@ -1175,114 +1095,16 @@ function cleanupSubs(){
     shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
     setMsg('Odpojeno.', 'info');
   };
-function canonicalPath(href){
-  // převede relativní i absolutní href na jednotný tvar: /path?query#hash
-  try{
-    const u = new URL(href, location.origin);
-    return u.pathname + u.search + u.hash;
-  }catch(_){
-    return href || '';
-  }
-}
 
-function herePath(){
-  return location.pathname + location.search + location.hash;
-}
-
-
-  
-  // --- SYNCHRON NAVIGACE: client poslouchá „current“ a přesměruje ---
-function attachNavigationSync(){
-  const local = getLocalSession();
-  if (!HAS_CONFIG || !local?.code || local.role !== 'client') return;
-
-  if (unsubNav) try{unsubNav();}catch(_){}
-  unsubNav = onSnapshot(sessionDoc(local.code), async (snap)=>{
-    if (!snap.exists()) return;
-    const s = snap.data() || {};
-    if (s.generation !== local.generation) return;
-
-    const cur = s.current;
-    if (!cur || !cur.path) return;
-
-    // klient musí být ACTIVE (ne pending/paused/denied/…)
-    try{
-      const meSnap = await getDoc(memberDoc(local.code, uid));
-      const me = meSnap.data() || {};
-      if (me.generation !== local.generation) return;
-      if (me.status !== 'active') return;
-    }catch(_){ return; }
-
-    const target = canonicalPath(cur.path);
-    const here = herePath();
-
-    if (here !== target){
-      location.href = target;
-    }
-  });
-}
-
-
-
-  // --- Host update: když host klikne na píseň v seznamu, zapíšeme current ---
-  // (Bez toho by se ostatní rozjely až po načtení song.html u hosta.)
-function isInternalZpjevnicekLink(href){
-  if (!href) return false;
-  if (href.startsWith('#')) return false;
-  if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
-  if (href.includes('://') && !href.startsWith(location.origin)) return false;
-  return href.includes('/zpjevnicek/');
-}
-
-function interceptNavigationForHost(){
-  document.addEventListener('click', async (e)=>{
-    const a = e.target?.closest?.('a');
-    if (!a) return;
-
-    const href = a.getAttribute('href') || '';
-    const target = canonicalPath(href);
-    if (!isInternalZpjevnicekLink(href)) return;
-
-    const local = getLocalSession();
-    if (!HAS_CONFIG || !local?.code || local.role !== 'host') return;
-
-    // otevření do nové záložky nech být
-    if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-    // ✅ STOP navigaci – nejdřív zapiš current
-    e.preventDefault();
-    e.stopPropagation();
-
-    try{
-      await updateDoc(sessionDoc(local.code), {
-        current: { path: target, at: serverTimestamp() },
-        lastActive: serverTimestamp(),
-        expiresAt: new Date(Date.now() + 60*60*1000),
-        generation: local.generation,
-      });
-    }catch(err){
-      console.error("HOST current update failed:", err);
-    }
-
-    // ✅ Až potom přejdi
-   location.href = target;
-  }, true);
-}
-
-  // pokud je v localStorage session, hned nastav barvu tlačítka + attach
+  // boot: pokud je v localStorage session, hned nastav barvu tlačítka + attach
   (function boot(){
     const local = getLocalSession();
     if (!HAS_CONFIG){ paintShare(''); return; }
-if (local?.code){
-  paintShare(local.role === 'host' ? 'host' : 'client');
-  attach(local.code);
-  attachNavigationSync();
-  interceptNavigationForHost();
-
-}
-
+    if (local?.code){
+      paintShare(local.role === 'host' ? 'host' : 'client');
+      attachRTDB(local.code);
+    }
   })();
-
 </script>
 </body>
 </html>
