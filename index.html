@@ -617,9 +617,9 @@ load();
 ============================================================================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
-  getDatabase, ref, set, update, onValue, onDisconnect, off, get
+  getDatabase, ref, set, update, onValue, onDisconnect, off, get, remove
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
   // 1) VLOŽ SVŮJ KONFIG (Firebase Console → Project settings → Your apps → Config)
@@ -646,23 +646,6 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
 
   // --- UI prvky ---
   const btnShare = document.getElementById('btnShare');
-
-  function getUrlSession(){
-    try{
-      const u = new URL(location.href);
-      const code = normCode(u.searchParams.get('sc') || '');
-      const role = (u.searchParams.get('sr') || '').toLowerCase();
-      if (code && (role === 'client' || role === 'host')) return { code, role };
-    }catch(_){}
-    return null;
-  }
-  function ensureSessionFromUrl(){
-    const us = getUrlSession();
-    if (!us) return;
-    const local = getLocalSession();
-    if (local && local.code === us.code && local.role === us.role) return;
-    setLocalSession({ code: us.code, role: us.role, nick: (local && local.nick) || '' , hostUid: (local && local.hostUid) || null });
-  }
   const dlgShare = document.getElementById('dlgShare');
   const dlgShareClose = document.getElementById('dlgShareClose');
   const shareJoin = document.getElementById('shareJoin');
@@ -683,31 +666,10 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   const SESSION_KEY = 'zpj_share_session';
 
   function getLocalSession(){
-    // preferujeme window.name (funguje i když prohlížeč blokuje Storage)
-    try{
-      const n = String(window.name || '');
-      if (n.startsWith(SESSION_KEY)){
-        const raw = decodeURIComponent(n.slice(SESSION_KEY.length));
-        return JSON.parse(raw || 'null');
-      }
-    }catch(_){}
-    // fallback: localStorage (může být zablokované)
     try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }catch(_){ return null; }
   }
-  function setLocalSession(s){
-    try{
-      window.name = SESSION_KEY + encodeURIComponent(JSON.stringify(s));
-      return;
-    }catch(_){}
-    try{ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }catch(_){}
-  }
-  function clearLocalSession(){
-    try{
-      const n = String(window.name || '');
-      if (n.startsWith(SESSION_KEY)) window.name = '';
-    }catch(_){}
-    try{ localStorage.removeItem(SESSION_KEY); }catch(_){}
-  }
+  function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
 
   function normCode(x){
     const s = String(x||'').replace(/\D/g,'').slice(0,5);
@@ -748,11 +710,38 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   // --- RTDB helpers ---
   let uid = null;
 
+  let uid = null;
+  let __authReadyP = null;
+
+  function waitAuthReady(){
+    if (__authReadyP) return __authReadyP;
+    __authReadyP = new Promise((resolve)=>{
+      const unsub = onAuthStateChanged(auth, (u)=>{
+        if (u){
+          try{ unsub(); }catch(_){}
+          uid = u.uid;
+          resolve(u);
+        }
+      });
+      if (auth.currentUser){
+        try{ unsub(); }catch(_){}
+        uid = auth.currentUser.uid;
+        resolve(auth.currentUser);
+      }
+    });
+    return __authReadyP;
+  }
+
   async function ensureAuth(){
     if (!auth) throw new Error('Auth not initialized');
+    await waitAuthReady().catch(()=>{});
     if (!auth.currentUser){
       await signInAnonymously(auth);
+      await waitAuthReady();
     }
+    uid = auth.currentUser.uid;
+    return uid;
+  }
     uid = auth.currentUser.uid;
     return uid;
   }
@@ -781,6 +770,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   let stopMembersListener = null;
   let stopCurrentListener = null;
   let stopMeListener = null;
+  let stopHeartbeatTimer = null;
 
   // back-trap pro klienta (aby 'Zpět' šlo rovnou na seznam)
   let cleanupBackTrap = null;
@@ -790,6 +780,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     if (stopMembersListener) { try{ stopMembersListener(); }catch(_){ } stopMembersListener=null; }
     if (stopCurrentListener) { try{ stopCurrentListener(); }catch(_){ } stopCurrentListener=null; }
     if (stopMeListener) { try{ stopMeListener(); }catch(_){ } stopMeListener=null; }
+    if (stopHeartbeatTimer){ try{ clearInterval(stopHeartbeatTimer); }catch(_){ } stopHeartbeatTimer=null; }
     if (cleanupBackTrap) { try{ cleanupBackTrap(); }catch(_){ } cleanupBackTrap=null; }
   }
 
@@ -801,6 +792,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     const sref = sessionRef(code);
     const snap = await get(sref);
     const now = Date.now();
+    const TTL = 30*60*1000; // 30 min
 
     let role = 'client';
     let hostUid = null;
@@ -809,6 +801,12 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       role = 'host';
     } else {
       const s = snap.val() || {};
+      // Auto-expire: pokud nebyla aktivita > 30 min, místnost smaž a uvolni kód
+      const lastA = (s.lastActivity || s.createdAt || 0);
+      if (lastA && (now - lastA) > TTL){
+        try{ await remove(sref); }catch(_){ }
+        role = 'host';
+      } else {
       if (s.closed) {
         // zavřená session -> nový host
         role = 'host';
@@ -819,6 +817,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
         hostUid = s.hostUid || null;
       }
     }
+      }
 
     if (role === 'host'){
       await update(sref, {
@@ -826,7 +825,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
         hostNick: nick,
         createdAt: now,
         closed: false,
-        closedAt: null
+        closedAt: null,
+        lastActivity: now
       });
 
       // host okamžitě nastav current na aktuální stránku
@@ -855,6 +855,9 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     }
 
     await update(mref, base);
+
+    // update lastActivity (aby místnost neumřela při aktivním připojení)
+    try{ await update(sref, { lastActivity: now }); }catch(_){ }
 
     await onDisconnect(mref).update({
       online: false,
@@ -1098,6 +1101,19 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     // session closed listener (host i client)
     stopSessionListener = listenSessionClosed(code);
 
+    // heartbeat: udržuje lastSeen + lastActivity (kvůli auto-expire 30 min)
+    try{
+      stopHeartbeatTimer = setInterval(async ()=>{
+        const local2 = getLocalSession();
+        if (!local2 || local2.code !== code) return;
+        try{
+          const t = Date.now();
+          await update(memberRef(code, uid), { lastSeen: t, online: true });
+          await update(sessionRef(code), { lastActivity: t });
+        }catch(_){ }
+      }, 20000);
+    }catch(_){ }
+
     if (local.role === 'host'){
       paintShare('host');
       hostPanel.style.display='block';
@@ -1176,7 +1192,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     const code = normCode(shareCode.value);
     if (!nick){ setMsg('Zadej přezdívku.', 'err'); return; }
     if (!code){ setMsg('Kód musí mít 5 číslic.', 'err'); return; }
-    try{ localStorage.setItem('zpj_share_nick', nick); }catch(_){ }
+    localStorage.setItem('zpj_share_nick', nick);
 
     try{
       const role = await joinSessionRTDB(code, nick);
@@ -1203,8 +1219,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     if (!local?.code || local.role !== 'host') return;
     if (!confirm('Opravdu zrušit sdílení? Tím odpojíš všechny připojené.')) return;
     try{
-      await update(sessionRef(local.code), { closed:true, closedAt: Date.now() });
-      try{ await set(currentRef(local.code), null); }catch(_){}
+      await remove(sessionRef(local.code));
     }catch(e){
       console.error(e);
     }
@@ -1261,7 +1276,6 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
 
   // boot: pokud je v localStorage session, hned nastav barvu tlačítka + attach
   (function boot(){
-    ensureSessionFromUrl();
     const local = getLocalSession();
     if (!HAS_CONFIG){ paintShare(''); return; }
     if (local?.code){
