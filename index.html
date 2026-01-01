@@ -729,12 +729,31 @@ function waitAuthReady(timeoutMs = 3000){
   });
 }
 
+let uid = null;
+let _authInitPromise = null;
+
+// Safe wrappers (Edge Tracking Prevention can block storage in some contexts)
+function safeSessionGet(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } }
+function safeSessionSet(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} }
+function safeSessionRemove(k){ try { sessionStorage.removeItem(k); } catch(e){} }
+
 async function ensureAuth(){
-    if (!auth) throw new Error('Auth not initialized');
-    if (!auth.currentUser){
-      await signInAnonymously(auth);
+  if (_authInitPromise) return _authInitPromise;
+  _authInitPromise = (async ()=>{
+    const firstUser = await new Promise((resolve)=>{
+      const unsub = onAuthStateChanged(auth, (u)=>{ unsub(); resolve(u); });
+    });
+    if (firstUser){
+      uid = firstUser.uid;
+      return uid;
     }
-    
+    const cred = await signInAnonymously(auth);
+    uid = cred.user.uid;
+    return uid;
+  })();
+  return _authInitPromise;
+}
+
 function setShareRole(role, code){
   try{
     sessionStorage.setItem('shareRole', role);
@@ -748,11 +767,8 @@ function clearShareRole(){
   }catch(_){}
 }
 
-uid = auth.currentUser.uid;
-    return uid;
-  }
 
-  function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
+function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
   function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
   function memberRef(code, memberUid){ return ref(db, `zpevnikShare/${code}/members/${memberUid}`); }
   function membersRef(code){ return ref(db, `zpevnikShare/${code}/members`); }
