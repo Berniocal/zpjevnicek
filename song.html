@@ -1122,14 +1122,31 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   // --- RTDB helpers ---
   let uid = null;
 
-  async function ensureAuth(){
-    if (!auth) throw new Error('Auth not initialized');
-    if (!auth.currentUser){
-      await signInAnonymously(auth);
-    }
-    uid = auth.currentUser.uid;
-    return uid;
+  function waitAuthReady(){
+  return new Promise((resolve)=>{
+    const unsub = onAuthStateChanged(auth, (user)=>{
+      unsub();
+      resolve(user || null);
+    });
+  });
+}
+
+async function ensureAuth(){
+  if (!auth) throw new Error('Firebase auth not initialized');
+  // Při načtení stránky chvíli trvá, než se obnoví anonymní uživatel.
+  // Kdybychom hned volali signInAnonymously(), vznikal by nový uid při každé navigaci
+  // (a klient by se pak tvářil "odpojený / pauznutý").
+  let user = auth.currentUser;
+  if (!user){
+    user = await waitAuthReady();
   }
+  if (!user){
+    await signInAnonymously(auth);
+    user = auth.currentUser;
+  }
+  uid = user.uid;
+  return uid;
+}
 
   function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
   function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
