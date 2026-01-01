@@ -1154,11 +1154,17 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   let stopSessionListener = null;
   let stopMembersListener = null;
   let stopCurrentListener = null;
+  let stopMeListener = null;
+
+  // back-trap pro klienta (aby 'Zpět' šlo rovnou na seznam)
+  let cleanupBackTrap = null;
 
   function cleanupSubs(){
     if (stopSessionListener) { try{ stopSessionListener(); }catch(_){ } stopSessionListener=null; }
     if (stopMembersListener) { try{ stopMembersListener(); }catch(_){ } stopMembersListener=null; }
     if (stopCurrentListener) { try{ stopCurrentListener(); }catch(_){ } stopCurrentListener=null; }
+    if (stopMeListener) { try{ stopMeListener(); }catch(_){ } stopMeListener=null; }
+    if (cleanupBackTrap) { try{ cleanupBackTrap(); }catch(_){ } cleanupBackTrap=null; }
   }
 
   // --- core: join / host / client ---
@@ -1201,16 +1207,28 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       await set(currentRef(code), { path: herePath(), ts: now });
     }
 
-    // member presence
+    // member presence + (u klienta) čekání na potvrzení hosta
     const mref = memberRef(code, uid);
-    await update(mref, {
+
+    const base = {
       uid,
       nick,
       role,
       online: true,
       lastSeen: now,
       paused: false
-    });
+    };
+
+    if (role === 'client'){
+      base.status = 'pending';
+      base.requestedAt = now;
+      base.hostUid = hostUid || null;
+    } else {
+      base.status = 'active';
+      base.acceptedAt = now;
+    }
+
+    await update(mref, base);
 
     await onDisconnect(mref).update({
       online: false,
@@ -1226,6 +1244,56 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   async function setCurrentRTDB(code, path){
     await ensureAuth();
     await set(currentRef(code), { path, ts: Date.now() });
+  }
+
+  function armBackTrapForClient(){
+    const returnTo = '/zpjevnicek/index.html';
+    const handler = ()=>{
+      const local = getLocalSession();
+      if (!local || local.role !== 'client') return;
+      location.replace(returnTo);
+    };
+    window.addEventListener('popstate', handler);
+    return ()=> window.removeEventListener('popstate', handler);
+  }
+
+  function listenMeForClient(code){
+    const mref = memberRef(code, uid);
+
+    const cb = (snap)=>{
+      const me = snap.val() || {};
+      const local = getLocalSession();
+      if (!local || local.code !== code || local.role !== 'client') return;
+
+      const st = me.status || 'pending';
+
+      if (st === 'pending'){
+        paintShare('paused');
+        clientState.textContent = 'Čekám na potvrzení od hlavního telefonu…';
+        setMsg('Čeká se na potvrzení hosta.', 'info');
+        if (stopCurrentListener) { try{ stopCurrentListener(); }catch(_){ } stopCurrentListener=null; }
+        return;
+      }
+
+      if (st === 'active'){
+        paintShare(me.paused ? 'paused' : 'client');
+        clientState.textContent = me.paused ? 'Pauza – hlavní telefon tě teď neovládá.' : 'Připojeno (ovládá tě hlavní telefon).';
+        if (!stopCurrentListener && !me.paused){
+          stopCurrentListener = listenCurrentForClient(code);
+        }
+        return;
+      }
+
+      cleanupSubs();
+      clearLocalSession();
+      paintShare('');
+      hostPanel.style.display='none'; clientPanel.style.display='none';
+      shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
+      setMsg((st === 'denied') ? 'Host odmítl připojení.' : 'Byl jsi odpojen.', 'err');
+    };
+
+    onValue(mref, cb);
+    return ()=> off(mref, "value", cb);
   }
 
   function listenSessionClosed(code){
@@ -1250,57 +1318,108 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
 
   function listenMembersForHost(code){
     const mref = membersRef(code);
+
     const cb = (snap)=>{
       const all = snap.val() || {};
       const items = Object.values(all)
         .filter(x=>x && x.online)
-        .sort((a,b)=> (a.role==='host'?-1:1) - (b.role==='host'?-1:1) || String(a.nick||'').localeCompare(String(b.nick||''), 'cs'));
+        .sort((a,b)=>{
+          const ah = (a.role==='host') ? 0 : 1;
+          const bh = (b.role==='host') ? 0 : 1;
+          if (ah !== bh) return ah-bh;
+          const as = String(a.status||'');
+          const bs = String(b.status||'');
+          const ap = (as==='pending') ? 0 : 1;
+          const bp = (bs==='pending') ? 0 : 1;
+          if (ap !== bp) return ap-bp;
+          return String(a.nick||'').localeCompare(String(b.nick||''), 'cs');
+        });
 
       hostMembers.innerHTML = items.map(m=>{
         const nick = (m.nick || m.uid || '—');
-        const badge = (m.role === 'host') ? 'HOST' : (m.paused ? 'PAUSED' : 'ONLINE');
         const isMe = (m.uid === uid);
+        const isHost = (m.role === 'host');
+
+        let badge = 'ONLINE';
+        if (isHost) badge = 'HOST';
+        else if (m.status === 'pending') badge = 'ČEKÁ';
+        else if (m.status === 'denied') badge = 'ODMÍTNUT';
+        else if (m.status === 'kicked') badge = 'ODPOJEN';
+        else if (m.paused) badge = 'PAUSED';
+
+        const canAccept = (!isHost && m.status === 'pending');
+        const canKick   = (!isHost && m.status !== 'pending');
+
         return `
           <li style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #1f2b46">
             <div style="flex:1;min-width:0">
               <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(nick)}${isMe?' <span class="badge" style="margin-left:6px">TY</span>':''}</div>
               <small class="badge" style="opacity:.85">${escapeHtml(badge)}</small>
             </div>
+            ${canAccept ? `
+              <button data-acc="${escapeHtml(m.uid)}">Přijmout</button>
+              <button data-den="${escapeHtml(m.uid)}">Odmítnout</button>
+            ` : ''}
+            ${canKick ? `<button data-kick="${escapeHtml(m.uid)}" title="Odpojit">⛔</button>` : ''}
           </li>
         `;
       }).join('') || '<li class="badge" style="opacity:.8">Nikdo připojený.</li>';
+
+      hostMembers.querySelectorAll('[data-acc]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          const mid = btn.dataset.acc;
+          try{
+            await update(memberRef(code, mid), { status:'active', acceptedAt: Date.now(), lastSeen: Date.now() });
+          }catch(e){ console.error(e); }
+        };
+      });
+      hostMembers.querySelectorAll('[data-den]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          const mid = btn.dataset.den;
+          try{
+            await update(memberRef(code, mid), { status:'denied', deniedAt: Date.now(), lastSeen: Date.now() });
+          }catch(e){ console.error(e); }
+        };
+      });
+      hostMembers.querySelectorAll('[data-kick]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          const mid = btn.dataset.kick;
+          if (!confirm('Odpojit tohoto uživatele?')) return;
+          try{
+            await update(memberRef(code, mid), { status:'kicked', kickedAt: Date.now(), online:false, lastSeen: Date.now() });
+          }catch(e){ console.error(e); }
+        };
+      });
     };
+
     onValue(mref, cb);
     return ()=> off(mref, "value", cb);
   }
 
   function listenCurrentForClient(code){
     const cref = currentRef(code);
+
     const cb = async (snap)=>{
       const cur = snap.val();
       if (!cur || !cur.path) return;
 
-      // pokud jsem pauznutý, nereaguj
       const local = getLocalSession();
       if (!local || local.code !== code || local.role !== 'client') return;
 
-      // zjisti paused stav ze svého member uzlu
       try{
         const meSnap = await get(memberRef(code, uid));
         const me = meSnap.val() || {};
-        if (me.paused) {
-          paintShare('paused');
-          clientState.textContent = 'Pauza – hlavní telefon tě teď neovládá.';
-          return;
-        }
+        if (me.status && me.status !== 'active') return;
+        if (me.paused) return;
       }catch(_){}
 
       const target = canonicalPath(cur.path);
       const here = herePath();
       if (here !== target){
-        location.href = target;
+        location.replace(target);
       }
     };
+
     onValue(cref, cb);
     return ()=> off(cref, "value", cb);
   }
@@ -1365,14 +1484,17 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       // host zajišťuje, aby se zapisovalo current při kliknutí
       interceptNavigationForHost();
     } else {
-      paintShare('client');
+      // klient nejdřív čeká na potvrzení hosta (status pending -> active)
       hostPanel.style.display='none';
       clientPanel.style.display='block';
-      clientState.textContent = 'Připojeno (ovládá tě hlavní telefon).';
-      setMsg('Připojeno.', 'info');
 
-      // client poslouchá current
-      stopCurrentListener = listenCurrentForClient(code);
+      if (!cleanupBackTrap) cleanupBackTrap = armBackTrapForClient();
+
+      paintShare('paused');
+      clientState.textContent = 'Čekám na potvrzení od hlavního telefonu…';
+      setMsg('Čekám na potvrzení hosta.', 'info');
+
+      stopMeListener = listenMeForClient(code);
     }
   }
 
