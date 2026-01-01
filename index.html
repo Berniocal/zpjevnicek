@@ -634,7 +634,7 @@ const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
   appId: "...",
   measurementId: "..."
 };
-
+window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
 
   const HAS_CONFIG = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId);
 
