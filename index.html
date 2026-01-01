@@ -617,7 +617,7 @@ load();
 ============================================================================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
   getDatabase, ref, set, update, onValue, onDisconnect, off, get
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
@@ -710,31 +710,47 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   // --- RTDB helpers ---
   let uid = null;
 
-  function waitAuthReady(){
-  return new Promise((resolve)=>{
-    const unsub = onAuthStateChanged(auth, (user)=>{
-      unsub();
+  
+function waitAuthReady(timeoutMs = 3000){
+  return new Promise((resolve) => {
+    let settled = false;
+    const stop = onAuthStateChanged(auth, (user) => {
+      if (settled) return;
+      settled = true;
+      try { stop(); } catch(_){}
       resolve(user || null);
     });
+    setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      try { stop(); } catch(_){}
+      resolve(auth.currentUser || null);
+    }, timeoutMs);
   });
 }
 
 async function ensureAuth(){
-  if (!auth) throw new Error('Firebase auth not initialized');
-  // Při načtení stránky chvíli trvá, než se obnoví anonymní uživatel.
-  // Kdybychom hned volali signInAnonymously(), vznikal by nový uid při každé navigaci
-  // (a klient by se pak tvářil "odpojený / pauznutý").
-  let user = auth.currentUser;
-  if (!user){
-    user = await waitAuthReady();
-  }
-  if (!user){
-    await signInAnonymously(auth);
-    user = auth.currentUser;
-  }
-  uid = user.uid;
-  return uid;
+    if (!auth) throw new Error('Auth not initialized');
+    if (!auth.currentUser){
+      await signInAnonymously(auth);
+    }
+    
+function setShareRole(role, code){
+  try{
+    sessionStorage.setItem('shareRole', role);
+    sessionStorage.setItem('shareCode', code || '');
+  }catch(_){}
 }
+function clearShareRole(){
+  try{
+    sessionStorage.removeItem('shareRole');
+    sessionStorage.removeItem('shareCode');
+  }catch(_){}
+}
+
+uid = auth.currentUser.uid;
+    return uid;
+  }
 
   function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
   function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
@@ -1065,7 +1081,7 @@ async function ensureAuth(){
       }
 
       // Až potom přejdi
-      location.href = target;
+      location.replace(target);
     }, true);
   }
 
