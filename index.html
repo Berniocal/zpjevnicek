@@ -740,9 +740,7 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
     uid = auth.currentUser.uid;
     return uid;
   }
-    uid = auth.currentUser.uid;
-    return uid;
-  }
+
 
   function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
   function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
