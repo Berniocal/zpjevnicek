@@ -163,7 +163,7 @@
     <div class="sheet">
       <div id="chrome">
 <div class="chrome-row">
-  <a id="backLink" href="index.html">← Zpět</a>
+  <a id="backLink" href="/zpjevnicek/index.html">← Zpět</a>
   <div style="display:flex;gap:8px;align-items:center">
     <button id="btnShare" class="ghost" title="Sdílení ovládání (host / připojit se)">Sdílení</button>
     <button id="btnSettings" class="ghost" title="Nastavení posuvu a akordů">⚙️</button>
@@ -794,15 +794,6 @@ async function load(){
 
   // 4) Zpět odkaz (playlist / zpěvník / hlavní seznam)
   const backLink = document.getElementById('backLink');
-enableClientBackTrap();
-backLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  // při návratu na seznam zruš klientský režim
-  safeSessionRemove('shareRole');
-  safeSessionRemove('shareCode');
-  location.replace('index.html');
-});
-
   if (plId){
     backLink.textContent = '← Zpět na playlist';
     backLink.onclick = (e)=>{ e.preventDefault(); location.href = '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId); };
@@ -1038,7 +1029,7 @@ load();
 ============================================================================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
   getDatabase, ref, set, update, onValue, onDisconnect, off, get
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
@@ -1067,6 +1058,33 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
 
   // --- UI prvky ---
   const btnShare = document.getElementById('btnShare');
+  const backLink = document.getElementById('backLink');
+  if (backLink){
+    backLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      // klient i host: návrat na seznam, bez hromadění historie
+      location.replace('/zpjevnicek/index.html');
+    });
+  }
+
+  function getUrlSession(){
+    try{
+      const u = new URL(location.href);
+      const code = normCode(u.searchParams.get('sc') || '');
+      const role = (u.searchParams.get('sr') || '').toLowerCase();
+      if (code && (role === 'client' || role === 'host')) return { code, role };
+    }catch(_){}
+    return null;
+  }
+
+  function ensureSessionFromUrl(){
+    const us = getUrlSession();
+    if (!us) return;
+    const local = getLocalSession();
+    if (local && local.code === us.code && local.role === us.role) return;
+    // doplň minimum (nick si doplní uživatel při joinu, tady jen držíme kód/roli)
+    setLocalSession({ code: us.code, role: us.role, nick: (local && local.nick) || '' , hostUid: (local && local.hostUid) || null });
+  }
   const dlgShare = document.getElementById('dlgShare');
   const dlgShareClose = document.getElementById('dlgShareClose');
   const shareJoin = document.getElementById('shareJoin');
@@ -1087,10 +1105,31 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   const SESSION_KEY = 'zpj_share_session';
 
   function getLocalSession(){
+    // preferujeme window.name (funguje i když prohlížeč blokuje Storage)
+    try{
+      const n = String(window.name || '');
+      if (n.startsWith(SESSION_KEY)){
+        const raw = decodeURIComponent(n.slice(SESSION_KEY.length));
+        return JSON.parse(raw || 'null');
+      }
+    }catch(_){}
+    // fallback: localStorage (může být zablokované)
     try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }catch(_){ return null; }
   }
-  function setLocalSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
-  function clearLocalSession(){ localStorage.removeItem(SESSION_KEY); }
+  function setLocalSession(s){
+    try{
+      window.name = SESSION_KEY + encodeURIComponent(JSON.stringify(s));
+      return;
+    }catch(_){}
+    try{ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }catch(_){}
+  }
+  function clearLocalSession(){
+    try{
+      const n = String(window.name || '');
+      if (n.startsWith(SESSION_KEY)) window.name = '';
+    }catch(_){}
+    try{ localStorage.removeItem(SESSION_KEY); }catch(_){}
+  }
 
   function normCode(x){
     const s = String(x||'').replace(/\D/g,'').slice(0,5);
@@ -1131,70 +1170,16 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   // --- RTDB helpers ---
   let uid = null;
 
-  
-function waitAuthReady(timeoutMs = 3000){
-  return new Promise((resolve) => {
-    let settled = false;
-    const stop = onAuthStateChanged(auth, (user) => {
-      if (settled) return;
-      settled = true;
-      try { stop(); } catch(_){}
-      resolve(user || null);
-    });
-    setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      try { stop(); } catch(_){}
-      resolve(auth.currentUser || null);
-    }, timeoutMs);
-  });
-}
-
-let uid = null;
-let _authInitPromise = null;
-
-// Safe wrappers (Edge Tracking Prevention can block storage in some contexts)
-function safeSessionGet(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } }
-function safeSessionSet(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} }
-function safeSessionRemove(k){ try { sessionStorage.removeItem(k); } catch(e){} }
-
-async function ensureAuth(){
-  if (_authInitPromise) return _authInitPromise;
-  _authInitPromise = (async ()=>{
-    const firstUser = await new Promise((resolve)=>{
-      const unsub = onAuthStateChanged(auth, (u)=>{ unsub(); resolve(u); });
-    });
-    if (firstUser){
-      uid = firstUser.uid;
-      return uid;
+  async function ensureAuth(){
+    if (!auth) throw new Error('Auth not initialized');
+    if (!auth.currentUser){
+      await signInAnonymously(auth);
     }
-    const cred = await signInAnonymously(auth);
-    uid = cred.user.uid;
+    uid = auth.currentUser.uid;
     return uid;
-  })();
-  return _authInitPromise;
-}
+  }
 
-function enableClientBackTrap(){
-  // Pokud jsme v režimu klienta (ovládaný), nechceme procházet historii písní.
-  // Uděláme "jednokrokový" back, který vždy skočí na seznam.
-  if (safeSessionGet('shareRole') !== 'client') return;
-
-  try{
-    history.replaceState({p:'song'}, '');
-    history.pushState({p:'song'}, '');
-  }catch(_){}
-
-  window.addEventListener('popstate', () => {
-    if (safeSessionGet('shareRole') !== 'client') return;
-    safeSessionRemove('shareRole');
-    safeSessionRemove('shareCode');
-    location.replace('index.html');
-  });
-}
-
-
-function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
+  function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
   function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
   function memberRef(code, memberUid){ return ref(db, `zpevnikShare/${code}/members/${memberUid}`); }
   function membersRef(code){ return ref(db, `zpevnikShare/${code}/members`); }
@@ -1311,6 +1296,16 @@ function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
 
   function armBackTrapForClient(){
     const returnTo = '/zpjevnicek/index.html';
+
+    // vytvoř jeden "ochranný" záznam do historie, aby HW tlačítko Zpět vyvolalo popstate
+    try{
+      const local = getLocalSession();
+      if (local && local.role === 'client'){
+        history.replaceState({zpj:'client'}, '', location.href);
+        history.pushState({zpj:'client'}, '', location.href);
+      }
+    }catch(_){}
+
     const handler = ()=>{
       const local = getLocalSession();
       if (!local || local.role !== 'client') return;
@@ -1479,7 +1474,15 @@ function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
       const target = canonicalPath(cur.path);
       const here = herePath();
       if (here !== target){
-        location.replace(target);
+        // při řízení z hosta udržuj v URL informaci o session (sc/sr), aby se po reloadu neztratil kontext
+        let targetUrl = target;
+        try{
+          const u = new URL(target, location.origin);
+          u.searchParams.set('sc', code);
+          u.searchParams.set('sr', 'client');
+          targetUrl = u.pathname + (u.search ? u.search : '') + (u.hash ? u.hash : '');
+        }catch(_){}
+        location.replace(targetUrl);
       }
     };
 
@@ -1523,7 +1526,7 @@ function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
       }
 
       // Až potom přejdi
-      location.replace(target);
+      location.href = target;
     }, true);
   }
 
@@ -1698,6 +1701,7 @@ function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
 
   // boot: pokud je v localStorage session, hned nastav barvu tlačítka + attach
   (function boot(){
+    ensureSessionFromUrl();
     const local = getLocalSession();
     if (!HAS_CONFIG){ paintShare(''); return; }
     if (local?.code){
