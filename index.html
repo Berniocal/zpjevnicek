@@ -369,11 +369,9 @@ function renderMain(){
       const badgeNum = selectedBook
     ? (s.books?.[selectedBook] ?? '–')
     : (s.number ?? '–');
-const shareCode = (state && state.attached && state.code) ? String(state.code) : '';
-const hrefBase = selectedBook
+const href = selectedBook
   ? `/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}&book=${encodeURIComponent(selectedBook)}`
   : `/zpjevnicek/song.html?id=${encodeURIComponent(s.id)}`;
-const href = shareCode ? (hrefBase + `&share=${encodeURIComponent(shareCode)}`) : hrefBase;
 
 return `
   <li class="item">
@@ -390,30 +388,6 @@ return `
 
   empty.style.display = data.length ? 'none' : 'block';
 }
-
-/* ------- sdílení: zachovej ?share=CODE při kliknutí na píseň + okamžitě vysílej current ------- */
-document.addEventListener('click', async (ev) => {
-  const a = ev.target && ev.target.closest ? ev.target.closest('a.title[href*="/zpjevnicek/song.html"]') : null;
-  if (!a) return;
-
-  // pokud není aktivní sdílení, nech to být
-  if (!(state && state.attached && state.code)) return;
-
-  // vždy zachovej share param
-  try{
-    const url = new URL(a.href, location.origin);
-    if (!url.searchParams.get('share')) url.searchParams.set('share', String(state.code));
-    a.href = url.pathname + url.search;
-  }catch(_e){}
-
-  // host zároveň hned pošle current (aby klienti reagovali i když host zůstává na indexu chvíli)
-  if (state.isHost) {
-    try{
-      const path = a.getAttribute('href');
-      await setCurrentPath(path);
-    }catch(_e){}
-  }
-});
 
 /* ------- playlisty – seznam ------- */
 function renderPlaylistList(){
