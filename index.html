@@ -917,8 +917,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       setMsg((st === 'denied') ? 'Host odmítl připojení.' : 'Byl jsi odpojen.', 'err');
     };
 
-    onValue(mref, cb);
-    return ()=> off(mref, "value", cb);
+    onValue(sref, cb);
+    return ()=> off(sref, "value", cb);
   }
 
   function listenSessionClosed(code){
@@ -937,8 +937,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
         shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
       }
     };
-    onValue(mref, cb);
-    return ()=> off(mref, "value", cb);
+    onValue(sref, cb);
+    return ()=> off(sref, "value", cb);
   }
 
   function listenMembersForHost(code){
@@ -1017,8 +1017,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       });
     };
 
-    onValue(mref, cb);
-    return ()=> off(mref, "value", cb);
+    onValue(sref, cb);
+    return ()=> off(sref, "value", cb);
   }
 
   function listenCurrentForClient(code){
