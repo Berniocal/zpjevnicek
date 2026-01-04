@@ -917,8 +917,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
       setMsg((st === 'denied') ? 'Host odmítl připojení.' : 'Byl jsi odpojen.', 'err');
     };
 
-    onValue(sref, cb);
-    return ()=> off(sref, "value", cb);
+    onValue(mref, cb);
+    return ()=> off(mref, "value", cb);
   }
 
   function listenSessionClosed(code){
