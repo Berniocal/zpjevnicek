@@ -84,7 +84,8 @@
   }
 
   // už jednou ověřený přístup
-  if (localStorage.getItem(KEY) === "yes") {
+  let __ok=false; try{ __ok = (localStorage.getItem(KEY) === "yes"); }catch(_e){ __ok=false; }
+  if (__ok) {
     document.documentElement.style.display = "block";
     return;
   }
@@ -96,7 +97,7 @@
   }
 
   // správné heslo
-  localStorage.setItem(KEY, "yes");
+  try{ localStorage.setItem(KEY, "yes"); }catch(_e){}
   document.documentElement.style.display = "block";
 })();
 </script>
@@ -681,27 +682,74 @@ let state = {
   attached: false,
 };
 
+
+// --- Safe storage (localStorage může být blokované – použij fallback přes window.name) ---
+function _safeParseName(){
+  try{ return window.name ? JSON.parse(window.name) : {}; }catch(_e){ return {}; }
+}
+function _safeWriteName(obj){
+  try{ window.name = JSON.stringify(obj||{}); }catch(_e){}
+}
+function sGet(key){
+  try{ const v = localStorage.getItem(key); if (v !== null) return v; }catch(_e){}
+  const obj = _safeParseName();
+  return (obj && Object.prototype.hasOwnProperty.call(obj,key)) ? obj[key] : null;
+}
+function sSet(key, val){
+  try{ localStorage.setItem(key, val); return; }catch(_e){}
+  const obj = _safeParseName();
+  obj[key] = val;
+  _safeWriteName(obj);
+}
+function sDel(key){
+  try{ localStorage.removeItem(key); }catch(_e){}
+  const obj = _safeParseName();
+  if (obj && Object.prototype.hasOwnProperty.call(obj,key)) delete obj[key];
+  _safeWriteName(obj);
+}
+function getShareCodeFromUrl(){
+  try{
+    const u = new URL(location.href);
+    const c = (u.searchParams.get('share')||'').trim();
+    return (/^\d{5}$/.test(c)) ? c : null;
+  }catch(_e){ return null; }
+}
+function ensureShareParamInUrl(code){
+  try{
+    const u = new URL(location.href);
+    if (u.searchParams.get('share') !== code){
+      u.searchParams.set('share', code);
+      history.replaceState(null, '', u.pathname + '?' + u.searchParams.toString() + u.hash);
+    }
+  }catch(_e){}
+}
+function broadcastPath(code){
+  const u = new URL(location.href);
+  u.searchParams.set('share', code);
+  return u.pathname + '?' + u.searchParams.toString(); // bez hash, držíme se původního formátu
+}
+
 function getClientId(){
-  let id = localStorage.getItem(CLIENT_KEY);
+  let id = sGet(CLIENT_KEY);
   if (!id) {
     id = (crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(16).slice(2) + Date.now().toString(16)))
       .replace(/-/g,'').slice(0,16);
-    localStorage.setItem(CLIENT_KEY, id);
+    sSet(CLIENT_KEY, id);
   }
   return id;
 }
 
 function saveSession(code, nick){
-  try{ localStorage.setItem(SESSION_KEY, JSON.stringify({ code, nick })); }catch(_e){}
+  try{ sSet(SESSION_KEY, JSON.stringify({ code, nick })); }catch(_e){}
 }
 function loadSession(){
   try{
-    const raw = localStorage.getItem(SESSION_KEY);
+    const raw = sGet(SESSION_KEY);
     return raw ? JSON.parse(raw) : null;
   }catch(_e){ return null; }
 }
 function clearSession(){
-  try{ localStorage.removeItem(SESSION_KEY); }catch(_e){}
+  try{ sDel(SESSION_KEY); }catch(_e){}
 }
 
 function normCode(v){
@@ -941,7 +989,7 @@ async function ensureRoomAndJoin(code, nick){
     await set(roomRef(code), {
       hostId: cid,
       createdAt: serverTimestamp(),
-      current: { path: location.pathname + location.search, ts: serverTimestamp() },
+      current: { path: broadcastPath(code), ts: serverTimestamp() },
       members: {
         [cid]: { nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() }
       }
@@ -951,6 +999,7 @@ async function ensureRoomAndJoin(code, nick){
     state.nick = nick;
     state.attached = true;
     saveSession(code, nick);
+    ensureShareParamInUrl(code);
 
     state.stopRoom = listenRoomClosed(code);
     state.stopMe   = listenMe(code, cid);
@@ -967,14 +1016,14 @@ async function ensureRoomAndJoin(code, nick){
     state.isHost = true;
     await update(roomRef(code), {
       hostId: cid,
-      current: { path: location.pathname + location.search, ts: serverTimestamp() }
+      current: { path: broadcastPath(code), ts: serverTimestamp() }
     });
     await update(memberRef(code, cid), { nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
   } else if (hostId === cid){
     // Já jsem host (už dříve)
     state.isHost = true;
     await update(memberRef(code, cid), { nick, role:'host', status:'active', lastSeen: serverTimestamp() });
-    await update(currentRef(code), { path: location.pathname + location.search, ts: serverTimestamp() });
+    await update(currentRef(code), { path: broadcastPath(code), ts: serverTimestamp() });
   } else {
     // Jsem klient
     state.isHost = false;
@@ -1008,7 +1057,7 @@ async function ensureRoomAndJoin(code, nick){
 
 async function broadcastCurrentIfHost(){
   if (!db || !state.attached || !state.isHost || !state.code) return;
-  try { await update(currentRef(state.code), { path: location.pathname + location.search, ts: serverTimestamp() }); }
+  try { await update(currentRef(state.code), { path: broadcastPath(code), ts: serverTimestamp() }); }
   catch(e){ console.warn('broadcastCurrent failed', e); }
 }
 
@@ -1074,7 +1123,13 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   paintShare('off');
   if (!HAS_CONFIG || !db) return;
 
+  const urlCode = getShareCodeFromUrl();
   const s = loadSession();
+  if (!s && urlCode) {
+    // fallback, když storage nefunguje
+    try{ await ensureRoomAndJoin(urlCode, 'Klient'); paintShare('on'); }catch(_e){}
+    return;
+  }
   if (!s || !s.code) return;
 
   // Zkus tichý návrat do session
