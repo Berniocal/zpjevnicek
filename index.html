@@ -932,9 +932,11 @@ async function ensureRoomAndJoin(code, nick){
   const cid = getClientId();
   state.clientId = cid;
 
+  // 1) načti room
   const rSnap = await get(roomRef(code));
-  if (!rSnap.exists()) {
-    // vytvořím room jako host
+
+  // 2) room neexistuje -> vytvoř host
+  if (!rSnap.exists()){
     state.isHost = true;
     await set(roomRef(code), {
       hostId: cid,
@@ -944,40 +946,60 @@ async function ensureRoomAndJoin(code, nick){
         [cid]: { nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() }
       }
     });
-  } else {
-    const room = rSnap.val() || {};
-    const hostId = room.hostId;
 
-    if (!hostId) {
-      state.isHost = true;
-      await update(roomRef(code), {
-        hostId: cid,
-        current: { path: location.pathname + location.search, ts: serverTimestamp() }
-      });
-      await update(memberRef(code, cid), { nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
-    } else if (hostId === cid) {
-      state.isHost = true;
-      await update(memberRef(code, cid), { nick, role:'host', status:'active', lastSeen: serverTimestamp() });
-      await update(currentRef(code), { path: location.pathname + location.search, ts: serverTimestamp() });
-    } else {
-      state.isHost = false;
-      await set(memberRef(code, cid), { nick, role:'client', status:'pending', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
-    }
+    state.code = code;
+    state.nick = nick;
+    state.attached = true;
+    saveSession(code, nick);
+
+    state.stopRoom = listenRoomClosed(code);
+    state.stopMe   = listenMe(code, cid);
+    state.stopMembers = listenMembersForHost(code);
+    return;
   }
 
-  // onDisconnect úklid
-  try { onDisconnect(memberRef(code, cid)).remove(); } catch(_e){}
+  // 3) room existuje
+  const room = rSnap.val() || {};
+  const hostId = room.hostId || null;
 
-  // host po připojení pošle aktuální stránku
-  if (state.isHost) {
-    try { await update(currentRef(code), { path: location.pathname + location.search, ts: serverTimestamp() }); } catch(_e){}
+  // Pokud room nemá hostId, vezmeme si ho (první kdo přijde)
+  if (!hostId){
+    state.isHost = true;
+    await update(roomRef(code), {
+      hostId: cid,
+      current: { path: location.pathname + location.search, ts: serverTimestamp() }
+    });
+    await update(memberRef(code, cid), { nick, role:'host', status:'active', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
+  } else if (hostId === cid){
+    // Já jsem host (už dříve)
+    state.isHost = true;
+    await update(memberRef(code, cid), { nick, role:'host', status:'active', lastSeen: serverTimestamp() });
+    await update(currentRef(code), { path: location.pathname + location.search, ts: serverTimestamp() });
+  } else {
+    // Jsem klient
+    state.isHost = false;
+    const meRef = memberRef(code, cid);
+    const meSnap = await get(meRef);
+    const prev = meSnap.exists() ? (meSnap.val() || {}) : null;
+
+    // Sticky approval: pokud už jsem active, NESHODÍM se zpět do pending
+    if (prev && prev.status === 'active'){
+      await update(meRef, { nick, role:'client', lastSeen: serverTimestamp() });
+    } else {
+      // nový nebo nebyl active -> požádej o schválení
+      const payload = { nick, role:'client', status:'pending', joinedAt: serverTimestamp(), lastSeen: serverTimestamp() };
+      if (meSnap.exists()) await update(meRef, payload);
+      else await set(meRef, payload);
+    }
   }
 
   state.code = code;
   state.nick = nick;
   state.attached = true;
-
   saveSession(code, nick);
+
+  // onDisconnect úklid (v no-auth režimu to může být best-effort)
+  try { onDisconnect(memberRef(code, cid)).remove(); } catch(_e){}
 
   state.stopRoom = listenRoomClosed(code);
   state.stopMe   = listenMe(code, cid);
