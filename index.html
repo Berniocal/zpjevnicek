@@ -742,10 +742,10 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
   }
 
 
-  function sessionRef(code){ return ref(db, `zpevnikShare/${code}`); }
-  function currentRef(code){ return ref(db, `zpevnikShare/${code}/current`); }
-  function memberRef(code, memberUid){ return ref(db, `zpevnikShare/${code}/members/${memberUid}`); }
-  function membersRef(code){ return ref(db, `zpevnikShare/${code}/members`); }
+  function sessionRef(code){ return ref(db, `rooms/${code}`); }
+  function currentRef(code){ return ref(db, `rooms/${code}/current`); }
+  function memberRef(code, memberUid){ return ref(db, `rooms/${code}/members/${memberUid}`); }
+  function membersRef(code){ return ref(db, `rooms/${code}/members`); }
 
   function canonicalPath(href){
     // převede relativní i absolutní href na jednotný tvar: /path?query#hash
