@@ -937,8 +937,8 @@ window.__FIREBASE_CONFIG = FIREBASE_CONFIG;
         shareCode.disabled=false; shareNick.disabled=false; shareJoin.style.display='';
       }
     };
-    onValue(sref, cb);
-    return ()=> off(sref, "value", cb);
+    onValue(mref, cb);
+    return ()=> off(mref, "value", cb);
   }
 
   function listenMembersForHost(code){
