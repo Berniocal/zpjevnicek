@@ -278,9 +278,7 @@
       <div id="clientPanel" style="display:none">
         <div id="clientState" class="badge" style="margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="clientPause">Pauznout</button>
-          <button id="clientResume">Obnovit</button>
-          <button id="clientLeave">Odpojit se</button>
+          <button id="clientLeave" style="background:#b91c1c;color:#fff;border-color:rgba(255,255,255,0.25)">Odpojit se</button>
         </div>
       </div>
     </div>
@@ -797,13 +795,15 @@ async function load(){
   const backLink = document.getElementById('backLink');
   if (plId){
     backLink.textContent = '← Zpět na playlist';
-    backLink.onclick = (e)=>{ e.preventDefault(); location.href = '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId); };
+    backLink.onclick = (e)=>{ e.preventDefault(); location.replace('/zpjevnicek/index.html#pl:' + encodeURIComponent(plId)); };
   } else if (book){
     backLink.textContent = '← Zpět na zpěvník';
-    backLink.onclick = (e)=>{ e.preventDefault(); location.href = '/zpjevnicek/'; };
+    backLink.onclick = (e)=>{ e.preventDefault(); location.replace('/zpjevnicek/'); };
   } else {
     backLink.textContent = '← Zpět na seznam';
-    backLink.onclick = (e)=>{ e.preventDefault(); if (document.referrer.includes('/zpjevnicek/')) history.back(); else location.href='/zpjevnicek/'; };
+    // V režimu sdílení může "hlavní" během připojení vystřídat víc písní.
+    // Aby tlačítko Zpět (i HW back) neprocházelo historii písní, vracíme se vždy přímo na seznam.
+    backLink.onclick = (e)=>{ e.preventDefault(); location.replace('/zpjevnicek/'); };
   }
 
   // 5) Render: ChordPro vs. AlphaTab
@@ -1016,9 +1016,9 @@ if ('serviceWorker' in navigator) {
 /* --- HW tlačítko zpět --- */
 window.addEventListener('popstate', (e) => {
   e.preventDefault();
-  const backLink = document.getElementById('backLink');
-  if (backLink) backLink.click();
-  else location.href = plId ? '/zpjevnicek/index.html#pl:' + encodeURIComponent(plId) : '/zpjevnicek/';
+  // NIKDY neprocházej historii písní – vždy zpět na seznam (playlist / zpěvník / hlavní seznam)
+  if (plId) location.replace('/zpjevnicek/index.html#pl:' + encodeURIComponent(plId));
+  else location.replace('/zpjevnicek/');
 });
 
 load();
@@ -1308,7 +1308,8 @@ function listenCurrent(code){
     if (!cur || !cur.path) return;
     const want = cur.path;
     const here = location.pathname + location.search;
-    if (want !== here) location.assign(want);
+    // Nepřidávej do historie další písně – aby HW "Zpět" i "Zpět na seznam" neprocházely minulými písněmi.
+    if (want !== here) location.replace(want);
   };
   onValue(c, cb);
   return ()=> off(c, 'value', cb);
