@@ -1135,7 +1135,7 @@ function ensureShareParamInUrl(code){
     }
   }catch(_e){}
 }
-function broadcastPath(state.code){
+function broadcastPath(code){
   const u = new URL(location.href);
   u.searchParams.set('share', code);
   return u.pathname + '?' + u.searchParams.toString(); // bez hash, držíme se původního formátu
@@ -1303,14 +1303,12 @@ function listenMe(code, cid){
 
 const LAST_APPLIED_TS_KEY = 'zpjevnicek_share_lastAppliedTs_v1';
 function getLastAppliedTs(){
-  try{
-    const v = sessionStorage.getItem(LAST_APPLIED_TS_KEY);
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  }catch(_e){ return 0; }
+  const v = sessionStorage.getItem(LAST_APPLIED_TS_KEY);
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
 }
 function setLastAppliedTs(ts){
-  try{ sessionStorage.setItem(LAST_APPLIED_TS_KEY, String(ts || 0)); }catch(_e){}
+  sessionStorage.setItem(LAST_APPLIED_TS_KEY, String(ts || 0));
 }
 
 function listenCurrent(code){
@@ -1322,10 +1320,9 @@ function listenCurrent(code){
     const want = cur.path;
     const ts = (typeof cur.ts === 'number') ? cur.ts : 0;
 
-    // Přepni jen na NOVOU změnu od hlavního telefonu (jinak si klient může "odskočit" jinam).
+    // Reaguj jen na novou změnu od hosta.
     const last = getLastAppliedTs();
     if (ts && ts <= last) return;
-
     if (ts) setLastAppliedTs(ts);
 
     const here = location.pathname + location.search;
