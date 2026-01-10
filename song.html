@@ -1135,7 +1135,7 @@ function ensureShareParamInUrl(code){
     }
   }catch(_e){}
 }
-function broadcastPath(code){
+function broadcastPath(state.code){
   const u = new URL(location.href);
   u.searchParams.set('share', code);
   return u.pathname + '?' + u.searchParams.toString(); // bez hash, držíme se původního formátu
@@ -1298,21 +1298,43 @@ function listenMe(code, cid){
     }
   };
   onValue(m, cb);
-  return ()=> off(m, 'value', cb);
+  return ()=> off(m, 'value', cbconst LAST_APPLIED_TS_KEY = 'zpjevnicek_share_lastAppliedTs_v1';
+
+function getLastAppliedTs(){
+  const v = sessionStorage.getItem(LAST_APPLIED_TS_KEY);
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function setLastAppliedTs(ts){
+  sessionStorage.setItem(LAST_APPLIED_TS_KEY, String(ts || 0));
 }
 
 function listenCurrent(code){
   const c = currentRef(code);
+
   const cb = (snap)=>{
     const cur = snap.val();
     if (!cur || !cur.path) return;
+
     const want = cur.path;
+    const ts = (typeof cur.ts === 'number') ? cur.ts : 0;
+
+    // Reaguj jen na NOVOU změnu od hosta (aby si klient mohl mezitím listovat po svém).
+    const last = getLastAppliedTs();
+    if (ts && ts <= last) return;
+
+    // Označ, že jsme tuhle host změnu už „viděli“ (i kdybychom už byli na stejné stránce).
+    if (ts) setLastAppliedTs(ts);
+
     const here = location.pathname + location.search;
+
     // Nepřidávej do historie další písně – aby HW "Zpět" i "Zpět na seznam" neprocházely minulými písněmi.
     if (want !== here) location.replace(want);
   };
+
   onValue(c, cb);
   return ()=> off(c, 'value', cb);
+}cb);
 }
 
 function renderMembersList(code, membersObj){
@@ -1402,7 +1424,7 @@ async function ensureRoomAndJoin(code, nick){
     await set(roomRef(code), {
       hostId: cid,
       createdAt: serverTimestamp(),
-      current: { path: broadcastPath(code), ts: serverTimestamp() },
+      current: { path: broadcastPath(state.code), ts: serverTimestamp() },
       members: {
         [cid]: { nick, role:'host', status:'active', online:true, joinedAt: serverTimestamp(), lastSeen: serverTimestamp() }
       }
@@ -1429,14 +1451,14 @@ async function ensureRoomAndJoin(code, nick){
     state.isHost = true;
     await update(roomRef(code), {
       hostId: cid,
-      current: { path: broadcastPath(code), ts: serverTimestamp() }
+      current: { path: broadcastPath(state.code), ts: serverTimestamp() }
     });
     await update(memberRef(code, cid), { nick, role:'host', status:'active', online:true, joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
   } else if (hostId === cid){
     // Já jsem host (už dříve)
     state.isHost = true;
     await update(memberRef(code, cid), { nick, role:'host', status:'active', lastSeen: serverTimestamp() });
-    await update(currentRef(code), { path: broadcastPath(code), ts: serverTimestamp() });
+    await update(currentRef(code), { path: broadcastPath(state.code), ts: serverTimestamp() });
   } else {
     // Jsem klient
     state.isHost = false;
@@ -1470,7 +1492,7 @@ async function ensureRoomAndJoin(code, nick){
 
 async function broadcastCurrentIfHost(){
   if (!db || !state.attached || !state.isHost || !state.code) return;
-  try { await update(currentRef(state.code), { path: broadcastPath(code), ts: serverTimestamp() }); }
+  try { await update(currentRef(state.code), { path: broadcastPath(state.code), ts: serverTimestamp() }); }
   catch(e){ console.warn('broadcastCurrent failed', e); }
 }
 
