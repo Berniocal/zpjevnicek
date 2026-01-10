@@ -1135,7 +1135,7 @@ function ensureShareParamInUrl(code){
     }
   }catch(_e){}
 }
-function broadcastPath(state.code){
+function broadcastPath(code){
   const u = new URL(location.href);
   u.searchParams.set('share', code);
   return u.pathname + '?' + u.searchParams.toString(); // bez hash, držíme se původního formátu
@@ -1334,7 +1334,6 @@ function listenCurrent(code){
 
   onValue(c, cb);
   return ()=> off(c, 'value', cb);
-}cb);
 }
 
 function renderMembersList(code, membersObj){
