@@ -1135,7 +1135,7 @@ function ensureShareParamInUrl(code){
     }
   }catch(_e){}
 }
-function broadcastPath(code){
+function broadcastPath(state.code){
   const u = new URL(location.href);
   u.searchParams.set('share', code);
   return u.pathname + '?' + u.searchParams.toString(); // bez hash, držíme se původního formátu
@@ -1301,12 +1301,33 @@ function listenMe(code, cid){
   return ()=> off(m, 'value', cb);
 }
 
+const LAST_APPLIED_TS_KEY = 'zpjevnicek_share_lastAppliedTs_v1';
+function getLastAppliedTs(){
+  try{
+    const v = sessionStorage.getItem(LAST_APPLIED_TS_KEY);
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }catch(_e){ return 0; }
+}
+function setLastAppliedTs(ts){
+  try{ sessionStorage.setItem(LAST_APPLIED_TS_KEY, String(ts || 0)); }catch(_e){}
+}
+
 function listenCurrent(code){
   const c = currentRef(code);
   const cb = (snap)=>{
     const cur = snap.val();
     if (!cur || !cur.path) return;
+
     const want = cur.path;
+    const ts = (typeof cur.ts === 'number') ? cur.ts : 0;
+
+    // Přepni jen na NOVOU změnu od hlavního telefonu (jinak si klient může "odskočit" jinam).
+    const last = getLastAppliedTs();
+    if (ts && ts <= last) return;
+
+    if (ts) setLastAppliedTs(ts);
+
     const here = location.pathname + location.search;
     // Nepřidávej do historie další písně – aby HW "Zpět" i "Zpět na seznam" neprocházely minulými písněmi.
     if (want !== here) location.replace(want);
@@ -1470,7 +1491,7 @@ async function ensureRoomAndJoin(code, nick){
 
 async function broadcastCurrentIfHost(){
   if (!db || !state.attached || !state.isHost || !state.code) return;
-  try { await update(currentRef(state.code), { path: broadcastPath(code), ts: serverTimestamp() }); }
+  try { await update(currentRef(state.code), { path: broadcastPath(state.code), ts: serverTimestamp() }); }
   catch(e){ console.warn('broadcastCurrent failed', e); }
 }
 
