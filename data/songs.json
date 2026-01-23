@@ -1054,5 +1054,16 @@
     "books": {
       "Zpjěvníček 1": 96
     }
+  },
+  {
+    "id": "songs/097-marie-tomas-klus.pro",
+    "file": "songs/097-marie-tomas-klus.pro",
+    "title": "Marie",
+    "author": "Tomáš Klus",
+    "number": 97,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 97
+    }
   }
 ]
