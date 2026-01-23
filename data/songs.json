@@ -1043,5 +1043,16 @@
     "books": {
       "Zpjěvníček 1": 95
     }
+  },
+  {
+    "id": "songs/096-bara-kabat.pro",
+    "file": "songs/096-bara-kabat.pro",
+    "title": "Bára",
+    "author": "Kabát",
+    "number": 96,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 96
+    }
   }
 ]
