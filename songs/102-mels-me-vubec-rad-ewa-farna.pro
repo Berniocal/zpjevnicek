@@ -2,7 +2,7 @@
 {artist: Ewa Farna}
 {book: Zpjěvníček 1 = 102}
 
-[/:D A Hm G:/]
+[/:][D] [A] [Hm] [G][:/]
 [D]Zavo[A]lá, [Hm]nebo [G]příjde
 [D]Prostě [A]řek, [Hm]jak to [G]vyjde 
 [D]Dou[A]fám, [Hmi]že jsi [G]sám. 
