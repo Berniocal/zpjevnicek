@@ -1065,5 +1065,16 @@
     "books": {
       "Zpjěvníček 1": 97
     }
+  },
+  {
+    "id": "songs/098-pocity-tomas-klus.pro",
+    "file": "songs/098-pocity-tomas-klus.pro",
+    "title": "Pocity",
+    "author": "Tomáš Klus",
+    "number": 98,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 98
+    }
   }
 ]
