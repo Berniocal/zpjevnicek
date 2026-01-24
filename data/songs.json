@@ -1109,5 +1109,16 @@
     "books": {
       "Zpjěvníček 1": 101
     }
+  },
+  {
+    "id": "songs/102-mels-me-vubec-rad-ewa-farna.pro",
+    "file": "songs/102-mels-me-vubec-rad-ewa-farna.pro",
+    "title": "Měls mě vůbec rád",
+    "author": "Ewa Farna",
+    "number": 102,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 102
+    }
   }
 ]
