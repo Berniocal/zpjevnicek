@@ -1135,10 +1135,10 @@
   },
   {
     "id": "songs/104-leto-lasky-summer-all-stars.pro",
-    "file": "songs/104-leto-lasky-summer-all-stars.pro",
+    "number": 104,
     "title": "Léto lásky",
     "author": "Summer All Stars",
-    "number": 104,
+    "file": "songs/104-leto-lasky-summer-all-stars.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 104
@@ -1146,10 +1146,10 @@
   },
   {
     "id": "songs/105-klara-chinaski.pro",
-    "file": "songs/105-klara-chinaski.pro",
+    "number": 105,
     "title": "Klára",
     "author": "Chinaski",
-    "number": 105,
+    "file": "songs/105-klara-chinaski.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 105
