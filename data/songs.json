@@ -1076,5 +1076,16 @@
     "books": {
       "Zpjěvníček 1": 98
     }
+  },
+  {
+    "id": "songs/099-cizi-zed-pokac.pro",
+    "file": "songs/099-cizi-zed-pokac.pro",
+    "title": "Cizí zeď",
+    "author": "Pokáč",
+    "number": 99,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 99
+    }
   }
 ]
