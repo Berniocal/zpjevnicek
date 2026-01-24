@@ -1131,5 +1131,16 @@
     "books": {
       "Zpjěvníček 1": 103
     }
+  },
+  {
+    "id": "songs/104-leto-lasky-summer-all-stars.pro",
+    "file": "songs/104-leto-lasky-summer-all-stars.pro",
+    "title": "Léto lásky",
+    "author": "Summer All Stars",
+    "number": 104,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 104
+    }
   }
 ]
