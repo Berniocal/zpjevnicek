@@ -1142,5 +1142,16 @@
     "books": {
       "Zpjěvníček 1": 104
     }
+  },
+  {
+    "id": "songs/105-klara-chinaski.pro",
+    "file": "songs/105-klara-chinaski.pro",
+    "title": "Klára",
+    "author": "Chinaski",
+    "number": 105,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 105
+    }
   }
 ]
