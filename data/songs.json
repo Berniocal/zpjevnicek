@@ -1199,5 +1199,16 @@
     "books": {
       "Já, písničkář I": 4
     }
+  },
+  {
+    "id": "songs/404-pricichnuti-alergikovo-tomas-klus.pro",
+    "file": "songs/404-pricichnuti-alergikovo-tomas-klus.pro",
+    "title": "Přičichnutí alergikovo",
+    "author": "Tomáš Klus",
+    "number": 404,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 5
+    }
   }
 ]
