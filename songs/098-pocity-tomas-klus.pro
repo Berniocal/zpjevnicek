@@ -1,6 +1,7 @@
 {title: Pocity}
 {artist: Tomáš Klus}
 {book: Zpjěvníček 1 = 98}
+{book: Já, písničkář I = 13}
 
 [G]Z posledních pocitů[D] 
 [Emi]poskládám ještě jednou [C]úžasnou chvíli
