@@ -20,7 +20,7 @@ Co o nás [(C/E)]budou [Dm]psát[B] a vyprá[Csus4]vět?[C]
 Snad taky [B]budou si umět zpívat[(C)]
 a [F]tančit na stole [(C)]
 jako [Dm]my [B]i za 100 [F]let 
-/:[Dm] [B] [F] [C/E]:/
+[/:][Dm] [B] [F] [C/E][:/]
 
 Kdyby [Dm]cesty mohly povědět
 kdo [B]po nich jezdil tam a zpět
@@ -40,7 +40,7 @@ Co o nás [(C/E)]budou [Dm]psát[B] a vyprá[Csus4]vět?[C]
 Snad taky [B]budou si umět zpívat[(C)]
 a [F]tančit na stole [(C)]
 jako [Dm]my [B]i za 100 [F]let 
-/:[Dm] [B] [F] [C/E]:/
+[/:][Dm] [B] [F] [C/E][:/]
 
 Dáme si [Bmaj7]na triko triko trikoloru
 i když to [Dm]neděláváme často
@@ -54,9 +54,9 @@ Co o nás [(C/E)]budou [Dm]psát[B] a vyprá[Csus4]vět?[C]
 Snad taky [B]budou si umět zpívat[(C)]
 a [F]tančit na stole [(C)]
 jako [Dm]my [B]i za 100 [F]let 
-/:[Dm] [B] [F] [C/E]:/
+[/:][Dm] [B] [F] [C/E][:/]
 
 Snad taky [B]budou si umět zpívat[(C)]
 a [F]tančit na stole [(C)]
 jako [Dm]my [B]i za 100 [F]let 
-/:[Dm] [B] [F] [C/E]:/
+[/:][Dm] [B] [F] [C/E][:/]
