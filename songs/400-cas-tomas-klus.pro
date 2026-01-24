@@ -1,6 +1,6 @@
 {title: Čas}
 {artist: Tomáš Klus}
-{book: Já, písničkář I = 41}
+{book: Já, písničkář I = 1}
 
 [Emi]V jednu chvíli oba zavřem oči,
 asi [C]proto, že už není víc co říct.
