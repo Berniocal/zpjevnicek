@@ -1155,5 +1155,16 @@
     "books": {
       "Zpjěvníček 1": 105
     }
+  },
+  {
+    "id": "songs/400-cas-tomas-klus.pro",
+    "file": "songs/400-cas-tomas-klus.pro",
+    "title": "Čas",
+    "author": "Tomáš Klus",
+    "number": 400,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 41
+    }
   }
 ]
