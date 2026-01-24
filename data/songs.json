@@ -1098,5 +1098,16 @@
     "books": {
       "Zpjěvníček 1": 100
     }
+  },
+  {
+    "id": "songs/101-po-kalisku-straznican.pro",
+    "file": "songs/101-po-kalisku-straznican.pro",
+    "title": "Po kalíšku",
+    "author": "Strážničan",
+    "number": 101,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 101
+    }
   }
 ]
