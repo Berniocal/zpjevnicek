@@ -1101,10 +1101,10 @@
   },
   {
     "id": "songs/101-po-kalisku-straznican.pro",
-    "file": "songs/101-po-kalisku-straznican.pro",
+    "number": 101,
     "title": "Po kalíšku",
     "author": "Strážničan",
-    "number": 101,
+    "file": "songs/101-po-kalisku-straznican.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 101
@@ -1112,10 +1112,10 @@
   },
   {
     "id": "songs/102-mels-me-vubec-rad-ewa-farna.pro",
-    "file": "songs/102-mels-me-vubec-rad-ewa-farna.pro",
+    "number": 102,
     "title": "Měls mě vůbec rád",
     "author": "Ewa Farna",
-    "number": 102,
+    "file": "songs/102-mels-me-vubec-rad-ewa-farna.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 102
@@ -1123,10 +1123,10 @@
   },
   {
     "id": "songs/103-colorado-kabat.pro",
-    "file": "songs/103-colorado-kabat.pro",
+    "number": 103,
     "title": "Colorado",
     "author": "Kabát",
-    "number": 103,
+    "file": "songs/103-colorado-kabat.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 103
