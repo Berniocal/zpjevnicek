@@ -1,6 +1,6 @@
 {title: Přičichnutí alergikovo}
 {artist: Tomáš Klus}
-{book: Já, písničkář I = 5}
+{book: Já, písničkář I = 6}
 
 [Ami]V nose mě šimrá [Dmi]alergie,
 [F]jak se tak šourám, [E]ale je mi, ale
