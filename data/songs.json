@@ -1188,5 +1188,16 @@
     "books": {
       "Já, písničkář I": 3
     }
+  },
+  {
+    "id": "songs/403-chybis-mi-tomas-klus.pro",
+    "file": "songs/403-chybis-mi-tomas-klus.pro",
+    "title": "Chybíš mi",
+    "author": "Tomáš Klus",
+    "number": 403,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 4
+    }
   }
 ]
