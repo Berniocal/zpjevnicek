@@ -1046,10 +1046,10 @@
   },
   {
     "id": "songs/096-bara-kabat.pro",
-    "file": "songs/096-bara-kabat.pro",
+    "number": 96,
     "title": "Bára",
     "author": "Kabát",
-    "number": 96,
+    "file": "songs/096-bara-kabat.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 96
@@ -1057,10 +1057,10 @@
   },
   {
     "id": "songs/097-marie-tomas-klus.pro",
-    "file": "songs/097-marie-tomas-klus.pro",
+    "number": 97,
     "title": "Marie",
     "author": "Tomáš Klus",
-    "number": 97,
+    "file": "songs/097-marie-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 97
@@ -1068,10 +1068,10 @@
   },
   {
     "id": "songs/098-pocity-tomas-klus.pro",
-    "file": "songs/098-pocity-tomas-klus.pro",
+    "number": 98,
     "title": "Pocity",
     "author": "Tomáš Klus",
-    "number": 98,
+    "file": "songs/098-pocity-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 98
