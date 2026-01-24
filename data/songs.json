@@ -1120,5 +1120,16 @@
     "books": {
       "Zpjěvníček 1": 102
     }
+  },
+  {
+    "id": "songs/103-colorado-kabat.pro",
+    "file": "songs/103-colorado-kabat.pro",
+    "title": "Colorado",
+    "author": "Kabát",
+    "number": 103,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 103
+    }
   }
 ]
