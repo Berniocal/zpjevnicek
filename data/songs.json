@@ -1087,5 +1087,16 @@
     "books": {
       "Zpjěvníček 1": 99
     }
+  },
+  {
+    "id": "songs/100-za-100-let-jananas.pro",
+    "file": "songs/100-za-100-let-jananas.pro",
+    "title": "Za 100 let",
+    "author": "Jananas",
+    "number": 100,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 100
+    }
   }
 ]
