@@ -1,6 +1,7 @@
 {title: Marie}
 {artist: Tomáš Klus}
 {book: Zpjěvníček 1 = 97}
+{book: Já, písničkář I = 5}
 
 Je [F]den, tak [A]pojď Marie ven.
 Budeme [B]žít, házet [C]šutry do oken.
