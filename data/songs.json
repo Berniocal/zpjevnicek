@@ -1169,10 +1169,10 @@
   },
   {
     "id": "songs/401-az-tomas-klus.pro",
-    "file": "songs/401-az-tomas-klus.pro",
+    "number": 401,
     "title": "Až",
     "author": "Tomáš Klus",
-    "number": 401,
+    "file": "songs/401-az-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 2
@@ -1180,10 +1180,10 @@
   },
   {
     "id": "songs/402-17-b-tomas-klus.pro",
-    "file": "songs/402-17-b-tomas-klus.pro",
+    "number": 402,
     "title": "17 B",
     "author": "Tomáš Klus",
-    "number": 402,
+    "file": "songs/402-17-b-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 3
@@ -1191,10 +1191,10 @@
   },
   {
     "id": "songs/403-chybis-mi-tomas-klus.pro",
-    "file": "songs/403-chybis-mi-tomas-klus.pro",
+    "number": 403,
     "title": "Chybíš mi",
     "author": "Tomáš Klus",
-    "number": 403,
+    "file": "songs/403-chybis-mi-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 4
@@ -1202,10 +1202,10 @@
   },
   {
     "id": "songs/404-pricichnuti-alergikovo-tomas-klus.pro",
-    "file": "songs/404-pricichnuti-alergikovo-tomas-klus.pro",
+    "number": 404,
     "title": "Přičichnutí alergikovo",
     "author": "Tomáš Klus",
-    "number": 404,
+    "file": "songs/404-pricichnuti-alergikovo-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 6
