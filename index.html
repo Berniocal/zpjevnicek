@@ -326,7 +326,7 @@ function buildBookSelect(){
     }
   });
   const options = [
-    `<option value="">Všechny</option>`,
+    `<option value="">Zpěvníky</option>`,
     ...Array.from(set).sort((a,b)=>a.localeCompare(b, 'cs')).map(name =>
       `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
     )
