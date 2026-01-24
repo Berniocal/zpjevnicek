@@ -1166,5 +1166,16 @@
     "books": {
       "Já, písničkář I": 1
     }
+  },
+  {
+    "id": "songs/401-az-tomas-klus.pro",
+    "file": "songs/401-az-tomas-klus.pro",
+    "title": "Až",
+    "author": "Tomáš Klus",
+    "number": 401,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 2
+    }
   }
 ]
