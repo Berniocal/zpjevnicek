@@ -1079,10 +1079,10 @@
   },
   {
     "id": "songs/099-cizi-zed-pokac.pro",
-    "file": "songs/099-cizi-zed-pokac.pro",
+    "number": 99,
     "title": "Cizí zeď",
     "author": "Pokáč",
-    "number": 99,
+    "file": "songs/099-cizi-zed-pokac.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 99
@@ -1090,10 +1090,10 @@
   },
   {
     "id": "songs/100-za-100-let-jananas.pro",
-    "file": "songs/100-za-100-let-jananas.pro",
+    "number": 100,
     "title": "Za 100 let",
     "author": "Jananas",
-    "number": 100,
+    "file": "songs/100-za-100-let-jananas.pro",
     "type": "chordpro",
     "books": {
       "Zpjěvníček 1": 100
