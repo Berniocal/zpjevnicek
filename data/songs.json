@@ -1213,12 +1213,15 @@
     }
   },
   {
-    "id": "111-tabacek-chinaski",
+    "id": "songs/111-tabacek-chinaski.pro",
     "number": 111,
     "title": "Tabáček",
     "author": "Chinaski",
     "file": "songs/111-tabacek-chinaski.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 111
+    }
   },
   {
     "id": "songs/400-cas-tomas-klus.pro",
