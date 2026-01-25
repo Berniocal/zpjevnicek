@@ -1224,6 +1224,14 @@
     }
   },
   {
+    "id": "112-srdce-nehasnou-karel-gott",
+    "number": 112,
+    "title": "Srdce nehasnou",
+    "author": "Karel Gott",
+    "file": "songs/112-srdce-nehasnou-karel-gott.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
