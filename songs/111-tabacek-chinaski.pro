@@ -37,7 +37,7 @@ a taky [Em]vím, že obtěžuju [A]okolí
 [Em]Víceméně se to dobře [A]vyvíjí
 život je [D]návykovej a někdy [D]zabíjí
 
-EEA:x2
+[/:][E] [E] [A] [H][:/] [x2]
 
 [F#m]Polevím z vysokejch [H]otáček
 [Emaj7]pohoda, klídek a [C#m]tabáček
