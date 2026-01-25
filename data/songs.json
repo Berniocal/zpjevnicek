@@ -1329,5 +1329,16 @@
     "books": {
       "Zpjěvníček 1": 112
     }
+  },
+  {
+    "id": "songs/409-da-mukluv-mec-tomas-klus.pro",
+    "file": "songs/409-da-mukluv-mec-tomas-klus.pro",
+    "title": "DA.MUklův meč",
+    "author": "Tomáš Klus",
+    "number": 409,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 10
+    }
   }
 ]
