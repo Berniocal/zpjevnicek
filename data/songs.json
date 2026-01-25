@@ -1277,5 +1277,16 @@
     "books": {
       "Já, písničkář I": 7
     }
+  },
+  {
+    "id": "songs/406-jaroslava-tomas-klus.pro",
+    "file": "songs/406-jaroslava-tomas-klus.pro",
+    "title": "Jaroslava",
+    "author": "Tomáš Klus",
+    "number": 406,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 8
+    }
   }
 ]
