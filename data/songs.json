@@ -1340,5 +1340,16 @@
     "books": {
       "Já, písničkář I": 10
     }
+  },
+  {
+    "id": "songs/409-damukluv-mec-tomas-klus.pro",
+    "file": "songs/409-damukluv-mec-tomas-klus.pro",
+    "title": "DAMUklův meč",
+    "author": "Tomáš Klus",
+    "number": 409,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 10
+    }
   }
 ]
