@@ -1229,5 +1229,16 @@
     "books": {
       "Zpjěvníček 1": 106
     }
+  },
+  {
+    "id": "songs/107-srdcebeat-chinaski.pro",
+    "file": "songs/107-srdcebeat-chinaski.pro",
+    "title": "Srdcebeat",
+    "author": "Chinaski",
+    "number": 107,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 107
+    }
   }
 ]
