@@ -1266,5 +1266,16 @@
     "books": {
       "Zpjěvníček 1": 110
     }
+  },
+  {
+    "id": "songs/405-laska-tomas-klus.pro",
+    "file": "songs/405-laska-tomas-klus.pro",
+    "title": "Láska",
+    "author": "Tomáš Klus",
+    "number": 405,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 7
+    }
   }
 ]
