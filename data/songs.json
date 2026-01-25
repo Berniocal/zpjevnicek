@@ -1354,5 +1354,16 @@
     "books": {
       "Já, písničkář I": 12
     }
+  },
+  {
+    "id": "songs/413-balada-tomas-klus.pro",
+    "file": "songs/413-balada-tomas-klus.pro",
+    "title": "Balada",
+    "author": "Tomáš Klus",
+    "number": 413,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 14
+    }
   }
 ]
