@@ -1288,5 +1288,16 @@
     "books": {
       "Já, písničkář I": 8
     }
+  },
+  {
+    "id": "songs/407-sentiment-na-tri-body-tomas-klus.pro",
+    "file": "songs/407-sentiment-na-tri-body-tomas-klus.pro",
+    "title": "Sentiment na tři body",
+    "author": "Tomáš Klus",
+    "number": 407,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 9
+    }
   }
 ]
