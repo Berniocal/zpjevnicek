@@ -1210,5 +1210,16 @@
     "books": {
       "Já, písničkář I": 6
     }
+  },
+  {
+    "id": "songs/106-stejne-jako-ja-chinaski.pro",
+    "file": "songs/106-stejne-jako-ja-chinaski.pro",
+    "title": "Stejně jako já",
+    "author": "Chinaski",
+    "number": 106,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 106
+    }
   }
 ]
