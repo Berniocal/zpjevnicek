@@ -1255,5 +1255,16 @@
     "books": {
       "Zpjěvníček 1": 109
     }
+  },
+  {
+    "id": "songs/110-dobrak-od-kosti-chinaski.pro",
+    "file": "songs/110-dobrak-od-kosti-chinaski.pro",
+    "title": "Dobrák od kosti",
+    "author": "Chinaski",
+    "number": 110,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 110
+    }
   }
 ]
