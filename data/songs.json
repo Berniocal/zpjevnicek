@@ -1224,12 +1224,15 @@
     }
   },
   {
-    "id": "112-srdce-nehasnou-karel-gott",
+    "id": "songs/112-srdce-nehasnou-karel-gott.pro",
     "number": 112,
     "title": "Srdce nehasnou",
     "author": "Karel Gott",
     "file": "songs/112-srdce-nehasnou-karel-gott.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 112
+    }
   },
   {
     "id": "songs/400-cas-tomas-klus.pro",
@@ -1320,22 +1323,11 @@
     }
   },
   {
-    "id": "songs/112-srdce-nehasnou-karel-gott.pro",
-    "file": "songs/112-srdce-nehasnou-karel-gott.pro",
-    "title": "Srdce nehasnou",
-    "author": "Karel Gott",
-    "number": 112,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 112
-    }
-  },
-  {
     "id": "songs/409-da-mukluv-mec-tomas-klus.pro",
-    "file": "songs/409-da-mukluv-mec-tomas-klus.pro",
+    "number": 409,
     "title": "DA.MUklův meč",
     "author": "Tomáš Klus",
-    "number": 409,
+    "file": "songs/409-da-mukluv-mec-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 10
@@ -1343,10 +1335,10 @@
   },
   {
     "id": "songs/409-damukluv-mec-tomas-klus.pro",
-    "file": "songs/409-damukluv-mec-tomas-klus.pro",
+    "number": 409,
     "title": "Inzerát",
     "author": "Tomáš Klus",
-    "number": 410,
+    "file": "songs/409-damukluv-mec-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 11
@@ -1354,10 +1346,10 @@
   },
   {
     "id": "songs/411-jsousedky-tomas-klus.pro",
-    "file": "songs/411-jsousedky-tomas-klus.pro",
+    "number": 411,
     "title": "Jsousedky",
     "author": "Tomáš Klus",
-    "number": 411,
+    "file": "songs/411-jsousedky-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 12
