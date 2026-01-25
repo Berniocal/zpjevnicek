@@ -1351,5 +1351,16 @@
     "books": {
       "Já, písničkář I": 11
     }
+  },
+  {
+    "id": "songs/411-jsousedky-tomas-klus.pro",
+    "file": "songs/411-jsousedky-tomas-klus.pro",
+    "title": "Jsousedky",
+    "author": "Tomáš Klus",
+    "number": 411,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 12
+    }
   }
 ]
