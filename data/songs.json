@@ -1156,7 +1156,7 @@
       "Zpjěvníček 1": 105
     }
   },
-   {
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -1243,6 +1243,17 @@
     "books": {
       "Zpjěvníček 1": 108,
       "Já, písničkář II": 25
+    }
+  },
+  {
+    "id": "songs/109-stiznost-chinaski.pro",
+    "file": "songs/109-stiznost-chinaski.pro",
+    "title": "Stížnost",
+    "author": "Chinaski",
+    "number": 109,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 109
     }
   }
 ]
