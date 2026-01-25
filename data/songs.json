@@ -1299,5 +1299,16 @@
     "books": {
       "Já, písničkář I": 9
     }
+  },
+  {
+    "id": "songs/111-tabacek-chinaski.pro",
+    "file": "songs/111-tabacek-chinaski.pro",
+    "title": "Tabáček",
+    "author": "Chinaski",
+    "number": 111,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 111
+    }
   }
 ]
