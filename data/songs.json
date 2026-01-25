@@ -1310,5 +1310,16 @@
     "books": {
       "Já, písničkář I": 9
     }
+  },
+  {
+    "id": "songs/112-srdce-nehasnou-karel-gott.pro",
+    "file": "songs/112-srdce-nehasnou-karel-gott.pro",
+    "title": "Srdce nehasnou",
+    "author": "Karel Gott",
+    "number": 112,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 112
+    }
   }
 ]
