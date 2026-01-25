@@ -1,6 +1,6 @@
-{title: DAMUklův meč}
+{title: Inzerát}
 {artist: Tomáš Klus}
-{book: Já, písničkář I = 10}
+{book: Já, písničkář I = 11}
 
 [G]Tak už mi zase někdo ukradl den
 a noc mě [D]obepíná.
