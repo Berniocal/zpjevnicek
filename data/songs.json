@@ -1157,6 +1157,62 @@
     }
   },
   {
+    "id": "songs/106-stejne-jako-ja-chinaski.pro",
+    "number": 106,
+    "title": "Stejně jako já",
+    "author": "Chinaski",
+    "file": "songs/106-stejne-jako-ja-chinaski.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 106
+    }
+  },
+  {
+    "id": "songs/107-srdcebeat-chinaski.pro",
+    "number": 107,
+    "title": "Srdcebeat",
+    "author": "Kryštof",
+    "file": "songs/107-srdcebeat-chinaski.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 107
+    }
+  },
+  {
+    "id": "songs/108-nina-tomas-klus.pro",
+    "number": 108,
+    "title": "Nina",
+    "author": "Tomáš Klus",
+    "file": "songs/108-nina-tomas-klus.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 108,
+      "Já, písničkář II": 25
+    }
+  },
+  {
+    "id": "songs/109-stiznost-chinaski.pro",
+    "number": 109,
+    "title": "Stížnost",
+    "author": "Chinaski",
+    "file": "songs/109-stiznost-chinaski.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 109
+    }
+  },
+  {
+    "id": "songs/110-dobrak-od-kosti-chinaski.pro",
+    "number": 110,
+    "title": "Dobrák od kosti",
+    "author": "Chinaski",
+    "file": "songs/110-dobrak-od-kosti-chinaski.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 110
+    }
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -1212,67 +1268,11 @@
     }
   },
   {
-    "id": "songs/106-stejne-jako-ja-chinaski.pro",
-    "file": "songs/106-stejne-jako-ja-chinaski.pro",
-    "title": "Stejně jako já",
-    "author": "Chinaski",
-    "number": 106,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 106
-    }
-  },
-  {
-    "id": "songs/107-srdcebeat-chinaski.pro",
-    "file": "songs/107-srdcebeat-chinaski.pro",
-    "title": "Srdcebeat",
-    "author": "Kryštof",
-    "number": 107,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 107
-    }
-  },
-  {
-    "id": "songs/108-nina-tomas-klus.pro",
-    "file": "songs/108-nina-tomas-klus.pro",
-    "title": "Nina",
-    "author": "Tomáš Klus",
-    "number": 108,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 108,
-      "Já, písničkář II": 25
-    }
-  },
-  {
-    "id": "songs/109-stiznost-chinaski.pro",
-    "file": "songs/109-stiznost-chinaski.pro",
-    "title": "Stížnost",
-    "author": "Chinaski",
-    "number": 109,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 109
-    }
-  },
-  {
-    "id": "songs/110-dobrak-od-kosti-chinaski.pro",
-    "file": "songs/110-dobrak-od-kosti-chinaski.pro",
-    "title": "Dobrák od kosti",
-    "author": "Chinaski",
-    "number": 110,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 110
-    }
-  },
-  {
     "id": "songs/405-laska-tomas-klus.pro",
-    "file": "songs/405-laska-tomas-klus.pro",
+    "number": 405,
     "title": "Láska",
     "author": "Tomáš Klus",
-    "number": 405,
+    "file": "songs/405-laska-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 7
@@ -1280,10 +1280,10 @@
   },
   {
     "id": "songs/406-jaroslava-tomas-klus.pro",
-    "file": "songs/406-jaroslava-tomas-klus.pro",
+    "number": 406,
     "title": "Jaroslava",
     "author": "Tomáš Klus",
-    "number": 406,
+    "file": "songs/406-jaroslava-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 8
