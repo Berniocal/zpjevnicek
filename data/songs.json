@@ -1156,15 +1156,7 @@
       "Zpjěvníček 1": 105
     }
   },
-  {
-    "id": "106-stejne-jako-ja-chinaski",
-    "number": 106,
-    "title": "Stejně jako já",
-    "author": "Chinaski",
-    "file": "songs/106-stejne-jako-ja-chinaski.pro",
-    "type": "chordpro"
-  },
-  {
+   {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
