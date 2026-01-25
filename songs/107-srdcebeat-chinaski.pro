@@ -1,5 +1,5 @@
 {title: Srdcebeat}
-{artist: Chinaski}
+{artist: Kryštof}
 {book: Zpjěvníček 1 = 107}
 
 [G] [D] [Hmi] [C]
