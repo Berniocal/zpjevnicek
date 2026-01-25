@@ -9,14 +9,14 @@
 Inu [Dmaj7]Zodpovědná žena, [Gmaj7]životem [Dmaj7]zmražená[Gmaj7].
  
 [Dmaj7] [Gmaj7][Dmaj7][Gmaj7]
-[Dmaj7]Jsou, [Gmaj7]V blízkosti neprůchozích
-[Dmaj7]stěn. [Gmaj7]Pár cizích [Dmaj7]žen.[Gmaj7]
-[Dmaj7]Jsou. [Gmaj7]Popíjí kávu a
-[Dmaj7]kouří [Gmaj7]jednu za druho[Dmaj7]u.[Gmaj7]
+[Dmaj7]Jsou, [Gmaj7]V blízkosti neprůchozích [Dmaj7]stěn.
+[Gmaj7]Pár cizích [Dmaj7]žen.[Gmaj7]
+[Dmaj7]Jsou. [Gmaj7]Popíjí kávu a [Dmaj7]kouří 
+[Gmaj7]jednu za druho[Dmaj7]u.[Gmaj7]
  
 Je všední [Em7]den, pondělní [A7]ráno.
-A do o[Em7]ken, [A7]ač zakázáno, [Dmaj7]kouká.[Gmaj7]
-[Dmaj7] [Gmaj7]
+A do o[Em7]ken, [A7]ač zakázáno, 
+[Dmaj7]kouká.[Gmaj7] [Dmaj7] [Gmaj7]
 [Dmaj7]Jsou. [Gmaj7]Na cestě s igelitkou[Dmaj7].[Gmaj7]
 [Dmaj7]Jen o patro delší trasa, 
 [Gmaj7]jen o hladový krk víc.
