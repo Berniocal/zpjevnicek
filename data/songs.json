@@ -1240,5 +1240,17 @@
     "books": {
       "Zpjěvníček 1": 107
     }
+  },
+  {
+    "id": "songs/108-nina-tomas-klus.pro",
+    "file": "songs/108-nina-tomas-klus.pro",
+    "title": "Nina",
+    "author": "Tomáš Klus",
+    "number": 108,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 108,
+      "Já, písničkář II": 25
+    }
   }
 ]
