@@ -1387,5 +1387,16 @@
     "books": {
       "Já, písničkář I": 16
     }
+  },
+  {
+    "id": "songs/113-pramen-zdravi-z-posazavi-sverak-a-uhlir.pro",
+    "file": "songs/113-pramen-zdravi-z-posazavi-sverak-a-uhlir.pro",
+    "title": "Pramen zdraví z Posázaví",
+    "author": "Svěrák a Uhlíř",
+    "number": 113,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 113
+    }
   }
 ]
