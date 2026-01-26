@@ -501,17 +501,66 @@ function wireAutoScrollDesktopControls(){
 }
 
 
-/* --- CZ noty + transpozice --- */
-const NOTES_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
-const ALT = { 'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','A#':'B','Bb':'B','Hb':'B','Cb':'H','B#':'C','H#':'C','E#':'F','Fb':'E' };
-function normRoot(r){ return ALT[r] || r; }
-function transposeNote(n, semi){ const up=n.toUpperCase(); const norm=normRoot(up); const i=NOTES_CZ.indexOf(norm); if(i<0) return n; return NOTES_CZ[(i+semi+120)%12]; }
+/* --- CZ noty + transpozice (včetně Ab/Db atd.) --- */
+
+// indexy půltónů v CZ/DE zápisu (B = Bb, H = B)
+const NOTE_TO_PC = {
+  'C':0, 'B#':0, 'H#':0,
+  'C#':1, 'DB':1,
+  'D':2,
+  'D#':3, 'EB':3,
+  'E':4, 'FB':4,
+  'F':5, 'E#':5,
+  'F#':6, 'GB':6,
+  'G':7,
+  'G#':8, 'AB':8,
+  'A':9,
+  'A#':10, 'BB':10, 'B':10, 'HB':10, // Bb se často píše jako B (CZ/DE)
+  'H':11, 'CB':11
+};
+
+const PC_TO_SHARP_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
+const PC_TO_FLAT_CZ  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','H']; // 11 držíme jako H
+
+function _noteStyle(s){
+  // zachovej styl: kdo zadal béčko, dostane béčko (Db/Ab/Bb…)
+  return (/[b]/i.test(s)) ? 'flat' : 'sharp';
+}
+
+function _normNoteToken(token){
+  // token typu "Ab" => "AB", "Db" => "DB", "C#" => "C#"
+  const m = String(token || '').trim().match(/^([A-Ha-h])([#b]?)$/);
+  if(!m) return null;
+  return (m[1].toUpperCase() + (m[2] || '')).toUpperCase();
+}
+
+function transposeNote(n, semi){
+  const norm = _normNoteToken(n);
+  if(!norm) return n;
+
+  const pc = NOTE_TO_PC[norm];
+  if(pc === undefined) return n;
+
+  const outPc = (pc + semi + 120) % 12;
+  const style = _noteStyle(n);
+  return (style === 'flat') ? PC_TO_FLAT_CZ[outPc] : PC_TO_SHARP_CZ[outPc];
+}
+
 function transposeChord(token, semi){
-  const m = token.match(/^([A-Ha-h](?:#|b)?)(.*?)(?:\/([A-Ha-h](?:#|b)?)(.*))?$/);
+  // root + zbytek (+ volitelný bas)
+  // např: "Abm7/Gb", "Db/F", "C#sus4", "Hmi", "B"
+  const m = String(token).match(/^([A-Ha-h])([#b]?)(.*?)(?:\/([A-Ha-h])([#b]?)(.*))?$/);
   if (!m) return token;
-  const rootT = transposeNote(m[1], semi);
-  const bassT = m[3] ? transposeNote(m[3], semi) : null;
-  return rootT + (m[2]||'') + (bassT?('/'+bassT):'') + (m[4]||'');
+
+  const rootIn = (m[1] || '') + (m[2] || '');
+  const rest1  = (m[3] || '');
+  const bassIn = m[4] ? ((m[4] || '') + (m[5] || '')) : null;
+  const rest2  = m[6] || '';
+
+  const rootT = transposeNote(rootIn, semi);
+  const bassT = bassIn ? transposeNote(bassIn, semi) : null;
+
+  return rootT + rest1 + (bassT ? ('/' + bassT) : '') + rest2;
 }
 
 /* --- Parser + render --- */
