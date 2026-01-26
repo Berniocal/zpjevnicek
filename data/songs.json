@@ -1235,6 +1235,14 @@
     }
   },
   {
+    "id": "113-pramen-zdravi-z-posazavi-sverak-a-uhlir",
+    "number": 113,
+    "title": "Pramen zdraví z Posázaví",
+    "author": "Svěrák a Uhlíř",
+    "file": "songs/113-pramen-zdravi-z-posazavi-sverak-a-uhlir.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -1357,10 +1365,10 @@
   },
   {
     "id": "songs/413-balada-tomas-klus.pro",
-    "file": "songs/413-balada-tomas-klus.pro",
+    "number": 413,
     "title": "Balada",
     "author": "Tomáš Klus",
-    "number": 413,
+    "file": "songs/413-balada-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 14
@@ -1368,10 +1376,10 @@
   },
   {
     "id": "songs/414-psano-u-zprav-tomas-klus.pro",
-    "file": "songs/414-psano-u-zprav-tomas-klus.pro",
+    "number": 414,
     "title": "Psáno u zpráv",
     "author": "Tomáš Klus",
-    "number": 414,
+    "file": "songs/414-psano-u-zprav-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 15
@@ -1379,10 +1387,10 @@
   },
   {
     "id": "songs/415-do-nebe-tomas-klus.pro",
-    "file": "songs/415-do-nebe-tomas-klus.pro",
+    "number": 415,
     "title": "Do nebe",
     "author": "Tomáš Klus",
-    "number": 415,
+    "file": "songs/415-do-nebe-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 16
