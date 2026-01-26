@@ -515,12 +515,12 @@ const NOTE_TO_PC = {
   'G':7,
   'G#':8, 'AB':8,
   'A':9,
-  'A#':10, 'BB':10, 'B':10, 'HB':10, // Bb se často píše jako B (CZ/DE)
+  'A#':10, 'B':10, 'HB':10, // Bb se často píše jako B (CZ/DE)
   'H':11, 'CB':11
 };
 
 const PC_TO_SHARP_CZ = ['C','C#','D','D#','E','F','F#','G','G#','A','B','H'];
-const PC_TO_FLAT_CZ  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','H']; // 11 držíme jako H
+const PC_TO_FLAT_CZ  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','B','H']; // 11 držíme jako H
 
 function _noteStyle(s){
   // zachovej styl: kdo zadal béčko, dostane béčko (Db/Ab/Bb…)
