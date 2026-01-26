@@ -1365,5 +1365,16 @@
     "books": {
       "Já, písničkář I": 14
     }
+  },
+  {
+    "id": "songs/414-psano-u-zprav-tomas-klus.pro",
+    "file": "songs/414-psano-u-zprav-tomas-klus.pro",
+    "title": "Psáno u zpráv",
+    "author": "Tomáš Klus",
+    "number": 414,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 15
+    }
   }
 ]
