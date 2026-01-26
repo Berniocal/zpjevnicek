@@ -1417,5 +1417,16 @@
     "books": {
       "Zpjěvníček 1": 114
     }
+  },
+  {
+    "id": "songs/115-moderni-devce-kabat.pro",
+    "file": "songs/115-moderni-devce-kabat.pro",
+    "title": "Moderní děvče",
+    "author": "Kabát",
+    "number": 115,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 115
+    }
   }
 ]
