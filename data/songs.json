@@ -1376,5 +1376,16 @@
     "books": {
       "Já, písničkář I": 15
     }
+  },
+  {
+    "id": "songs/415-do-nebe-tomas-klus.pro",
+    "file": "songs/415-do-nebe-tomas-klus.pro",
+    "title": "Do nebe",
+    "author": "Tomáš Klus",
+    "number": 415,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 16
+    }
   }
 ]
