@@ -1406,5 +1406,16 @@
     "books": {
       "Zpjěvníček 1": 113
     }
+  },
+  {
+    "id": "songs/114-cmelak-divokej-bill.pro",
+    "file": "songs/114-cmelak-divokej-bill.pro",
+    "title": "Čmelák",
+    "author": "Divokej Bill",
+    "number": 114,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 114
+    }
   }
 ]
