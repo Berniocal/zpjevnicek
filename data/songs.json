@@ -1439,5 +1439,16 @@
     "books": {
       "Zpjěvníček 1": 116
     }
+  },
+  {
+    "id": "songs/117-mala-zuzu-horkyze-slize.pro",
+    "file": "songs/117-mala-zuzu-horkyze-slize.pro",
+    "title": "Malá Žužu",
+    "author": "Horkýže Slíže",
+    "number": 117,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 117
+    }
   }
 ]
