@@ -1461,5 +1461,16 @@
     "books": {
       "Zpjěvníček 1": 118
     }
+  },
+  {
+    "id": "songs/119-mnisi-pohadkova.pro",
+    "file": "songs/119-mnisi-pohadkova.pro",
+    "title": "Mniši",
+    "author": "Pohádková",
+    "number": 119,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 119
+    }
   }
 ]
