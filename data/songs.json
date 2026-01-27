@@ -1450,5 +1450,16 @@
     "books": {
       "Zpjěvníček 1": 117
     }
+  },
+  {
+    "id": "songs/118-zlatovlaska-lodka-pohadkova.pro",
+    "file": "songs/118-zlatovlaska-lodka-pohadkova.pro",
+    "title": "Zlatovláska - loďka",
+    "author": "Pohádková",
+    "number": 118,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 118
+    }
   }
 ]
