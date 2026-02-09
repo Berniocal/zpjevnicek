@@ -1472,5 +1472,14 @@
     "books": {
       "Zpjěvníček 1": 119
     }
+  },
+  {
+    "id": "songs/120-o-cem-se-zda-medvedum-jaroslav-lenk.pro",
+    "file": "songs/120-o-cem-se-zda-medvedum-jaroslav-lenk.pro",
+    "title": "O čem se zdá medvědům",
+    "author": "Jaroslav Lenk",
+    "number": 120,
+    "type": "chordpro",
+    "books": {}
   }
 ]
