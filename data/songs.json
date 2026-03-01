@@ -1492,5 +1492,16 @@
     "books": {
       "Zpjěvníček 1": 120
     }
+  },
+  {
+    "id": "songs/121-jahody-mrazeny-jiri-schelinger.pro",
+    "file": "songs/121-jahody-mrazeny-jiri-schelinger.pro",
+    "title": "Jahody mražený",
+    "author": "Jiří Schelinger",
+    "number": 121,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 121
+    }
   }
 ]
