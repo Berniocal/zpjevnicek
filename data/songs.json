@@ -1503,5 +1503,16 @@
     "books": {
       "Zpjěvníček 1": 121
     }
+  },
+  {
+    "id": "songs/122-slavici-z-madridu-waldemar-matuska.pro",
+    "file": "songs/122-slavici-z-madridu-waldemar-matuska.pro",
+    "title": "Slavíci z Madridu",
+    "author": "Waldemar Matuška",
+    "number": 122,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 122
+    }
   }
 ]
