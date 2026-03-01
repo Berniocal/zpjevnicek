@@ -1353,6 +1353,14 @@
     }
   },
   {
+    "id": "124-modlitba-andel-pane-2-ondrej-brzobohaty",
+    "number": 124,
+    "title": "Modlitba - Anděl Páně 2",
+    "author": "Ondřej Brzobohatý",
+    "file": "songs/124-modlitba-andel-pane-2-ondrej-brzobohaty.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
