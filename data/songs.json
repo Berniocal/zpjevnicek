@@ -1516,16 +1516,5 @@
     "books": {
       "Já, písničkář I": 16
     }
-  },
-  {
-    "id": "songs/124-modlitba-andel-pane-2-ondrej-brzobohaty.pro",
-    "file": "songs/124-modlitba-andel-pane-2-ondrej-brzobohaty.pro",
-    "title": "Modlitba - Anděl Páně 2",
-    "author": "Ondřej Brzobohatý",
-    "number": 124,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 1": 124
-    }
   }
 ]
