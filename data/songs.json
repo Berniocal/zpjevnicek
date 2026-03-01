@@ -1514,5 +1514,16 @@
     "books": {
       "Zpjěvníček 1": 122
     }
+  },
+  {
+    "id": "songs/123-slibuju-ze-nebudu-pit-rybicky-48.pro",
+    "file": "songs/123-slibuju-ze-nebudu-pit-rybicky-48.pro",
+    "title": "Slibuju, že nebudu pít",
+    "author": "Rybičky 48",
+    "number": 123,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 123
+    }
   }
 ]
