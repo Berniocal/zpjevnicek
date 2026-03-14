@@ -1571,5 +1571,16 @@
     "books": {
       "Zpjěvníček 1": 129
     }
+  },
+  {
+    "id": "songs/130-obchodnik-s-destem-krystof.pro",
+    "file": "songs/130-obchodnik-s-destem-krystof.pro",
+    "title": "Obchodník s deštěm",
+    "author": "Kryštof",
+    "number": 130,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 130
+    }
   }
 ]
