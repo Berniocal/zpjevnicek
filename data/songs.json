@@ -1516,5 +1516,16 @@
     "books": {
       "Já, písničkář I": 16
     }
+  },
+  {
+    "id": "songs/125-modlitba-ulrychovci.pro",
+    "file": "songs/125-modlitba-ulrychovci.pro",
+    "title": "Modlitba",
+    "author": "Ulrychovci",
+    "number": 125,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 125
+    }
   }
 ]
