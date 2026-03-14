@@ -1549,5 +1549,16 @@
     "books": {
       "Zpjěvníček 1": 127
     }
+  },
+  {
+    "id": "songs/128-o-blechach-a-tak-david-stypka.pro",
+    "file": "songs/128-o-blechach-a-tak-david-stypka.pro",
+    "title": "O blechách a tak",
+    "author": "David Stypka",
+    "number": 128,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 128
+    }
   }
 ]
