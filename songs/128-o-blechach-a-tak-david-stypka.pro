@@ -1,5 +1,5 @@
 {title: O blechách a tak}
-{artist: David Stypka}
+{artist: Karel Plíhal}
 {book: Zpjěvníček 1 = 128}
 
 Jsem starý [Am]penzion pro osamělé [Em]blechy,
