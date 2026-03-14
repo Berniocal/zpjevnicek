@@ -1560,5 +1560,16 @@
     "books": {
       "Zpjěvníček 1": 128
     }
+  },
+  {
+    "id": "songs/129-rubikon-krystof.pro",
+    "file": "songs/129-rubikon-krystof.pro",
+    "title": "Rubikon",
+    "author": "Kryštof",
+    "number": 129,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 129
+    }
   }
 ]
