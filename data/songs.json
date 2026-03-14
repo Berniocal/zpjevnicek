@@ -1546,5 +1546,16 @@
     "books": {
       "Zpjěvníček 1": 126
     }
+  },
+  {
+    "id": "songs/127-dobre-rano-mila-david-stypka.pro",
+    "file": "songs/127-dobre-rano-mila-david-stypka.pro",
+    "title": "Dobré ráno milá",
+    "author": "David Stypka",
+    "number": 127,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 127
+    }
   }
 ]
