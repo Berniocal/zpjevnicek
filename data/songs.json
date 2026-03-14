@@ -1535,5 +1535,16 @@
     "books": {
       "Zpjěvníček 1": 125
     }
+  },
+  {
+    "id": "songs/126-medvidek-lucie.pro",
+    "file": "songs/126-medvidek-lucie.pro",
+    "title": "Medvídek",
+    "author": "Lucie",
+    "number": 126,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 126
+    }
   }
 ]
