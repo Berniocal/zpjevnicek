@@ -1659,5 +1659,16 @@
     "books": {
       "Zpjěvníček 1": 137
     }
+  },
+  {
+    "id": "songs/138-a-ja-te-nechci-lidova.pro",
+    "file": "songs/138-a-ja-te-nechci-lidova.pro",
+    "title": "A já tě nechci",
+    "author": "Lidová",
+    "number": 138,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 138
+    }
   }
 ]
