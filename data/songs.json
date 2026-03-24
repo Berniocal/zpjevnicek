@@ -1802,5 +1802,16 @@
     "books": {
       "Zpjěvníček 1": 150
     }
+  },
+  {
+    "id": "songs/151-napojen-tomas-klus.pro",
+    "file": "songs/151-napojen-tomas-klus.pro",
+    "title": "Napojen",
+    "author": "Tomáš Klus",
+    "number": 151,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 151
+    }
   }
 ]
