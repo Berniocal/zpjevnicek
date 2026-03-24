@@ -1593,5 +1593,16 @@
     "books": {
       "Zpjěvníček 1": 131
     }
+  },
+  {
+    "id": "songs/132-andele-wanastowi-vjecy.pro",
+    "file": "songs/132-andele-wanastowi-vjecy.pro",
+    "title": "Andělé",
+    "author": "Wanastowi Vjecy",
+    "number": 132,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 132
+    }
   }
 ]
