@@ -1791,5 +1791,16 @@
     "books": {
       "Zpjěvníček 1": 149
     }
+  },
+  {
+    "id": "songs/150-mamko-nedavej-me-cechomor.pro",
+    "file": "songs/150-mamko-nedavej-me-cechomor.pro",
+    "title": "Mamko nedávej mě",
+    "author": "Čechomor",
+    "number": 150,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 150
+    }
   }
 ]
