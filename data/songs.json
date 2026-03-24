@@ -1714,5 +1714,16 @@
     "books": {
       "Zpjěvníček 1": 142
     }
+  },
+  {
+    "id": "songs/143-esce-si-ja-pohar-vina-zaplatim-lidova.pro",
+    "file": "songs/143-esce-si-ja-pohar-vina-zaplatim-lidova.pro",
+    "title": "Ešče si já pohár vína zaplatím",
+    "author": "Lidová",
+    "number": 143,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 143
+    }
   }
 ]
