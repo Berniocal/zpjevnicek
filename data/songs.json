@@ -1681,5 +1681,16 @@
     "books": {
       "Zpjěvníček 1": 139
     }
+  },
+  {
+    "id": "songs/140-burlaci-kabat.pro",
+    "file": "songs/140-burlaci-kabat.pro",
+    "title": "Burlaci",
+    "author": "Kabát",
+    "number": 140,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 140
+    }
   }
 ]
