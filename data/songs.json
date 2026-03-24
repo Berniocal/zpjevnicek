@@ -1615,5 +1615,16 @@
     "books": {
       "Zpjěvníček 1": 133
     }
+  },
+  {
+    "id": "songs/134-kdyz-se-zamiluje-kun-sverak-a-uhlir.pro",
+    "file": "songs/134-kdyz-se-zamiluje-kun-sverak-a-uhlir.pro",
+    "title": "Když se zamiluje kůň",
+    "author": "Svěrák a Uhlíř",
+    "number": 134,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 134
+    }
   }
 ]
