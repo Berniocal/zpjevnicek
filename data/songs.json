@@ -1637,5 +1637,16 @@
     "books": {
       "Zpjěvníček 1": 135
     }
+  },
+  {
+    "id": "songs/136-batalion-spiritual-kvintet.pro",
+    "file": "songs/136-batalion-spiritual-kvintet.pro",
+    "title": "Batalion",
+    "author": "Spirituál kvintet",
+    "number": 136,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 136
+    }
   }
 ]
