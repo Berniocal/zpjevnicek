@@ -1758,5 +1758,16 @@
     "books": {
       "Zpjěvníček 1": 146
     }
+  },
+  {
+    "id": "songs/147-bile-vinecko-lidova.pro",
+    "file": "songs/147-bile-vinecko-lidova.pro",
+    "title": "Bílé vínečko",
+    "author": "Lidová",
+    "number": 147,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 147
+    }
   }
 ]
