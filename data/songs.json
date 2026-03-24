@@ -1703,5 +1703,16 @@
     "books": {
       "Zpjěvníček 1": 141
     }
+  },
+  {
+    "id": "songs/142-jediny-co-chci-jelen.pro",
+    "file": "songs/142-jediny-co-chci-jelen.pro",
+    "title": "Jediný co chci",
+    "author": "Jelen",
+    "number": 142,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 142
+    }
   }
 ]
