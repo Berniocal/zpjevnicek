@@ -1604,5 +1604,16 @@
     "books": {
       "Zpjěvníček 1": 132
     }
+  },
+  {
+    "id": "songs/133-pata-jiri-staidl.pro",
+    "file": "songs/133-pata-jiri-staidl.pro",
+    "title": "Pátá",
+    "author": "Jiří Štaidl",
+    "number": 133,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 133
+    }
   }
 ]
