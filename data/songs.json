@@ -1670,5 +1670,16 @@
     "books": {
       "Zpjěvníček 1": 138
     }
+  },
+  {
+    "id": "songs/139-kalhotky-si-sundej-mig-21.pro",
+    "file": "songs/139-kalhotky-si-sundej-mig-21.pro",
+    "title": "Kalhotky si sundej",
+    "author": "MIG 21",
+    "number": 139,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 139
+    }
   }
 ]
