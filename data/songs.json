@@ -1692,5 +1692,16 @@
     "books": {
       "Zpjěvníček 1": 140
     }
+  },
+  {
+    "id": "songs/141-i-presto-vsechno-mirai.pro",
+    "file": "songs/141-i-presto-vsechno-mirai.pro",
+    "title": "I přesto všechno",
+    "author": "Mirai",
+    "number": 141,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 141
+    }
   }
 ]
