@@ -1736,5 +1736,16 @@
     "books": {
       "Zpjěvníček 1": 144
     }
+  },
+  {
+    "id": "songs/145-pilo-by-sa-pilo-lidova.pro",
+    "file": "songs/145-pilo-by-sa-pilo-lidova.pro",
+    "title": "Pilo by sa pilo",
+    "author": "Lidová",
+    "number": 145,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 145
+    }
   }
 ]
