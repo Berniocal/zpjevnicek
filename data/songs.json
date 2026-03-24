@@ -1648,5 +1648,16 @@
     "books": {
       "Zpjěvníček 1": 136
     }
+  },
+  {
+    "id": "songs/137-tancuj-tancuj-lidova.pro",
+    "file": "songs/137-tancuj-tancuj-lidova.pro",
+    "title": "Tancuj tancuj",
+    "author": "Lidová",
+    "number": 137,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 137
+    }
   }
 ]
