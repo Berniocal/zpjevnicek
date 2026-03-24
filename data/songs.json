@@ -1747,5 +1747,16 @@
     "books": {
       "Zpjěvníček 1": 145
     }
+  },
+  {
+    "id": "songs/146-my-jsme-potichu-lidova.pro",
+    "file": "songs/146-my-jsme-potichu-lidova.pro",
+    "title": "My jsme potichu",
+    "author": "Lidová",
+    "number": 146,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 146
+    }
   }
 ]
