@@ -1769,5 +1769,16 @@
     "books": {
       "Zpjěvníček 1": 147
     }
+  },
+  {
+    "id": "songs/148-tezky-zivot-muzikanta-lidova.pro",
+    "file": "songs/148-tezky-zivot-muzikanta-lidova.pro",
+    "title": "Těžký život muzikanta",
+    "author": "Lidová",
+    "number": 148,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 148
+    }
   }
 ]
