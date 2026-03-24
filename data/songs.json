@@ -1725,5 +1725,16 @@
     "books": {
       "Zpjěvníček 1": 143
     }
+  },
+  {
+    "id": "songs/144-isel-macek-lidova.pro",
+    "file": "songs/144-isel-macek-lidova.pro",
+    "title": "Išel Macek",
+    "author": "Lidová",
+    "number": 144,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 144
+    }
   }
 ]
