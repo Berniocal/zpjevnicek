@@ -1626,5 +1626,16 @@
     "books": {
       "Zpjěvníček 1": 134
     }
+  },
+  {
+    "id": "songs/135-kazdy-si-nese-sve-brime-jaromir-nohavica.pro",
+    "file": "songs/135-kazdy-si-nese-sve-brime-jaromir-nohavica.pro",
+    "title": "Každý si nese své břímě",
+    "author": "Jaromír Nohavica",
+    "number": 135,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 1": 135
+    }
   }
 ]
