@@ -303,11 +303,8 @@ async function load(){
   buildBookSelect();          // naplň select se zpěvníky
   // vždy po načtení nastav „Všechny“
   if (bookSel) {
-    bookSel.value = localStorage.getItem('zpj_lastBook') || '';
-    bookSel.addEventListener('change', () => {
-  localStorage.setItem('zpj_lastBook', bookSel.value);
-  renderMain();
-});
+    bookSel.value = '';
+    bookSel.addEventListener('change', renderMain);
   }
 
 
