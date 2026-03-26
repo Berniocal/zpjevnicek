@@ -1813,5 +1813,16 @@
     "books": {
       "Zpjěvníček 1": 151
     }
+  },
+  {
+    "id": "songs/152-srdce-jako-knize-rohan-richard-muller.pro",
+    "file": "songs/152-srdce-jako-knize-rohan-richard-muller.pro",
+    "title": "Srdce jako kníže Rohan",
+    "author": "Richard Müller",
+    "number": 152,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 1
+    }
   }
 ]
