@@ -1857,5 +1857,16 @@
     "books": {
       "Zpjěvníček 2": 4
     }
+  },
+  {
+    "id": "songs/156-mam-jizvu-na-rtu-jaromir-nohavica.pro",
+    "file": "songs/156-mam-jizvu-na-rtu-jaromir-nohavica.pro",
+    "title": "Mám jizvu na rtu",
+    "author": "Jaromír Nohavica",
+    "number": 156,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 5
+    }
   }
 ]
