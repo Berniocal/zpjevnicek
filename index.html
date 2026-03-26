@@ -297,14 +297,22 @@ async function load(){
 
 
   }catch(e){ songs = []; }
-  renderMain();
+  // restore last book BEFORE rendering
+if (bookSel) {
+  const last = localStorage.getItem('zpj_lastBook');
+  if (last) bookSel.value = last;
+}
+renderMain();
   loadPlaylists();
   renderPlaylistList();
   buildBookSelect();          // naplň select se zpěvníky
   // vždy po načtení nastav „Všechny“
   if (bookSel) {
     bookSel.value = '';
-    bookSel.addEventListener('change', renderMain);
+    bookSel.addEventListener('change', () => {
+  localStorage.setItem('zpj_lastBook', bookSel.value);
+  renderMain();
+});
   }
 
 
@@ -339,7 +347,9 @@ function buildBookSelect(){
 function renderMain(){
   const term = q.value.trim().toLowerCase();
   const srt  = sort.value;
-  const selectedBook = bookSel ? bookSel.value : '';
+  const selectedBook = (bookSel && bookSel.value) 
+  ? bookSel.value 
+  : (localStorage.getItem('zpj_lastBook') || '');
 
   let data = songs.filter(s =>
     s.title.toLowerCase().includes(term) ||
