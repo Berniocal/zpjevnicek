@@ -1846,5 +1846,16 @@
     "books": {
       "Zpjěvníček 2": 3
     }
+  },
+  {
+    "id": "songs/155-teplakova-souprava-nightwork.pro",
+    "file": "songs/155-teplakova-souprava-nightwork.pro",
+    "title": "Tepláková souprava",
+    "author": "Nightwork",
+    "number": 155,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 4
+    }
   }
 ]
