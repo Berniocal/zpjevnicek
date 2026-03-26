@@ -1824,5 +1824,16 @@
     "books": {
       "Zpjěvníček 2": 1
     }
+  },
+  {
+    "id": "songs/153-vedouci-chinaski.pro",
+    "file": "songs/153-vedouci-chinaski.pro",
+    "title": "Vedoucí",
+    "author": "Chinaski",
+    "number": 153,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 2
+    }
   }
 ]
