@@ -1835,5 +1835,16 @@
     "books": {
       "Zpjěvníček 2": 2
     }
+  },
+  {
+    "id": "songs/154-vstavej-divokej-bill.pro",
+    "file": "songs/154-vstavej-divokej-bill.pro",
+    "title": "Vstávej",
+    "author": "Divokej Bill",
+    "number": 154,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 3
+    }
   }
 ]
