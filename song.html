@@ -837,11 +837,20 @@ async function load(){
     document.getElementById('title').textContent='Píseň nenalezena';
     return;
   }
-  document.getElementById('title').textContent = `${song.number ?? '–'} · ${song.title}`;
+  const num = (book && song.books && song.books[book]) ? song.books[book] : (song.number ?? '–');
+document.getElementById('title').textContent = `${num} · ${song.title}`;
   document.getElementById('meta').textContent = song.author || '';
 
   // 4) Zpět odkaz (playlist / zpěvník / hlavní seznam)
   const backLink = document.getElementById('backLink');
+if (book){
+  backLink.href = `/zpjevnicek/index.html`;
+  backLink.onclick = (e)=>{
+    e.preventDefault();
+    localStorage.setItem('zpj_lastBook', book);
+    window.location.href = `/zpjevnicek/index.html`;
+  };
+}
   if (plId){
     backLink.textContent = '← Zpět na playlist';
     backLink.onclick = (e)=>{ e.preventDefault(); location.replace('/zpjevnicek/index.html#pl:' + encodeURIComponent(plId)); };
