@@ -1945,5 +1945,16 @@
     "books": {
       "Já, písničkář I": 16
     }
+  },
+  {
+    "id": "songs/164-zakazane-uvolneni-michal-hruza.pro",
+    "file": "songs/164-zakazane-uvolneni-michal-hruza.pro",
+    "title": "Zakázané uvolnění",
+    "author": "Michal Hrůza",
+    "number": 164,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 13
+    }
   }
 ]
