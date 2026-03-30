@@ -23,10 +23,11 @@ provdána [Emi]za mě, ale hlavně
 
 Na [D]vlnách slunce zářící, 
 v [D]Madridu zpívaj slavíci
-[:Cer[Emi]veza, rock 'n' roll, co[C]rrida Espa[A]ňol
+
+/:Cer[Emi]veza, rock 'n' roll, co[C]rrida Espa[A]ňol
 Nandej [G]mi to seňo[F]rito, por fa[C]vor
 Cer[Emi]veza, rock'n'roll, co[C]rrida Espa[A]ňol
-Teplý [G]tóny mají [F]zvony v Caste[C]lon:]
+Teplý [G]tóny mají [F]zvony v Caste[C]lon:/
 
 [Emi]Víno stáčí Sančo Panča, 
 [C]jedno slovo [A]stačí
@@ -40,7 +41,8 @@ stejky stranou! To[C]readore, co [A]s tím?
 
 Na [D]vlnách slunce zářící, 
 v [D]Madridu zpívaj slavíci
-[:Cer[Emi]veza, rock 'n' roll, co[C]rrida Espa[A]ňol
+
+/:Cer[Emi]veza, rock 'n' roll, co[C]rrida Espa[A]ňol
 Nandej [G]mi to seňo[F]rito, por fa[C]vor
 Cer[Emi]veza, rock'n'roll, co[C]rrida Espa[A]ňol
-Teplý [G]tóny mají [F]zvony v Caste[C]lon:]
+Teplý [G]tóny mají [F]zvony v Caste[C]lon:/
