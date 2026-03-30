@@ -1890,5 +1890,16 @@
     "books": {
       "Zpjěvníček 2": 7
     }
+  },
+  {
+    "id": "songs/159-bratricku-karel-kryl.pro",
+    "file": "songs/159-bratricku-karel-kryl.pro",
+    "title": "Bratříčku",
+    "author": "Karel Kryl",
+    "number": 159,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 8
+    }
   }
 ]
