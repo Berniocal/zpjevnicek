@@ -1978,5 +1978,16 @@
     "books": {
       "Já, písničkář I": 16
     }
+  },
+  {
+    "id": "songs/167-to-ta-helpa-lidova.pro",
+    "file": "songs/167-to-ta-helpa-lidova.pro",
+    "title": "To ta Heľpa",
+    "author": "Lidová",
+    "number": 167,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 16
+    }
   }
 ]
