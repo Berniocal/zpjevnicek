@@ -1793,6 +1793,14 @@
     }
   },
   {
+    "id": "164-zakazane-uvolneni-michal-hruza",
+    "number": 164,
+    "title": "Zakázané uvolnění",
+    "author": "Michal Hrůza",
+    "file": "songs/164-zakazane-uvolneni-michal-hruza.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
