@@ -1879,5 +1879,16 @@
     "books": {
       "Zpjěvníček 2": 6
     }
+  },
+  {
+    "id": "songs/158-corrida-kabat.pro",
+    "file": "songs/158-corrida-kabat.pro",
+    "title": "Corrida",
+    "author": "Kabát",
+    "number": 158,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 7
+    }
   }
 ]
