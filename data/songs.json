@@ -2034,5 +2034,16 @@
     "books": {
       "Já, písničkář I": 17
     }
+  },
+  {
+    "id": "songs/417-jednoducha-tomas-klus.pro",
+    "file": "songs/417-jednoducha-tomas-klus.pro",
+    "title": "Jednoduchá",
+    "author": "Tomáš Klus",
+    "number": 417,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 18
+    }
   }
 ]
