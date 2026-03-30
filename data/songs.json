@@ -1912,5 +1912,16 @@
     "books": {
       "Zpjěvníček 2": 9
     }
+  },
+  {
+    "id": "songs/161-dej-mi-vic-sve-lasky-olympic.pro",
+    "file": "songs/161-dej-mi-vic-sve-lasky-olympic.pro",
+    "title": "Dej mi víc své lásky",
+    "author": "Olympic",
+    "number": 161,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 10
+    }
   }
 ]
