@@ -1901,5 +1901,16 @@
     "books": {
       "Zpjěvníček 2": 8
     }
+  },
+  {
+    "id": "songs/160-mlyny-spiritual-kvintet.pro",
+    "file": "songs/160-mlyny-spiritual-kvintet.pro",
+    "title": "Mlýny",
+    "author": "Spiritual kvintet",
+    "number": 160,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 9
+    }
   }
 ]
