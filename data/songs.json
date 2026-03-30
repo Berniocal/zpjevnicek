@@ -1997,5 +1997,16 @@
     "books": {
       "Zpjěvníček 2": 16
     }
+  },
+  {
+    "id": "songs/168-frankie-dlouhan-frantisek-nedved.pro",
+    "file": "songs/168-frankie-dlouhan-frantisek-nedved.pro",
+    "title": "Frankie Dlouhán",
+    "author": "František Nedvěd",
+    "number": 168,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 17
+    }
   }
 ]
