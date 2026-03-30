@@ -2019,5 +2019,17 @@
     "books": {
       "Zpjěvníček 2": 18
     }
+  },
+  {
+    "id": "songs/170-naveky-tomas-klus.pro",
+    "file": "songs/170-naveky-tomas-klus.pro",
+    "title": "Navěky",
+    "author": "Tomáš Klus",
+    "number": 170,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 19,
+      "Já, písničkář I": 19
+    }
   }
 ]
