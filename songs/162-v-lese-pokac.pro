@@ -1,6 +1,6 @@
 {title: V lese}
 {artist: Pokáč}
-{book: Zpjěvníček 2 = 11}
+{book: Zpjěvníček 2 = 12}
 
 [F]Dneska všichni [C]říkají a [G]všude píše [Am]se,
 že prej je [F]moderní a [C]zdravý 
@@ -72,4 +72,3 @@ Dneska [F]jsem v lese [C]byl
 a už [G]tam nepu[Am]du,
 nikde [F]jsem neza[C]žil 
 [G]tak ukrutnou nu[Am]du. 
- 
