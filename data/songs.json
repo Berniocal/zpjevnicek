@@ -1923,5 +1923,16 @@
     "books": {
       "Zpjěvníček 2": 10
     }
+  },
+  {
+    "id": "songs/162-huslicky-vlasta-redl.pro",
+    "file": "songs/162-huslicky-vlasta-redl.pro",
+    "title": "Husličky",
+    "author": "Vlasta Redl",
+    "number": 162,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 11
+    }
   }
 ]
