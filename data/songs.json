@@ -2031,5 +2031,16 @@
       "Zpjěvníček 2": 19,
       "Já, písničkář I": 19
     }
+  },
+  {
+    "id": "songs/416-le-homole-tomas-klus.pro",
+    "file": "songs/416-le-homole-tomas-klus.pro",
+    "title": "Le.Homole",
+    "author": "Tomáš Klus",
+    "number": 416,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 17
+    }
   }
 ]
