@@ -11,8 +11,8 @@ než [Fmaj7]po kytaře [G]sáhla,
 [Fmaj7]tak nám chleba [G]kradla 
 a [Fmaj7]čmárala po zd[Emi]ech.
 
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+   
+[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
 [Em] [D] [G] [C] [G]
@@ -29,8 +29,7 @@ až jeden [G]pán v limuzíně
 bu[Fmaj7]deš mi, holka, [G]sloužit, 
 a [Fmaj7]oženil se [Emi]s ní.
 
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
 [Em] [D] [G] [C] [G]
@@ -47,8 +46,7 @@ za pár [G]let tahle můza,
 Skon[Fmaj7]čila na [G]ulici
 a [Fmaj7]pod mostem má [Emi]byt.
 
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
 [Em] [D] [G] [C] [G]
