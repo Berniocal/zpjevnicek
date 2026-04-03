@@ -2068,5 +2068,16 @@
     "books": {
       "Zpjěvníček 2": 21
     }
+  },
+  {
+    "id": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
+    "file": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
+    "title": "Všech vandráků múza",
+    "author": "Pavel Žalman Lohonka",
+    "number": 173,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 22
+    }
   }
 ]
