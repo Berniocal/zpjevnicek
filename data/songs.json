@@ -1871,6 +1871,14 @@
     }
   },
   {
+    "id": "171-panenka-tomas-klus",
+    "number": 171,
+    "title": "Panenka",
+    "author": "Tomáš Klus",
+    "file": "songs/171-panenka-tomas-klus.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -2037,10 +2045,10 @@
   },
   {
     "id": "songs/417-jednoducha-tomas-klus.pro",
-    "file": "songs/417-jednoducha-tomas-klus.pro",
+    "number": 417,
     "title": "Jednoduchá",
     "author": "Tomáš Klus",
-    "number": 417,
+    "file": "songs/417-jednoducha-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 18
