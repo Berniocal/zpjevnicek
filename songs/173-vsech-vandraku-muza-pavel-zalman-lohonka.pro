@@ -10,13 +10,11 @@ to nebyl [G]hřích po nocích,
 než [Fmaj7]po kytaře [G]sáhla,
 [Fmaj7]tak nám chleba [G]kradla 
 a [Fmaj7]čmárala po zd[Emi]ech.
-
    
-[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 [C]než skončíme [G]s Pánem 
 na hřbi[C]tově obu[G]tých.
 
@@ -29,11 +27,10 @@ až jeden [G]pán v limuzíně
 bu[Fmaj7]deš mi, holka, [G]sloužit, 
 a [Fmaj7]oženil se [Emi]s ní.
 
-[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 [C]než skončíme [G]s Pánem 
 na hřbi[C]tově obu[G]tých.
 
@@ -46,11 +43,10 @@ za pár [G]let tahle můza,
 Skon[Fmaj7]čila na [G]ulici
 a [Fmaj7]pod mostem má [Emi]byt.
 
-[Em]Ha-[D]le[G]luja,[C]zavírá se [G]brána
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 my [C]zpívat chcem do [G]rána, 
 [C]než napadá [G]sníh,
-[Em] [D] [G] [C] [G]
-[Ha-leluja,]
+[Em]Ha-[D]le[G]luja, [C]zavírá se [G]brána
 [C]než skončíme [G]s Pánem 
 na hřbi[C]tově obu[G]tých.
 
