@@ -1871,6 +1871,40 @@
     }
   },
   {
+    "id": "songs/171-panenka-tomas-klus.pro",
+    "number": 171,
+    "title": "Panenka",
+    "author": "Tomáš Klus",
+    "file": "songs/171-panenka-tomas-klus.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 20,
+      "Já, písničkář I": 32
+    }
+  },
+  {
+    "id": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
+    "number": 172,
+    "title": "Chci sluncem být",
+    "author": "Spirituál kvintet",
+    "file": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 21
+    }
+  },
+  {
+    "id": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
+    "number": 173,
+    "title": "Všech vandráků múza",
+    "author": "Pavel Žalman Lohonka",
+    "file": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 22
+    }
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -2044,40 +2078,6 @@
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 18
-    }
-  },
-  {
-    "id": "songs/171-panenka-tomas-klus.pro",
-    "file": "songs/171-panenka-tomas-klus.pro",
-    "title": "Panenka",
-    "author": "Tomáš Klus",
-    "number": 171,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 2": 20,
-      "Já, písničkář I": 32
-    }
-  },
-  {
-    "id": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
-    "file": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
-    "title": "Chci sluncem být",
-    "author": "Spirituál kvintet",
-    "number": 172,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 2": 21
-    }
-  },
-  {
-    "id": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
-    "file": "songs/173-vsech-vandraku-muza-pavel-zalman-lohonka.pro",
-    "title": "Všech vandráků múza",
-    "author": "Pavel Žalman Lohonka",
-    "number": 173,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 2": 22
     }
   }
 ]
