@@ -1870,7 +1870,7 @@
       "Já, písničkář I": 19
     }
   },
-   {
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
@@ -2054,8 +2054,19 @@
     "number": 171,
     "type": "chordpro",
     "books": {
-      "Zpjěvníček 2":20,
+      "Zpjěvníček 2": 20,
       "Já, písničkář I": 32
+    }
+  },
+  {
+    "id": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
+    "file": "songs/172-chci-sluncem-byt-spiritual-kvintet.pro",
+    "title": "Chci sluncem být",
+    "author": "Spirituál kvintet",
+    "number": 172,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 21
     }
   }
 ]
