@@ -2045,5 +2045,16 @@
     "books": {
       "Já, písničkář I": 18
     }
+  },
+  {
+    "id": "songs/171-panenka-tomas-klus.pro",
+    "file": "songs/171-panenka-tomas-klus.pro",
+    "title": "Panenka",
+    "author": "Tomáš Klus",
+    "number": 171,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 20
+    }
   }
 ]
