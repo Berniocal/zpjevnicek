@@ -2241,5 +2241,16 @@
     "books": {
       "Zpjěvníček 2": 36
     }
+  },
+  {
+    "id": "songs/188-nikde-zadnej-snih-pokac.pro",
+    "file": "songs/188-nikde-zadnej-snih-pokac.pro",
+    "title": "Nikde žádnej sníh",
+    "author": "Pokáč",
+    "number": 188,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 37
+    }
   }
 ]
