@@ -2219,5 +2219,16 @@
     "books": {
       "Zpjěvníček 2": 34
     }
+  },
+  {
+    "id": "songs/186-rande-michal-horak.pro",
+    "file": "songs/186-rande-michal-horak.pro",
+    "title": "Rande",
+    "author": "Michal Horák",
+    "number": 186,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 35
+    }
   }
 ]
