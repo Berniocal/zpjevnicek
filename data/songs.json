@@ -2230,5 +2230,16 @@
     "books": {
       "Zpjěvníček 2": 35
     }
+  },
+  {
+    "id": "songs/187-motyli-mandrage.pro",
+    "file": "songs/187-motyli-mandrage.pro",
+    "title": "Motýli",
+    "author": "Mandrage",
+    "number": 187,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 36
+    }
   }
 ]
