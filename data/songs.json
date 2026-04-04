@@ -2131,5 +2131,16 @@
     "books": {
       "Zpjěvníček 2": 26
     }
+  },
+  {
+    "id": "songs/178-nechte-vlajky-vlat-ales-brichta.pro",
+    "file": "songs/178-nechte-vlajky-vlat-ales-brichta.pro",
+    "title": "Nechte vlajky vlát",
+    "author": "Aleš Brichta",
+    "number": 178,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 27
+    }
   }
 ]
