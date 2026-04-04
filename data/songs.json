@@ -2175,5 +2175,16 @@
     "books": {
       "Zpjěvníček 2": 30
     }
+  },
+  {
+    "id": "songs/182-kdyz-me-brali-za-vojaka-jaromir-nohavica.pro",
+    "file": "songs/182-kdyz-me-brali-za-vojaka-jaromir-nohavica.pro",
+    "title": "Když mě brali za vojáka",
+    "author": "Jaromír Nohavica",
+    "number": 182,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 31
+    }
   }
 ]
