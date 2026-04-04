@@ -2263,5 +2263,16 @@
     "books": {
       "Zpjěvníček 2": 38
     }
+  },
+  {
+    "id": "songs/189-mam-doma-kocku-pokac.pro",
+    "file": "songs/189-mam-doma-kocku-pokac.pro",
+    "title": "Mám doma kočku",
+    "author": "Pokáč",
+    "number": 189,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 38
+    }
   }
 ]
