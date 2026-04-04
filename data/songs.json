@@ -2109,5 +2109,16 @@
     "books": {
       "Zpjěvníček 2": 24
     }
+  },
+  {
+    "id": "songs/176-eldorado-waldemar-matuska.pro",
+    "file": "songs/176-eldorado-waldemar-matuska.pro",
+    "title": "Eldorádo",
+    "author": "Waldemar Matuška",
+    "number": 176,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 25
+    }
   }
 ]
