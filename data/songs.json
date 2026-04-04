@@ -2079,5 +2079,16 @@
     "books": {
       "Já, písničkář I": 18
     }
+  },
+  {
+    "id": "songs/174-sametova-zluty-pes.pro",
+    "file": "songs/174-sametova-zluty-pes.pro",
+    "title": "Sametová",
+    "author": "Žlutý pes",
+    "number": 174,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 23
+    }
   }
 ]
