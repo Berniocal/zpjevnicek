@@ -2098,5 +2098,16 @@
     "books": {
       "Zpjěvníček 2": 23
     }
+  },
+  {
+    "id": "songs/175-na-kameni-kamen-jan-nedved.pro",
+    "file": "songs/175-na-kameni-kamen-jan-nedved.pro",
+    "title": "Na kameni kámen",
+    "author": "Jan Nedvěd",
+    "number": 175,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 24
+    }
   }
 ]
