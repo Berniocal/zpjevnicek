@@ -2142,5 +2142,16 @@
     "books": {
       "Zpjěvníček 2": 27
     }
+  },
+  {
+    "id": "songs/179-ved-me-dal-cesto-ma-pavel-bobek.pro",
+    "file": "songs/179-ved-me-dal-cesto-ma-pavel-bobek.pro",
+    "title": "Veď mě dál, cesto má",
+    "author": "Pavel Bobek",
+    "number": 179,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 28
+    }
   }
 ]
