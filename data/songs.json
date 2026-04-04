@@ -2252,5 +2252,16 @@
     "books": {
       "Zpjěvníček 2": 37
     }
+  },
+  {
+    "id": "songs/189-probuzeni-pokac.pro",
+    "file": "songs/189-probuzeni-pokac.pro",
+    "title": "Probuzení",
+    "author": "Pokáč",
+    "number": 189,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 38
+    }
   }
 ]
