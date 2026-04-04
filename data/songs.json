@@ -2186,5 +2186,16 @@
     "books": {
       "Zpjěvníček 2": 31
     }
+  },
+  {
+    "id": "songs/183-kometa-jaromir-nohavica.pro",
+    "file": "songs/183-kometa-jaromir-nohavica.pro",
+    "title": "Kometa",
+    "author": "Jaromír Nohavica",
+    "number": 183,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 32
+    }
   }
 ]
