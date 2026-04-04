@@ -2120,5 +2120,16 @@
     "books": {
       "Zpjěvníček 2": 25
     }
+  },
+  {
+    "id": "songs/177-jdou-po-mne-jdou-jaromir-nohavica.pro",
+    "file": "songs/177-jdou-po-mne-jdou-jaromir-nohavica.pro",
+    "title": "Jdou po mně jdou",
+    "author": "Jaromír Nohavica",
+    "number": 177,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 26
+    }
   }
 ]
