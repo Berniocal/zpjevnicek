@@ -2395,5 +2395,16 @@
     "books": {
       "Zpjěvníček 2": 50
     }
+  },
+  {
+    "id": "songs/202-litej-davidovi-mirai.pro",
+    "file": "songs/202-litej-davidovi-mirai.pro",
+    "title": "Lítej (Davidovi)",
+    "author": "Mirai",
+    "number": 202,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 51
+    }
   }
 ]
