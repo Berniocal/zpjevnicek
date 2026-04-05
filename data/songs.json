@@ -2285,5 +2285,16 @@
     "books": {
       "Zpjěvníček 2": 40
     }
+  },
+  {
+    "id": "songs/192-je-to-tak-michal-horak.pro",
+    "file": "songs/192-je-to-tak-michal-horak.pro",
+    "title": "Je to tak",
+    "author": "Michal Horák",
+    "number": 192,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 41
+    }
   }
 ]
