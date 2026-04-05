@@ -2340,5 +2340,16 @@
     "books": {
       "Zpjěvníček 2": 45
     }
+  },
+  {
+    "id": "songs/197-nekonfliktni-txp-michal-horak.pro",
+    "file": "songs/197-nekonfliktni-txp-michal-horak.pro",
+    "title": "Nekonfliktní txp",
+    "author": "Michal Horák",
+    "number": 197,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 46
+    }
   }
 ]
