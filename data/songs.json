@@ -2307,5 +2307,16 @@
     "books": {
       "Zpjěvníček 2": 42
     }
+  },
+  {
+    "id": "songs/193-jeste-jednu-noc-jelen.pro",
+    "file": "songs/193-jeste-jednu-noc-jelen.pro",
+    "title": "Ještě jednu noc",
+    "author": "Jelen",
+    "number": 193,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 42
+    }
   }
 ]
