@@ -2318,5 +2318,16 @@
     "books": {
       "Zpjěvníček 2": 42
     }
+  },
+  {
+    "id": "songs/195-hej-teto-michal-horak.pro",
+    "file": "songs/195-hej-teto-michal-horak.pro",
+    "title": "Hej teto!",
+    "author": "Michal Horák",
+    "number": 195,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 44
+    }
   }
 ]
