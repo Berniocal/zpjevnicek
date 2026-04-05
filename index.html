@@ -128,6 +128,7 @@
       </select>
 
       <button id="btnPlaylists">Playlisty</button>
+      <button id="btnNavrhy">Návrhy</button>
 </div>
 
     <!-- view: hlavní seznam -->
@@ -560,6 +561,9 @@ document.getElementById('btnImportPl').onclick = async ()=>{
 
 /* ------- navigace mezi views ------- */
 document.getElementById('btnPlaylists').onclick = ()=>{ location.hash='playlists'; };
+document.getElementById('btnNavrhy').onclick = ()=>{
+  window.open('https://forms.gle/Jg2KMry3E9DbJtKB7', '_blank');
+};
 document.getElementById('backToMain').onclick = ()=> history.back();        // seznam playlistů -> hlavní
 document.getElementById('backToPlaylists').onclick = ()=> history.back();   // detail -> seznam playlistů
 
