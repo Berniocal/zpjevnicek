@@ -2351,5 +2351,16 @@
     "books": {
       "Zpjěvníček 2": 46
     }
+  },
+  {
+    "id": "songs/198-je-nam-30-pokac-a-cadek.pro",
+    "file": "songs/198-je-nam-30-pokac-a-cadek.pro",
+    "title": "Je nám 30",
+    "author": "Pokáč a Čadek",
+    "number": 198,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 47
+    }
   }
 ]
