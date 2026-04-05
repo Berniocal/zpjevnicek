@@ -2373,5 +2373,16 @@
     "books": {
       "Zpjěvníček 2": 48
     }
+  },
+  {
+    "id": "songs/200-z-diplomky-nemam-nic-michal-horak.pro",
+    "file": "songs/200-z-diplomky-nemam-nic-michal-horak.pro",
+    "title": "Z diplomky nemám nic",
+    "author": "Michal Horák",
+    "number": 200,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 49
+    }
   }
 ]
