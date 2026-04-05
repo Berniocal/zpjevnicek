@@ -2417,5 +2417,16 @@
     "books": {
       "Zpjěvníček 2": 52
     }
+  },
+  {
+    "id": "songs/204-rodinny-typ-pokac.pro",
+    "file": "songs/204-rodinny-typ-pokac.pro",
+    "title": "Rodinný typ",
+    "author": "Pokáč",
+    "number": 204,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 53
+    }
   }
 ]
