@@ -2406,5 +2406,16 @@
     "books": {
       "Zpjěvníček 2": 51
     }
+  },
+  {
+    "id": "songs/203-julie-wanastowi-vjecy.pro",
+    "file": "songs/203-julie-wanastowi-vjecy.pro",
+    "title": "Julie",
+    "author": "Wanastowi Vjecy",
+    "number": 203,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 52
+    }
   }
 ]
