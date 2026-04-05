@@ -2274,5 +2274,16 @@
     "books": {
       "Zpjěvníček 2": 39
     }
+  },
+  {
+    "id": "songs/191-vymlaceny-entry-pokac.pro",
+    "file": "songs/191-vymlaceny-entry-pokac.pro",
+    "title": "Vymlácený entry",
+    "author": "Pokáč",
+    "number": 191,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 40
+    }
   }
 ]
