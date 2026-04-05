@@ -2329,5 +2329,16 @@
     "books": {
       "Zpjěvníček 2": 44
     }
+  },
+  {
+    "id": "songs/196-v-7-25-michal-horak.pro",
+    "file": "songs/196-v-7-25-michal-horak.pro",
+    "title": "V 7:25",
+    "author": "Michal Horák",
+    "number": 196,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 45
+    }
   }
 ]
