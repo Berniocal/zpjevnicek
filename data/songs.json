@@ -2296,5 +2296,16 @@
     "books": {
       "Zpjěvníček 2": 41
     }
+  },
+  {
+    "id": "songs/193-podme-spolu-cechomor.pro",
+    "file": "songs/193-podme-spolu-cechomor.pro",
+    "title": "Poďmě spolu",
+    "author": "Čechomor",
+    "number": 193,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 42
+    }
   }
 ]
