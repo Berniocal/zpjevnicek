@@ -2442,5 +2442,16 @@
     "books": {
       "Já, písničkář I": 20
     }
+  },
+  {
+    "id": "songs/419-kfjetina-tomas-klus.pro",
+    "file": "songs/419-kfjetina-tomas-klus.pro",
+    "title": "Kfjetina",
+    "author": "Tomáš Klus",
+    "number": 419,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 21
+    }
   }
 ]
