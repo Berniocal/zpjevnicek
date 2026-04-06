@@ -2431,5 +2431,16 @@
     "books": {
       "Já, písničkář I": 18
     }
+  },
+  {
+    "id": "songs/418-valecna-tomas-klus.pro",
+    "file": "songs/418-valecna-tomas-klus.pro",
+    "title": "Válečná",
+    "author": "Tomáš Klus",
+    "number": 418,
+    "type": "chordpro",
+    "books": {
+      "Já, písničkář I": 20
+    }
   }
 ]
