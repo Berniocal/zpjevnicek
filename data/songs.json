@@ -2126,7 +2126,7 @@
   },
   {
     "id": "songs/193-podme-spolu-cechomor.pro",
-    "number": 194,
+    "number": 193,
     "title": "Poďmě spolu",
     "author": "Čechomor",
     "file": "songs/193-podme-spolu-cechomor.pro",
@@ -2255,6 +2255,14 @@
     "books": {
       "Zpjěvníček 2": 54
     }
+  },
+  {
+    "id": "206-kdyz-jsem-sel-z-hradista-lidova",
+    "number": 206,
+    "title": "Když jsem šel z Hradišťa",
+    "author": "Lidová",
+    "file": "songs/206-kdyz-jsem-sel-z-hradista-lidova.pro",
+    "type": "chordpro"
   },
   {
     "id": "songs/400-cas-tomas-klus.pro",
@@ -2434,10 +2442,10 @@
   },
   {
     "id": "songs/418-valecna-tomas-klus.pro",
-    "file": "songs/418-valecna-tomas-klus.pro",
+    "number": 418,
     "title": "Válečná",
     "author": "Tomáš Klus",
-    "number": 418,
+    "file": "songs/418-valecna-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 20
@@ -2445,10 +2453,10 @@
   },
   {
     "id": "songs/419-kfjetina-tomas-klus.pro",
-    "file": "songs/419-kfjetina-tomas-klus.pro",
+    "number": 419,
     "title": "Kfjetina",
     "author": "Tomáš Klus",
-    "number": 419,
+    "file": "songs/419-kfjetina-tomas-klus.pro",
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 21
