@@ -2483,5 +2483,16 @@
     "books": {
       "Zpjěvníček 2": 56
     }
+  },
+  {
+    "id": "songs/208-jasna-zprava-olympic.pro",
+    "file": "songs/208-jasna-zprava-olympic.pro",
+    "title": "Jasná zpráva",
+    "author": "Olympic",
+    "number": 208,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 57
+    }
   }
 ]
