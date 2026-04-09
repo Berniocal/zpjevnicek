@@ -2516,5 +2516,16 @@
     "books": {
       "Zpjěvníček 2": 59
     }
+  },
+  {
+    "id": "songs/211-bude-mi-lehka-zem-petr-hapka.pro",
+    "file": "songs/211-bude-mi-lehka-zem-petr-hapka.pro",
+    "title": "Bude mi lehká zem",
+    "author": "Petr Hapka",
+    "number": 211,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 60
+    }
   }
 ]
