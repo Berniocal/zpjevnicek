@@ -2472,5 +2472,16 @@
     "books": {
       "Zpjěvníček 2": 55
     }
+  },
+  {
+    "id": "songs/207-morituri-te-salutant-karel-kryl.pro",
+    "file": "songs/207-morituri-te-salutant-karel-kryl.pro",
+    "title": "Morituri te salutant",
+    "author": "Karel Kryl",
+    "number": 207,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 56
+    }
   }
 ]
