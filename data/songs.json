@@ -2505,5 +2505,16 @@
     "books": {
       "Zpjěvníček 2": 58
     }
+  },
+  {
+    "id": "songs/210-sbohem-galanecko-vlasta-redl.pro",
+    "file": "songs/210-sbohem-galanecko-vlasta-redl.pro",
+    "title": "Sbohem, galánečko",
+    "author": "Vlasta Redl",
+    "number": 210,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 59
+    }
   }
 ]
