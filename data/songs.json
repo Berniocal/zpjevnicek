@@ -2453,5 +2453,16 @@
     "books": {
       "Já, písničkář I": 21
     }
+  },
+  {
+    "id": "songs/206-kdyz-jsem-sel-z-hradista-lidova.pro",
+    "file": "songs/206-kdyz-jsem-sel-z-hradista-lidova.pro",
+    "title": "Když jsem šel z Hradišťa",
+    "author": "Lidová",
+    "number": 206,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 55
+    }
   }
 ]
