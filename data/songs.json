@@ -2574,5 +2574,16 @@
     "books": {
       "Já, písničkář I": 21
     }
+  },
+  {
+    "id": "songs/217-ztracis-marek-ztraceny.pro",
+    "file": "songs/217-ztracis-marek-ztraceny.pro",
+    "title": "Ztrácíš",
+    "author": "Marek Ztracený",
+    "number": 217,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 66
+    }
   }
 ]
