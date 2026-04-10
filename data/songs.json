@@ -2560,5 +2560,16 @@
     "books": {
       "Zpjěvníček 2": 63
     }
+  },
+  {
+    "id": "songs/215-velrybarska-vyprava-pacifik.pro",
+    "file": "songs/215-velrybarska-vyprava-pacifik.pro",
+    "title": "Velrybářská výprava",
+    "author": "Pacifik",
+    "number": 215,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 64
+    }
   }
 ]
