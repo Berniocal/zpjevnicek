@@ -2626,5 +2626,16 @@
     "books": {
       "Zpjěvníček 2": 69
     }
+  },
+  {
+    "id": "songs/221-proklinam-janek-ledecky.pro",
+    "file": "songs/221-proklinam-janek-ledecky.pro",
+    "title": "Proklínám",
+    "author": "Janek Ledecký",
+    "number": 221,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 70
+    }
   }
 ]
