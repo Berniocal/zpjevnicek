@@ -2604,5 +2604,16 @@
     "books": {
       "Zpjěvníček 2": 67
     }
+  },
+  {
+    "id": "songs/219-reklama-na-ticho-team.pro",
+    "file": "songs/219-reklama-na-ticho-team.pro",
+    "title": "Reklama na ticho",
+    "author": "Team",
+    "number": 219,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 68
+    }
   }
 ]
