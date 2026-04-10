@@ -1,5 +1,5 @@
-{title: Ztrácíš}
-{artist: Marek Ztracený}
+{title: Mám na teba chuť}
+{artist: Elán}
 {book: Zpjěvníček 2 = 67}
 
 [/:][C#m][A][E][H][:/][X2]
