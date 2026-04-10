@@ -12,8 +12,8 @@ a teď už jenom Raz, Dva, Tři!
 [A]ta hrubá síla, galoše plný mouru mám.
 
 [A]Pochodem vchod, [H]páry těžkejch bot
-[D][F]unguje to [F#]líp než namazanej stroj
-[A][D]okola je tma, [H]nějakej permoník
+[D]Funguje to [F#]líp než namazanej stroj
+[A]Dokola je tma, [H]nějakej permoník
 [D]tu z díry civí [F#]jako Němec na orloj
 
 [A]Herodes tango tančí za zvuku kovadlin,
