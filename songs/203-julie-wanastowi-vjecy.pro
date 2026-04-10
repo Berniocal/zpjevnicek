@@ -9,7 +9,7 @@ Dívko, [Am]ty krás[G]ná jak [C]měsíční [D]svit,
 dívko, [Am]ty křeh[G]ká jsi [C]jak lili[D]e,
 [Dm]vykvetlas [Am]do krásy, [G]má Juli[Am]e!
 
-Děvče m[Am]ý voňav[G]ý jak h[C]rachovej l[D]usk,
+Děvče [Am]mý voňa[G]vý jak [C]hrachovej [D]lusk,
 [Dm]počítej [Am]hvězdičky [Em]a pak mě [Am]pusť,
 voči [Am]máš mod[G]rý co [C]hortenzi[D]e,
 [Dm]volá mě [Am]královna [G]Terezi[Am]e.
@@ -19,7 +19,7 @@ Pro ní [Am]já půj[G]du do [C]patáli[D]e,
 vojna [Am]si vzala [G]mě a [C]já si vzal [D]ji,
 [Dm]v noci se [Am]slzy mý [G]rozkutá[Am]lí.
 
-A jestli t[Am]vý srdíčk[G]o p[C]láče žal[D]em,
+A jestli [Am]tvý srdíč[G]ko [C]pláče ža[D]lem,
 [Dm]stanu se [Am]pro tebe [Em]dezentý[Am]rem,
 jestli [Am]tvý o[G]či jsou [C]uplaka[D]ný,
 [Dm]zahodím [Am]šavličku [G]v štyry stra[Am]ny.[Am]
@@ -43,7 +43,7 @@ Dívko, [Am]ty krás[G]ná jak [C]měsíční [D]svit,
 [Dm]pojď se mnou [Am]štěpnicí, [Em]začíná [Am]hřmít,
 dívko, [Am]ty křeh[G]ká jsi [C]jak lili[D]e,
 [Dm]vykvetlas [Am]do krásy, [G]má Juli[Am]e!
-Děvče m[Am]ý voňav[G]ý jak h[C]rachovej l[D]usk,
+Děvče [Am]mý voňa[G]vý jak [C]hrachovej [D]lusk,
 [Dm]počítej [Am]hvězdičky [Em]a pak mě [Am]pusť,
 voči [Am]máš mod[G]rý co [C]hortenzi[D]e,
 [Dm]volá mě [Am]královna [G]Terezi[Am]e.[Am]
