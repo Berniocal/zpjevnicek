@@ -2593,5 +2593,16 @@
     "books": {
       "Zpjěvníček 2": 66
     }
+  },
+  {
+    "id": "songs/218-ztracis-marek-ztraceny.pro",
+    "file": "songs/218-ztracis-marek-ztraceny.pro",
+    "title": "Ztrácíš",
+    "author": "Marek Ztracený",
+    "number": 218,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 67
+    }
   }
 ]
