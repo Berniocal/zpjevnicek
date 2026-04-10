@@ -2549,5 +2549,16 @@
     "books": {
       "Zpjěvníček 2": 62
     }
+  },
+  {
+    "id": "songs/214-rada-se-miluje-karel-plihal.pro",
+    "file": "songs/214-rada-se-miluje-karel-plihal.pro",
+    "title": "Ráda se miluje",
+    "author": "Karel Plíhal",
+    "number": 214,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 63
+    }
   }
 ]
