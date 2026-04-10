@@ -2378,6 +2378,14 @@
     }
   },
   {
+    "id": "217-ztracis-marek-ztraceny",
+    "number": 217,
+    "title": "Ztrácíš",
+    "author": "Marek Ztracený",
+    "file": "songs/217-ztracis-marek-ztraceny.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
