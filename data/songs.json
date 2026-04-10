@@ -2641,5 +2641,16 @@
     "books": {
       "Já, písničkář I": 21
     }
+  },
+  {
+    "id": "songs/223-holubi-dum-jiri-schelinger.pro",
+    "file": "songs/223-holubi-dum-jiri-schelinger.pro",
+    "title": "Holubí dům",
+    "author": "Jiří Schelinger",
+    "number": 223,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 72
+    }
   }
 ]
