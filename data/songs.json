@@ -2615,5 +2615,16 @@
     "books": {
       "Zpjěvníček 2": 68
     }
+  },
+  {
+    "id": "songs/220-dole-v-dole-kabat.pro",
+    "file": "songs/220-dole-v-dole-kabat.pro",
+    "title": "Dole v dole",
+    "author": "Kabát",
+    "number": 220,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 69
+    }
   }
 ]
