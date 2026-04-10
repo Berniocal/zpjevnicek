@@ -11,7 +11,7 @@ Na to, [Hm]co tě v mozku lehtá
 [D]Nic se [G]neboj a [D]vem si 
 [G]něco od [D]ní[G][D][G]  
 
-Abych [G]zabil dvě [D]mouchy 
+[D]Abych [G]zabil dvě [D]mouchy 
 [G]jednou ra[D]nou[G][D][G]  
 [D]Želví [G]nervy od [D]želvy 
 s[G]chovám stra[D]nou[G][D]  
