@@ -24,7 +24,7 @@ vždyť to [Am]ví, že jsem [Hm]chtěl pro ni [Em]žít
 [G]Od[D]rů[G]stáš chlape[D]ckým střeví[G]cům
 [Em]ne[D]sly[C]šíš holu[Hm]bích křídel [Em]šum
 
-[Em]Na[Db]í[C]zej úpla[Hm]tou coko[Em]li
+[Em]Na[D]bí[C]zej úpla[Hm]tou coko[Em]li
 [Em]ne[D]po[C]jíš cukro[Hm]vých homo[Em]lí
 [G]Mů[D]žeš [G]mít třeba [D]zrak soko[G]lí
 [Em]ne[D]spa[C]tříš ztrace[Hm]né údo[Em]lí
