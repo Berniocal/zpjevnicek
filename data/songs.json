@@ -2637,5 +2637,17 @@
     "books": {
       "Zpjěvníček 2": 70
     }
+  },
+  {
+    "id": "songs/222-panu-bohu-do-oken-tomas-klus.pro",
+    "file": "songs/222-panu-bohu-do-oken-tomas-klus.pro",
+    "title": "Pánu bohu do oken",
+    "author": "Tomáš Klus",
+    "number": 222,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 71,
+      "Já, písničkář II": 17
+    }
   }
 ]
