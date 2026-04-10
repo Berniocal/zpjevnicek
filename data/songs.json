@@ -2527,5 +2527,16 @@
     "books": {
       "Zpjěvníček 2": 60
     }
+  },
+  {
+    "id": "songs/212-co-bylo-dal-jelen.pro",
+    "file": "songs/212-co-bylo-dal-jelen.pro",
+    "title": "Co bylo dál?",
+    "author": "Jelen",
+    "number": 212,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 61
+    }
   }
 ]
