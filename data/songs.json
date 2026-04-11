@@ -2456,6 +2456,14 @@
     }
   },
   {
+    "id": "224-rosa-na-kolejich-wabi-danek",
+    "number": 224,
+    "title": "Rosa na kolejích",
+    "author": "Wabi Daněk",
+    "file": "songs/224-rosa-na-kolejich-wabi-danek.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
