@@ -2652,5 +2652,16 @@
     "books": {
       "Já, písničkář I": 21
     }
+  },
+  {
+    "id": "songs/224-rosa-na-kolejich-wabi-danek.pro",
+    "file": "songs/224-rosa-na-kolejich-wabi-danek.pro",
+    "title": "Rosa na kolejích",
+    "author": "Wabi Daněk",
+    "number": 224,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 73
+    }
   }
 ]
