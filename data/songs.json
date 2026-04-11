@@ -2671,5 +2671,16 @@
     "books": {
       "Zpjěvníček 2": 73
     }
+  },
+  {
+    "id": "songs/225-okolo-hradce-lidova.pro",
+    "file": "songs/225-okolo-hradce-lidova.pro",
+    "title": "Okolo Hradce",
+    "author": "Lidová",
+    "number": 225,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 74
+    }
   }
 ]
