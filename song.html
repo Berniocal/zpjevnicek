@@ -213,7 +213,7 @@
         </div>
 
         <div id="controls-cp" class="player" style="display:none">
-          <span class="kbd">Transponovat:
+          <span class="kbd">Transponovat [<span id="transposeValue">0</span>]:
             <button id="down" type="button">−</button>
             <button id="up"   type="button">+</button>
           </span>
@@ -222,7 +222,7 @@
               <span id="autoBtnIcon">✅</span>
             </button>
           </span>
-          <span class="kbd">Velikost:
+          <span class="kbd">Velikost [<span id="fontValue">1</span>]:
             <button id="fontDown" type="button">−</button>
             <button id="fontUp"   type="button">+</button>
           </span>
@@ -295,7 +295,27 @@ const book = params.get('book') || '';
 let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
   let CP_TEXT = '';      // uložíme si původní ChordPro text pro re-render
-let CP_TRANS = 0;      // aktuální transpozice pro re-render
+let CP_TRANS = 0;
+
+// --- NOVÉ: per-song nastavení ---
+function songKey(suffix){
+  return 'zpj_song_' + (id || 'unknown') + '_' + suffix;
+}
+
+function loadSongSettings(){
+  const t = parseInt(localStorage.getItem(songKey('transpose')) || '0', 10);
+  const f = parseFloat(localStorage.getItem(songKey('font')) || '1');
+  return { t, f };
+}
+
+function saveTranspose(val){
+  localStorage.setItem(songKey('transpose'), String(val));
+}
+
+function saveFont(val){
+  localStorage.setItem(songKey('font'), String(val));
+}
+      // aktuální transpozice pro re-render
 
 let justSwipedTs = 0;
 let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
@@ -869,7 +889,7 @@ if (book){
     document.getElementById('controls-cp').style.display='flex';
     const text = await fetch(song.file).then(r=>r.text());
 CP_TEXT = text;
-let trans = 0;
+const settings = loadSongSettings(); let trans = settings.t;
 CP_TRANS = 0;
 
 const render = ()=>{
@@ -896,15 +916,15 @@ const render = ()=>{
   updateChromeHeight();
 };
 
-render();
+render(); document.getElementById('transposeValue').textContent = trans;
 
-document.getElementById('up').onclick   = ()=>{ trans += 1; render(); };
-document.getElementById('down').onclick = ()=>{ trans -= 1; render(); };
+document.getElementById('up').onclick   = ()=>{ trans += 1; saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
+document.getElementById('down').onclick = ()=>{ trans -= 1; saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
 
 
-    let scale = getScale();
-    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); };
-    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); };
+    let scale = loadSongSettings().f || getScale(); setScale(scale); document.getElementById('fontValue').textContent = scale.toFixed(2);
+    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
+    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
