@@ -120,15 +120,6 @@
   /* Dialog sdílení */
   dialog{ border:1px solid #1f2b46; border-radius:12px; background:var(--card); color:var(--ink); }
   dialog::backdrop{ background:rgba(0,0,0,.4); }
-
-<style>
-.mode-active{
-  border:2px solid #a855f7;
-  border-radius:6px;
-  padding:2px 6px;
-}
-</style>
-
 </style>
 </head>
 <body>
@@ -305,16 +296,14 @@ let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
   let CP_TEXT = '';      // uložíme si původní ChordPro text pro re-render
 let CP_TRANS = 0;
-
-// --- režimy ukládání ---
 let SAVE_TRANSPOSE = true;
 let SAVE_FONT = true;
 
 function updateModeUI(){
   const t = document.getElementById('transposeLabel');
   const f = document.getElementById('fontLabel');
-  if(t) t.classList.toggle('mode-active', !SAVE_TRANSPOSE);
-  if(f) f.classList.toggle('mode-active', !SAVE_FONT);
+  if(t) t.style.border = SAVE_TRANSPOSE ? '' : '2px solid #a855f7';
+  if(f) f.style.border = SAVE_FONT ? '' : '2px solid #a855f7';
 }
 
 
@@ -405,6 +394,18 @@ async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
   while (performance.now() - t0 < timeoutMs){
     // vynucení layoutu po reflow (sloupce + akordy)
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
     relayoutChords();
 
     const s = getViewScrollState();
@@ -742,7 +743,19 @@ function fixChordOverlaps(root){
 /* --- Layout helpers --- */
 function relayoutChords(){ const cp=document.querySelector('#view .cp'); if(!cp) return; requestAnimationFrame(()=>fixChordOverlaps(cp)); }
 function updateChromeHeight(){ const ch=document.getElementById('chrome'); const h=ch?ch.getBoundingClientRect().height:0; document.documentElement.style.setProperty('--chromeH',(h||0)+'px'); }
-function setChromeHidden(h){ CHROME_HIDDEN=!!h; document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN); localStorage.setItem('chromeHidden', CHROME_HIDDEN?'1':'0'); updateChromeHeight(); }
+function setChromeHidden(h){ CHROME_HIDDEN=!!h; document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN); localStorage.setItem('chromeHidden', CHROME_HIDDEN?'1':'0'); updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+ }
 
 /* --- ovládání lišty + swipe --- */
 function wireDoubleToggle(){
@@ -924,6 +937,18 @@ const render = ()=>{
     view.appendChild(el);
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
     requestAnimationFrame(()=>{ /* jen aby se layout dosadil */ });
     return;
   }
@@ -935,6 +960,18 @@ const render = ()=>{
   requestAnimationFrame(()=>fixChordOverlaps(el));
   applyChordVisibility();
   updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
 };
 
 render(); document.getElementById('transposeValue').textContent = trans;
@@ -943,7 +980,7 @@ document.getElementById('up').onclick   = ()=>{ trans += 1; if(SAVE_TRANSPOSE) s
 document.getElementById('down').onclick = ()=>{ trans -= 1; if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
 
 
-    let scale = SAVE_FONT ? (loadSongSettings().f || getScale()) : getScale(); setScale(scale); document.getElementById('fontValue').textContent = scale.toFixed(2);
+    let scale = loadSongSettings().f || getScale(); setScale(scale); document.getElementById('fontValue').textContent = scale.toFixed(2);
     document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
     document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
 
@@ -958,6 +995,18 @@ document.getElementById('toggleChords').onclick = ()=>{
     view.appendChild(renderChordProPlain(CP_TEXT));
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
   } else {
     view.innerHTML = '';
     const el = renderChordPro(CP_TEXT, CP_TRANS);
@@ -965,6 +1014,18 @@ document.getElementById('toggleChords').onclick = ()=>{
     requestAnimationFrame(()=>fixChordOverlaps(el));
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
   }
 };
 
@@ -998,46 +1059,8 @@ document.getElementById('toggleChords').onclick = ()=>{
     COLS = (COLS === 1) ? 2 : 1;
     localStorage.setItem(ZPJ_COLS_KEY, String(COLS));
     applyColumns();
-// klikání na režimy
-window.addEventListener('load', ()=>{
-  const tLabel = document.getElementById('transposeLabel');
-  if(tLabel) tLabel.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
-  updateModeUI();
-});
-});
-
-  const fLabel = document.getElementById('fontLabel');
-  if(fLabel) fLabel.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
-  updateModeUI();
-});
-});
-
-updateModeUI();
-});
-
   };
   applyColumns();
-// klikání na režimy
-window.addEventListener('load', ()=>{
-  const tLabel = document.getElementById('transposeLabel');
-  if(tLabel) tLabel.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
-  updateModeUI();
-});
-});
-
-  const fLabel = document.getElementById('fontLabel');
-  if(fLabel) fLabel.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
-  updateModeUI();
-});
-});
-
-updateModeUI();
-});
-
 
 
   // 7) Panel nastavení – předvyplň + ulož/reset
@@ -1116,6 +1139,18 @@ try { wireSwipeNavigation(); } catch(e){ console.warn('wireSwipeNavigation faile
 wireAutoScrollDesktopControls();
 updateChromeHeight();
 
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
+
 }
 
 
@@ -1129,6 +1164,18 @@ function applyChordVisibility(){
 let _resizeTO;
 function onResizeReflow(){
   updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT;
+  updateModeUI();
+});
+updateModeUI();
+
   relayoutChords();
 }
 
