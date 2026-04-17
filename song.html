@@ -999,32 +999,44 @@ document.getElementById('toggleChords').onclick = ()=>{
     localStorage.setItem(ZPJ_COLS_KEY, String(COLS));
     applyColumns();
 // klikání na režimy
-document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+window.addEventListener('load', ()=>{
+  const tLabel = document.getElementById('transposeLabel');
+  if(tLabel) tLabel.addEventListener('click', ()=>{
   SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
   updateModeUI();
 });
+});
 
-document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  const fLabel = document.getElementById('fontLabel');
+  if(fLabel) fLabel.addEventListener('click', ()=>{
   SAVE_FONT = !SAVE_FONT;
   updateModeUI();
 });
+});
 
 updateModeUI();
+});
 
   };
   applyColumns();
 // klikání na režimy
-document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+window.addEventListener('load', ()=>{
+  const tLabel = document.getElementById('transposeLabel');
+  if(tLabel) tLabel.addEventListener('click', ()=>{
   SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
   updateModeUI();
 });
+});
 
-document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  const fLabel = document.getElementById('fontLabel');
+  if(fLabel) fLabel.addEventListener('click', ()=>{
   SAVE_FONT = !SAVE_FONT;
   updateModeUI();
 });
+});
 
 updateModeUI();
+});
 
 
 
