@@ -137,71 +137,7 @@
       <body style="font-family:sans-serif;text-align:center;padding:2rem">
         <h2>Přístup odepřen</h2>
         <p>Tento zpěvník je určen pouze pro uzavřenou skupinu.</p>
-      
-<script>
-(function(){
-  let SAVE_MODE = localStorage.getItem('global_save_mode') !== '0';
-
-  function updateIcon(){
-    const btn = document.getElementById('modeToggle');
-    if(btn) btn.textContent = SAVE_MODE ? '💾' : '🌐';
-  }
-
-  function applyInitialState(){
-    if(!SAVE_MODE){
-      // reset to defaults
-      if(typeof setScale === 'function'){
-        setScale(1);
-      }
-      if(typeof CP_TRANS !== 'undefined'){
-        CP_TRANS = 0;
-      }
-    }
-  }
-
-  window.addEventListener('load', ()=>{
-    const btn = document.getElementById('modeToggle');
-
-    if(btn){
-      btn.onclick = ()=>{
-        SAVE_MODE = !SAVE_MODE;
-        localStorage.setItem('global_save_mode', SAVE_MODE ? '1':'0');
-        updateIcon();
-
-        if(!SAVE_MODE){
-          // přepnutí do globálního režimu → reset
-          if(typeof setScale === 'function'){
-            setScale(1);
-          }
-          if(typeof CP_TRANS !== 'undefined'){
-            CP_TRANS = 0;
-          }
-        } else {
-          // návrat → reload písně aby se načetly uložené hodnoty
-          location.reload();
-        }
-      };
-    }
-
-    updateIcon();
-    applyInitialState();
-  });
-
-  // override ukládání
-  const origSaveTranspose = window.saveTranspose;
-  window.saveTranspose = function(val){
-    if(SAVE_MODE && origSaveTranspose) origSaveTranspose(val);
-  };
-
-  const origSaveFont = window.saveFont;
-  window.saveFont = function(val){
-    if(SAVE_MODE && origSaveFont) origSaveFont(val);
-  };
-
-})();
-</script>
-
-</body>`;
+      </body>`;
     document.documentElement.style.display = "block";
     throw new Error("Access denied");
   }
@@ -277,7 +213,7 @@
         </div>
 
         <div id="controls-cp" class="player" style="display:none">
-          <span class="kbd">Transponovat: <span id="transposeValue" style="margin:0 6px;">0</span>
+          <span class="kbd"><span id="transposeLabel" style="cursor:pointer;">Transponovat</span>: <span id="transposeValue" style="margin:0 6px;">0</span>
             <button id="down" type="button">−</button>
             <button id="up"   type="button">+</button>
           </span>
@@ -286,7 +222,7 @@
               <span id="autoBtnIcon">✅</span>
             </button>
           </span>
-          <span class="kbd">Velikost: <span id="fontValue" style="margin:0 6px;">1</span>
+          <span class="kbd"><span id="fontLabel" style="cursor:pointer;">Velikost</span>: <span id="fontValue" style="margin:0 6px;">1</span>
             <button id="fontDown" type="button">−</button>
             <button id="fontUp"   type="button">+</button>
           </span>
@@ -299,9 +235,6 @@
   <button id="toggleCols" type="button" aria-label="Přepnout počet sloupců" aria-pressed="false">
     <span id="colsIcon">1</span>
   </button>
-</span>
-<span class="kbd">Režim:
-  <button id="modeToggle" type="button">💾</button>
 </span>
 
         </div>
@@ -363,6 +296,21 @@ let song, SONGS_LIST=[], SONG_INDEX=-1;
 let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
   let CP_TEXT = '';      // uložíme si původní ChordPro text pro re-render
 let CP_TRANS = 0;
+let SAVE_TRANSPOSE = true;
+let SAVE_FONT = true;
+
+// načtení režimu z localStorage
+SAVE_TRANSPOSE = localStorage.getItem('mode_transpose') !== '0';
+SAVE_FONT = localStorage.getItem('mode_font') !== '0';
+
+
+function updateModeUI(){
+  const t = document.getElementById('transposeLabel');
+  const f = document.getElementById('fontLabel');
+  if(t) t.style.border = SAVE_TRANSPOSE ? '' : '2px solid #a855f7'; t.style.borderRadius='8px';
+  if(f) f.style.border = SAVE_FONT ? '' : '2px solid #a855f7'; f.style.borderRadius='8px';
+}
+
 
 // --- NOVÉ: per-song nastavení ---
 function songKey(suffix){
@@ -451,6 +399,18 @@ async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
   while (performance.now() - t0 < timeoutMs){
     // vynucení layoutu po reflow (sloupce + akordy)
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
     relayoutChords();
 
     const s = getViewScrollState();
@@ -788,7 +748,19 @@ function fixChordOverlaps(root){
 /* --- Layout helpers --- */
 function relayoutChords(){ const cp=document.querySelector('#view .cp'); if(!cp) return; requestAnimationFrame(()=>fixChordOverlaps(cp)); }
 function updateChromeHeight(){ const ch=document.getElementById('chrome'); const h=ch?ch.getBoundingClientRect().height:0; document.documentElement.style.setProperty('--chromeH',(h||0)+'px'); }
-function setChromeHidden(h){ CHROME_HIDDEN=!!h; document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN); localStorage.setItem('chromeHidden', CHROME_HIDDEN?'1':'0'); updateChromeHeight(); }
+function setChromeHidden(h){ CHROME_HIDDEN=!!h; document.body.classList.toggle('chrome-hidden', CHROME_HIDDEN); localStorage.setItem('chromeHidden', CHROME_HIDDEN?'1':'0'); updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+ }
 
 /* --- ovládání lišty + swipe --- */
 function wireDoubleToggle(){
@@ -956,7 +928,7 @@ if (book){
     document.getElementById('controls-cp').style.display='flex';
     const text = await fetch(song.file).then(r=>r.text());
 CP_TEXT = text;
-const settings = loadSongSettings(); let trans = settings.t;
+const settings = loadSongSettings(); let trans = SAVE_TRANSPOSE ? settings.t : 0;
 CP_TRANS = 0;
 
 const render = ()=>{
@@ -970,6 +942,18 @@ const render = ()=>{
     view.appendChild(el);
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
     requestAnimationFrame(()=>{ /* jen aby se layout dosadil */ });
     return;
   }
@@ -981,17 +965,29 @@ const render = ()=>{
   requestAnimationFrame(()=>fixChordOverlaps(el));
   applyChordVisibility();
   updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
 };
 
 render(); document.getElementById('transposeValue').textContent = trans;
 
-document.getElementById('up').onclick   = ()=>{ trans += 1; saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
-document.getElementById('down').onclick = ()=>{ trans -= 1; saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
+document.getElementById('up').onclick   = ()=>{ trans += 1; if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
+document.getElementById('down').onclick = ()=>{ trans -= 1; if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
 
 
     let scale = loadSongSettings().f || getScale(); setScale(scale); document.getElementById('fontValue').textContent = scale.toFixed(2);
-    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
-    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
+    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
+    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
@@ -1004,6 +1000,18 @@ document.getElementById('toggleChords').onclick = ()=>{
     view.appendChild(renderChordProPlain(CP_TEXT));
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
   } else {
     view.innerHTML = '';
     const el = renderChordPro(CP_TEXT, CP_TRANS);
@@ -1011,6 +1019,18 @@ document.getElementById('toggleChords').onclick = ()=>{
     requestAnimationFrame(()=>fixChordOverlaps(el));
     applyChordVisibility();
     updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
   }
 };
 
@@ -1124,6 +1144,18 @@ try { wireSwipeNavigation(); } catch(e){ console.warn('wireSwipeNavigation faile
 wireAutoScrollDesktopControls();
 updateChromeHeight();
 
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
+
 }
 
 
@@ -1137,6 +1169,18 @@ function applyChordVisibility(){
 let _resizeTO;
 function onResizeReflow(){
   updateChromeHeight();
+
+// režimy klikání
+document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+  updateModeUI();
+});
+document.getElementById('fontLabel')?.addEventListener('click', ()=>{
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+  updateModeUI();
+});
+updateModeUI();
+
   relayoutChords();
 }
 
@@ -1726,69 +1770,5 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 
 
   
-
-<script>
-(function(){
-  let SAVE_MODE = localStorage.getItem('global_save_mode') !== '0';
-
-  function updateIcon(){
-    const btn = document.getElementById('modeToggle');
-    if(btn) btn.textContent = SAVE_MODE ? '💾' : '🌐';
-  }
-
-  function applyInitialState(){
-    if(!SAVE_MODE){
-      // reset to defaults
-      if(typeof setScale === 'function'){
-        setScale(1);
-      }
-      if(typeof CP_TRANS !== 'undefined'){
-        CP_TRANS = 0;
-      }
-    }
-  }
-
-  window.addEventListener('load', ()=>{
-    const btn = document.getElementById('modeToggle');
-
-    if(btn){
-      btn.onclick = ()=>{
-        SAVE_MODE = !SAVE_MODE;
-        localStorage.setItem('global_save_mode', SAVE_MODE ? '1':'0');
-        updateIcon();
-
-        if(!SAVE_MODE){
-          // přepnutí do globálního režimu → reset
-          if(typeof setScale === 'function'){
-            setScale(1);
-          }
-          if(typeof CP_TRANS !== 'undefined'){
-            CP_TRANS = 0;
-          }
-        } else {
-          // návrat → reload písně aby se načetly uložené hodnoty
-          location.reload();
-        }
-      };
-    }
-
-    updateIcon();
-    applyInitialState();
-  });
-
-  // override ukládání
-  const origSaveTranspose = window.saveTranspose;
-  window.saveTranspose = function(val){
-    if(SAVE_MODE && origSaveTranspose) origSaveTranspose(val);
-  };
-
-  const origSaveFont = window.saveFont;
-  window.saveFont = function(val){
-    if(SAVE_MODE && origSaveFont) origSaveFont(val);
-  };
-
-})();
-</script>
-
 </body>
 </html>
