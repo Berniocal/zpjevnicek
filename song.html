@@ -299,11 +299,16 @@ let CP_TRANS = 0;
 let SAVE_TRANSPOSE = true;
 let SAVE_FONT = true;
 
+// načtení režimu z localStorage
+SAVE_TRANSPOSE = localStorage.getItem('mode_transpose') !== '0';
+SAVE_FONT = localStorage.getItem('mode_font') !== '0';
+
+
 function updateModeUI(){
   const t = document.getElementById('transposeLabel');
   const f = document.getElementById('fontLabel');
-  if(t) t.style.border = SAVE_TRANSPOSE ? '' : '2px solid #a855f7';
-  if(f) f.style.border = SAVE_FONT ? '' : '2px solid #a855f7';
+  if(t) t.style.border = SAVE_TRANSPOSE ? '' : '2px solid #a855f7'; t.style.borderRadius='8px';
+  if(f) f.style.border = SAVE_FONT ? '' : '2px solid #a855f7'; f.style.borderRadius='8px';
 }
 
 
@@ -397,11 +402,11 @@ async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -747,11 +752,11 @@ function setChromeHidden(h){ CHROME_HIDDEN=!!h; document.body.classList.toggle('
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -940,11 +945,11 @@ const render = ()=>{
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -963,11 +968,11 @@ updateModeUI();
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -998,11 +1003,11 @@ document.getElementById('toggleChords').onclick = ()=>{
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -1017,11 +1022,11 @@ updateModeUI();
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -1141,11 +1146,11 @@ updateChromeHeight();
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
@@ -1167,11 +1172,11 @@ function onResizeReflow(){
 
 // režimy klikání
 document.getElementById('transposeLabel')?.addEventListener('click', ()=>{
-  SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+  SAVE_TRANSPOSE = !SAVE_TRANSPOSE; localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
   updateModeUI();
 });
 document.getElementById('fontLabel')?.addEventListener('click', ()=>{
-  SAVE_FONT = !SAVE_FONT;
+  SAVE_FONT = !SAVE_FONT; localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
   updateModeUI();
 });
 updateModeUI();
