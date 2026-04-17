@@ -213,7 +213,7 @@
         </div>
 
         <div id="controls-cp" class="player" style="display:none">
-          <span class="kbd"><span id="transposeLabel" style="cursor:pointer;">Transponovat</span>: <span id="transposeValue" style="margin:0 6px;">0</span>
+          <span class="kbd">Transponovat: <button id="toggleTransposeMode" class="ghost">💾</button> <span id="transposeValue" style="margin:0 6px;">0</span>
             <button id="down" type="button">−</button>
             <button id="up"   type="button">+</button>
           </span>
@@ -222,7 +222,7 @@
               <span id="autoBtnIcon">✅</span>
             </button>
           </span>
-          <span class="kbd"><span id="fontLabel" style="cursor:pointer;">Velikost</span>: <span id="fontValue" style="margin:0 6px;">1</span>
+          <span class="kbd">Velikost: <button id="toggleFontMode" class="ghost">💾</button> <span id="fontValue" style="margin:0 6px;">1</span>
             <button id="fontDown" type="button">−</button>
             <button id="fontUp"   type="button">+</button>
           </span>
@@ -981,13 +981,13 @@ updateModeUI();
 
 render(); document.getElementById('transposeValue').textContent = trans;
 
-document.getElementById('up').onclick   = ()=>{ trans += 1; if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
-document.getElementById('down').onclick = ()=>{ trans -= 1; if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
+document.getElementById('up').onclick   = ()=>{ trans += 1; if(SAVE_TRANSPOSE) if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
+document.getElementById('down').onclick = ()=>{ trans -= 1; if(SAVE_TRANSPOSE) if(SAVE_TRANSPOSE) saveTranspose(trans); document.getElementById('transposeValue').textContent = trans; render(); document.getElementById('transposeValue').textContent = trans; };
 
 
     let scale = loadSongSettings().f || getScale(); setScale(scale); document.getElementById('fontValue').textContent = scale.toFixed(2);
-    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
-    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
+    document.getElementById('fontUp').onclick   = ()=>{ scale = Math.min(3,   +(scale + 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
+    document.getElementById('fontDown').onclick = ()=>{ scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); setScale(scale); if(SAVE_FONT) if(SAVE_FONT) saveFont(scale); document.getElementById('fontValue').textContent = scale.toFixed(2); };
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
@@ -1208,6 +1208,34 @@ window.addEventListener('popstate', (e) => {
   // NIKDY neprocházej historii písní – vždy zpět na seznam (playlist / zpěvník / hlavní seznam)
   if (plId) location.replace('/zpjevnicek/index.html#pl:' + encodeURIComponent(plId));
   else location.replace('/zpjevnicek/');
+});
+
+
+// --- toggle režimy ikonky ---
+let SAVE_TRANSPOSE = localStorage.getItem('mode_transpose') !== '0';
+let SAVE_FONT = localStorage.getItem('mode_font') !== '0';
+
+function updateModeIcons(){
+  const t = document.getElementById('toggleTransposeMode');
+  const f = document.getElementById('toggleFontMode');
+  if(t) t.textContent = SAVE_TRANSPOSE ? '💾' : '🌐';
+  if(f) f.textContent = SAVE_FONT ? '💾' : '🌐';
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('toggleTransposeMode')?.addEventListener('click', ()=>{
+    SAVE_TRANSPOSE = !SAVE_TRANSPOSE;
+    localStorage.setItem('mode_transpose', SAVE_TRANSPOSE ? '1':'0');
+    updateModeIcons();
+  });
+
+  document.getElementById('toggleFontMode')?.addEventListener('click', ()=>{
+    SAVE_FONT = !SAVE_FONT;
+    localStorage.setItem('mode_font', SAVE_FONT ? '1':'0');
+    updateModeIcons();
+  });
+
+  updateModeIcons();
 });
 
 load();
