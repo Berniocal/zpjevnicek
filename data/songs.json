@@ -2456,12 +2456,26 @@
     }
   },
   {
-    "id": "224-rosa-na-kolejich-wabi-danek",
+    "id": "songs/224-rosa-na-kolejich-wabi-danek.pro",
     "number": 224,
     "title": "Rosa na kolejích",
     "author": "Wabi Daněk",
     "file": "songs/224-rosa-na-kolejich-wabi-danek.pro",
-    "type": "chordpro"
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 73
+    }
+  },
+  {
+    "id": "songs/225-okolo-hradce-lidova.pro",
+    "number": 225,
+    "title": "Okolo Hradce",
+    "author": "Lidová",
+    "file": "songs/225-okolo-hradce-lidova.pro",
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 74
+    }
   },
   {
     "id": "songs/400-cas-tomas-klus.pro",
@@ -2659,28 +2673,6 @@
     "type": "chordpro",
     "books": {
       "Já, písničkář I": 21
-    }
-  },
-  {
-    "id": "songs/224-rosa-na-kolejich-wabi-danek.pro",
-    "file": "songs/224-rosa-na-kolejich-wabi-danek.pro",
-    "title": "Rosa na kolejích",
-    "author": "Wabi Daněk",
-    "number": 224,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 2": 73
-    }
-  },
-  {
-    "id": "songs/225-okolo-hradce-lidova.pro",
-    "file": "songs/225-okolo-hradce-lidova.pro",
-    "title": "Okolo Hradce",
-    "author": "Lidová",
-    "number": 225,
-    "type": "chordpro",
-    "books": {
-      "Zpjěvníček 2": 74
     }
   }
 ]
