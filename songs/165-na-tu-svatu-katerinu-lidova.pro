@@ -2,33 +2,33 @@
 {artist: Lidová}
 {book: Zpjěvníček 2 = 14}
 
-[G]Na tu svatú Katerinu, 
-[D7]katerinskú [G]nedělu,
-[D7]zverbovali šohajíčka [G]na vojnu,
-zverbovali [D7]šohajíčka [G]na vojnu.
-[G]Sama královna, sama královna
-[D7]ceduličku psala, ceduličku [G]psala,
+[E]Na tu svatú Katerinu, 
+[H7]katerinskú [E]nedělu,
+[H7]zverbovali šohajíčka [E]na vojnu,
+zverbovali [H7]šohajíčka [E]na vojnu.
+[E]Sama královna, sama královna
+[H7]ceduličku psala, ceduličku [E]psala,
 aby šohajka, aby šohajka
-[D7]na vojnu dostala, na vojnu dos[G]tala.
+[H7]na vojnu dostala, na vojnu dos[E]tala.
 
-[G]Čobogaj, nebogaj, čáry nebo[D7]gaj,
-čobogaj, nebogaj, čáry nebo[G]gaj,
-čobogaj, nebogaj, čáry nebo[D7]gaj,
+[E]Čobogaj, nebogaj, čáry nebo[H7]gaj,
+čobogaj, nebogaj, čáry nebo[E]gaj,
+čobogaj, nebogaj, čáry nebo[H7]gaj,
 bogaj, bogaj, bogaj, 
-bogaj, čáry nebo[G]gaj.
+bogaj, čáry nebo[E]gaj.
 
-[G]Prečo ste ma zverbovali, 
-[D7]zverbovali [G]v nedělu,
-[D7]Prečo ste to nenechali [G]na stredu?
-prečo ste to [D7]nenechali [G]na stredu?
-[G]Sama královna, sama královna
-[D7]ceduličku psala, ceduličku [G]psala,
+[E]Prečo ste ma zverbovali, 
+[H7]zverbovali [E]v nedělu,
+[H7]Prečo ste to nenechali [E]na stredu?
+prečo ste to [H7]nenechali [E]na stredu?
+[E]Sama královna, sama královna
+[H7]ceduličku psala, ceduličku [E]psala,
 aby šohajka, aby šohajka
-[D7]z vojny dom dostala, 
-z vojny dom dos[G]tala.
+[H7]z vojny dom dostala, 
+z vojny dom dos[E]tala.
 
-[G]Čobogaj, nebogaj, čáry nebo[D7]gaj,
-čobogaj, nebogaj, čáry nebo[G]gaj,
-čobogaj, nebogaj, čáry nebo[D7]gaj,
+[E]Čobogaj, nebogaj, čáry nebo[H7]gaj,
+čobogaj, nebogaj, čáry nebo[E]gaj,
+čobogaj, nebogaj, čáry nebo[H7]gaj,
 bogaj, bogaj, bogaj, 
-bogaj, čáry nebo[G]gaj.
+bogaj, čáry nebo[E]gaj.
