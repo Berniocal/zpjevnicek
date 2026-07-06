@@ -2737,5 +2737,16 @@
     "books": {
       "Zpjěvníček 2": 79
     }
+  },
+  {
+    "id": "songs/231-to-mame-mladez-petra-janu.pro",
+    "file": "songs/231-to-mame-mladez-petra-janu.pro",
+    "title": "To máme mládež",
+    "author": "Petra Janů",
+    "number": 231,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 80
+    }
   }
 ]
