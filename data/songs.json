@@ -2715,5 +2715,16 @@
     "books": {
       "Zpjěvníček 2": 77
     }
+  },
+  {
+    "id": "songs/229-bon-soir-mademoiselle-paris-olympic.pro",
+    "file": "songs/229-bon-soir-mademoiselle-paris-olympic.pro",
+    "title": "Bon Soir Mademoiselle Paris",
+    "author": "Olympic",
+    "number": 229,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 78
+    }
   }
 ]
