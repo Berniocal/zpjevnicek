@@ -2704,5 +2704,16 @@
     "books": {
       "Zpjěvníček 2": 76
     }
+  },
+  {
+    "id": "songs/228-rana-v-trave-zalman-a-spol.pro",
+    "file": "songs/228-rana-v-trave-zalman-a-spol.pro",
+    "title": "Rána v trávě",
+    "author": "Žalman a spol",
+    "number": 228,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 77
+    }
   }
 ]
