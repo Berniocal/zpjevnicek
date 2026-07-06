@@ -2478,6 +2478,14 @@
     }
   },
   {
+    "id": "226-blaznova-ukolebavka-pavel-dydovic",
+    "number": 226,
+    "title": "Bláznova ukolébavka",
+    "author": "Pavel Dydovič",
+    "file": "songs/226-blaznova-ukolebavka-pavel-dydovic.pro",
+    "type": "chordpro"
+  },
+  {
     "id": "songs/400-cas-tomas-klus.pro",
     "number": 400,
     "title": "Čas",
