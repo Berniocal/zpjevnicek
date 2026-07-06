@@ -2748,5 +2748,16 @@
     "books": {
       "Zpjěvníček 2": 80
     }
+  },
+  {
+    "id": "songs/232-ruze-z-papiru-nedvedi.pro",
+    "file": "songs/232-ruze-z-papiru-nedvedi.pro",
+    "title": "Růže z papíru",
+    "author": "Nedvědi",
+    "number": 232,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 81
+    }
   }
 ]
