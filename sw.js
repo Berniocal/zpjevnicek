@@ -6,7 +6,7 @@
    - /songs/*: cache-first (offline-ready)
    - Volitelně: hromadné stažení všech písní přes postMessage {type:'CACHE_ALL_SONGS'}
 */
-const VERSION = '2026-07-06-offline-cache';
+const VERSION = '2026-07-07-offline-cache';
 const CACHE_STATIC  = `zpj-static-${VERSION}`; // mění se při deployi
 const CACHE_DYNAMIC = `zpj-dyn-v1`;            // STÁLÉ, NEMĚNIT KVŮLI UDRŽENÍ OFFLINE OBSAHU
 const BASE = '/zpjevnicek';
