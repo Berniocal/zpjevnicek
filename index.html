@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="cs">
-<head> 
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Zpjěvníček</title>
@@ -11,6 +11,113 @@
 <link rel="apple-touch-icon" href="/zpjevnicek/assets/icons/icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Zpjěvníček" />
+
+<script>
+(function () {
+  const CHOICE_KEY = 'zpj_install_choice';
+  const LATER_KEY = 'zpj_install_later_at';
+  const LATER_DELAY = 7 * 24 * 60 * 60 * 1000;
+  let deferredPrompt = null;
+
+  function storageGet(key) {
+    try { return localStorage.getItem(key); } catch (_e) { return null; }
+  }
+  function storageSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (_e) {}
+  }
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function shouldOffer() {
+    if (isStandalone()) return false;
+    const choice = storageGet(CHOICE_KEY);
+    if (choice === 'never' || choice === 'installed') return false;
+    const laterAt = Number(storageGet(LATER_KEY) || 0);
+    if (choice === 'later' && laterAt && Date.now() - laterAt < LATER_DELAY) return false;
+    return true;
+  }
+  function closeOffer() {
+    const old = document.getElementById('pwaInstallOffer');
+    if (old) old.remove();
+  }
+  function showManualInstallHelp() {
+    alert('Pokud prohlížeč nenabídne instalaci automaticky, otevři menu prohlížeče a zvol „Instalovat aplikaci“ nebo „Přidat na plochu“.');
+  }
+  function showOffer() {
+    if (!shouldOffer() || document.getElementById('pwaInstallOffer') || !document.body) return;
+
+    const box = document.createElement('div');
+    box.id = 'pwaInstallOffer';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.innerHTML = `
+      <div class="pwa-install-backdrop"></div>
+      <div class="pwa-install-card">
+        <h2>Instalovat zpěvníček?</h2>
+        <p>Zpěvníček můžeš používat jako aplikaci a mít ho po ruce i pro offline použití.</p>
+        <div class="pwa-install-actions">
+          <button type="button" id="pwaInstallNow">Instalovat</button>
+          <button type="button" id="pwaInstallLater" class="ghost">Později</button>
+          <button type="button" id="pwaInstallNever" class="ghost">Nikdy</button>
+        </div>
+      </div>`;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #pwaInstallOffer{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:16px}
+      #pwaInstallOffer .pwa-install-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+      #pwaInstallOffer .pwa-install-card{position:relative;width:min(420px,100%);border:1px solid #2c3b60;border-radius:12px;background:#0f1722;color:#e6eef8;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+      #pwaInstallOffer h2{margin:0 0 8px;font-size:22px}
+      #pwaInstallOffer p{margin:0 0 14px;color:#9fb0c7;line-height:1.4}
+      #pwaInstallOffer .pwa-install-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+      #pwaInstallOffer button{border:1px solid #2c3b60;border-radius:8px;background:#2563eb;color:white;padding:8px 12px;cursor:pointer}
+      #pwaInstallOffer button.ghost{background:transparent;color:#e6eef8}
+    `;
+    box.appendChild(style);
+    document.body.appendChild(box);
+
+    document.getElementById('pwaInstallNow').onclick = async () => {
+      if (deferredPrompt) {
+        const promptEvent = deferredPrompt;
+        deferredPrompt = null;
+        promptEvent.prompt();
+        const choice = await promptEvent.userChoice.catch(() => null);
+        if (choice && choice.outcome === 'accepted') {
+          storageSet(CHOICE_KEY, 'installed');
+          closeOffer();
+          return;
+        }
+      }
+      showManualInstallHelp();
+    };
+    document.getElementById('pwaInstallLater').onclick = () => {
+      storageSet(CHOICE_KEY, 'later');
+      storageSet(LATER_KEY, String(Date.now()));
+      closeOffer();
+    };
+    document.getElementById('pwaInstallNever').onclick = () => {
+      storageSet(CHOICE_KEY, 'never');
+      closeOffer();
+    };
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  window.addEventListener('appinstalled', () => {
+    storageSet(CHOICE_KEY, 'installed');
+    closeOffer();
+  });
+
+  window.ZPJInstallOffer = {
+    maybeShowSoon() {
+      if (!shouldOffer()) return;
+      setTimeout(showOffer, 700);
+    }
+  };
+})();
+</script>
 
 <style>
   /* Odsazení + šířka */
@@ -90,6 +197,7 @@
   let __ok=false; try{ __ok = (localStorage.getItem(KEY) === "yes"); }catch(_e){ __ok=false; }
   if (__ok) {
     document.documentElement.style.display = "block";
+    window.ZPJInstallOffer?.maybeShowSoon();
     return;
   }
 
@@ -102,6 +210,7 @@
   // správné heslo
   try{ localStorage.setItem(KEY, "yes"); }catch(_e){}
   document.documentElement.style.display = "block";
+  window.ZPJInstallOffer?.maybeShowSoon();
 })();
 </script>
 
