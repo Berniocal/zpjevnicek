@@ -811,13 +811,6 @@ render(); document.getElementById('transposeValue').textContent = trans;
 	      SETTINGS_MODE = SETTINGS_MODES[(idx + 1) % SETTINGS_MODES.length];
 	      localStorage.setItem(SETTINGS_MODE_KEY, SETTINGS_MODE);
 
-	      if (SETTINGS_MODE === 'global' || SETTINGS_MODE === 'individual') {
-	        saveFont(scale);
-	        saveColumns(COLS);
-	        saveTranspose(trans);
-	        saveChordVisibility(HIDE_CHORDS);
-	      }
-
 	      const nextSettings = loadSongSettings();
 	      trans = nextSettings.t;
 	      CP_TRANS = trans;
