@@ -598,23 +598,27 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ------- Prefetch písní při dobrém připojení ------- */
+/* ------- Prefetch písní pro offline režim ------- */
 function goodConnection(){
   const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
   if (!c) return true;
   if (c.saveData) return false;
-  const ok = ['wifi','ethernet','unknown'];
-  return ok.includes(c.type) || (c.effectiveType||'').includes('4g');
+  return true;
 }
 async function prefetchAllSongs(){
+  if (!('serviceWorker' in navigator)) return;
   if (!navigator.onLine) return;
   if (!goodConnection()) return;
   try{
-    const reg = await navigator.serviceWorker.getRegistration('/zpjevnicek/');
-    if (reg && reg.active) reg.active.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
+    const reg = await navigator.serviceWorker.ready;
+    const sw = reg.active || navigator.serviceWorker.controller;
+    if (sw) sw.postMessage({ type: 'CACHE_ALL_SONGS', chunkSize: 6, reportProgress: false });
   }catch(e){}
 }
-window.addEventListener('load', prefetchAllSongs);
+window.addEventListener('load', () => setTimeout(prefetchAllSongs, 1000));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(prefetchAllSongs, 1000));
+}
 setInterval(prefetchAllSongs, 30*60*1000);
 
 /* ------- globální scale pro song.html ------- */

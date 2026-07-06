@@ -6,7 +6,7 @@
    - /songs/*: cache-first (offline-ready)
    - Volitelně: hromadné stažení všech písní přes postMessage {type:'CACHE_ALL_SONGS'}
 */
-const VERSION = '2025-10-26-12';
+const VERSION = '2026-07-06-offline-cache';
 const CACHE_STATIC  = `zpj-static-${VERSION}`; // mění se při deployi
 const CACHE_DYNAMIC = `zpj-dyn-v1`;            // STÁLÉ, NEMĚNIT KVŮLI UDRŽENÍ OFFLINE OBSAHU
 const BASE = '/zpjevnicek';
@@ -20,6 +20,7 @@ const CORE_ASSETS = [
   `${BASE}/manifest.webmanifest`,
   `${BASE}/assets/icons/icon-192.png`,
   `${BASE}/assets/icons/icon-512.png`,
+  `${BASE}/assets/icons/maskable-192.png`,
   `${BASE}/assets/icons/maskable-512.png`,
 ];
 
@@ -27,6 +28,10 @@ self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const cStatic = await caches.open(CACHE_STATIC);
     await cStatic.addAll(CORE_ASSETS.map(u => new Request(u, { cache: 'reload' })));
+    try {
+      const cDyn = await caches.open(CACHE_DYNAMIC);
+      await cDyn.add(new Request(`${BASE}/data/songs.json`, { cache: 'reload' }));
+    } catch {}
     // Pozn.: Nezatahujeme všechny /songs/* v install – to může timeoutovat.
     self.skipWaiting();
   })());
@@ -185,8 +190,9 @@ async function cacheAllSongs(chunkSize = 8, reportProgress = false) {
   // stáhni seznam
   const listRes = await fetch(`${BASE}/data/songs.json`, { cache: 'reload' });
   if (!listRes.ok) return;
-  const list = await listRes.json();
   const dyn = await caches.open(CACHE_DYNAMIC);
+  await dyn.put(new Request(`${BASE}/data/songs.json`), listRes.clone());
+  const list = await listRes.json();
 
   const files = (Array.isArray(list) ? list : [])
     .map(s => toAbsoluteSongPath(s?.file))
