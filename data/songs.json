@@ -2674,5 +2674,16 @@
     "books": {
       "Já, písničkář I": 21
     }
+  },
+  {
+    "id": "songs/226-blaznova-ukolebavka-pavel-dydovic.pro",
+    "file": "songs/226-blaznova-ukolebavka-pavel-dydovic.pro",
+    "title": "Bláznova ukolébavka",
+    "author": "Pavel Dydovič",
+    "number": 226,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 75
+    }
   }
 ]
