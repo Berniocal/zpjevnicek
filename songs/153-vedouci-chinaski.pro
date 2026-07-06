@@ -14,20 +14,20 @@ vypadněte z mojí kanceláře
 A pracujte tak, jak je žádoucí 
 Já jsem tady vedoucí 
  
-[:Já jsem [A]vedoucí! Já jsem king!
+/:Já jsem [A]vedoucí! Já jsem king!
 [E]Meeting, briefing, brainstorming 
 [D]Rád bych vám drink nabídl 
-Chci váš [E]feedback as soon as possible:]
+Chci váš [E]feedback as soon as possible:/
 
 [E]D-D-Důležitě koukám do diáře 
 Vypadněte z mojí kanceláře 
 A pracujte tak, jak je žádoucí.
 Já jsem, já jsem, já jsem tady vedoucí 
 
-[:Já jsem [A]vedoucí! Já jsem king!
+/:Já jsem [A]vedoucí! Já jsem king!
 [E]Meeting, briefing, brainstorming 
 [D]Rád bych vám drink nabídl 
-Chci váš [E]feedback as soon as possible:]
+Chci váš [E]feedback as soon as possible:/
 
 „Marcelko, prosim vás, 
 dneska už tady pro nikoho nejsem, jo?“
@@ -42,7 +42,7 @@ Doneste mi někdo trochu kávy
 Nebo bude peklo horoucí 
 Já jsem tady vedoucí 
 
-[:Já jsem [A]vedoucí! Já jsem king!
+/:Já jsem [A]vedoucí! Já jsem king!
 [E]Meeting, briefing, brainstorming 
 [D]Rád bych vám drink nabídl 
-Chci váš [E]feedback as soon as possible:]
+Chci váš [E]feedback as soon as possible:/
