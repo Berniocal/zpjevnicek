@@ -325,11 +325,22 @@ qs('#saveToken').onclick = ()=>{ localStorage.setItem('gh_pat', tokenEl.value.tr
 qs('#clearToken').onclick = ()=>{ localStorage.removeItem('gh_pat'); tokenEl.value=''; status('Token smazán.', true); };
 
 function detectRepo(){
+  const fallback = { user: 'berniocal', repo: 'zpjevnicek' };
   const host = location.host;
   const parts = location.pathname.split('/').filter(Boolean);
-  const repo = parts.length? parts[0] : '';
-  const user = host.includes('github.io') ? host.split('.')[0] : '';
-  return {user, repo};
+
+  if (host.includes('github.io')) {
+    return {
+      user: host.split('.')[0],
+      repo: parts.length ? parts[0] : fallback.repo
+    };
+  }
+
+  if (host === 'bernio.cz' || host.endsWith('.bernio.cz')) {
+    return fallback;
+  }
+
+  return fallback;
 }
 
 /* --------------------- zvýraznění dlouhých řádků ---------------------- */
