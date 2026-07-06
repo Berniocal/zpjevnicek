@@ -2693,5 +2693,16 @@
     "books": {
       "Zpjěvníček 2": 75
     }
+  },
+  {
+    "id": "songs/227-severni-vitr-sverak-a-uhlir.pro",
+    "file": "songs/227-severni-vitr-sverak-a-uhlir.pro",
+    "title": "Severní vítr",
+    "author": "Svěrák a Uhlíř",
+    "number": 227,
+    "type": "chordpro",
+    "books": {
+      "Zpjěvníček 2": 76
+    }
   }
 ]
