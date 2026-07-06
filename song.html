@@ -108,13 +108,6 @@
   #settingsSave{ border:1px solid #2c3b60; background:transparent; color:var(--ink); border-radius:8px; padding:6px 10px; cursor:pointer; }
   #settingsSave:hover{ background:#17213a; }
 
-  .auto-scroll{
-    position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:999px;
-    background:transparent; border:2px solid #2c3b60; color:var(--ink); font-size:28px; line-height:1;
-    display:flex; align-items:center; justify-content:center; z-index:10; opacity:.9; cursor:pointer;
-  }
-  .auto-scroll:hover{ opacity:1 } .auto-scroll:active{ transform:scale(.98) } .auto-scroll.hidden{ display:none }
-
   .container{ padding-right:0 !important; padding-left:0 !important; padding-top:0 !important; }
 
   /* Dialog sdílení */
@@ -182,15 +175,6 @@
           <div style="font-weight:600;margin-bottom:6px" id="settingsTitle">Nastavení</div>
 
           <div class="row">
-            <label for="speedInput">Rychlost posuvu (px/s)</label>
-            <input id="speedInput" type="number" min="5" max="300" step="1">
-          </div>
-          <div class="row">
-            <label for="delayInput">Zpoždění startu (s)</label>
-            <input id="delayInput" type="number" min="0" max="30" step="0.1">
-          </div>
-
-          <div class="row">
             <label for="chordColorInput">Barva akordů</label>
             <input id="chordColorInput" type="color">
           </div>
@@ -216,11 +200,6 @@
           <span class="kbd"><span id="transposeLabel">Transponovat</span>: <span id="transposeValue" style="margin:0 6px;">0</span>
             <button id="down" type="button">−</button>
             <button id="up"   type="button">+</button>
-          </span>
-          <span class="kbd">Rolování:
-            <button id="toggleAutoBtn" type="button" aria-label="Zobrazit/skrýt tlačítko autoposuvu">
-              <span id="autoBtnIcon">✅</span>
-            </button>
           </span>
           <span class="kbd"><span id="fontLabel">Velikost</span>: <span id="fontValue" style="margin:0 6px;">1</span>
             <button id="fontDown" type="button">−</button>
@@ -289,8 +268,6 @@
     </div>
   </dialog>
 
-<button id="autoScroll" class="auto-scroll" title="Auto posuv">∨</button>
-
 <script>
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
@@ -298,7 +275,7 @@ const plId = params.get('pl') || '';
 const book = params.get('book') || '';
 
 let song, SONGS_LIST=[], SONG_INDEX=-1;
-let HIDE_CHORDS = localStorage.getItem('hideChords') === '1';
+let HIDE_CHORDS = false;
 let CP_TEXT = '';      // uložíme si původní ChordPro text pro re-render
 let CP_TRANS = 0;
 let CURRENT_SCALE = 1;
@@ -328,14 +305,21 @@ function updateModeUI(){
   const btn = document.getElementById('settingsModeBtn');
   const label = document.getElementById('settingsModeLabel');
   const title = {
-    default: 'Výchozí: každá píseň začne s velikostí 1, transpozicí 0 a jedním sloupcem.',
-    global: 'Společné: velikost a sloupce se přenášejí mezi písněmi, transpozice se ukládá pro každou píseň.',
-    individual: 'Individuální: velikost, transpozice i sloupce se ukládají zvlášť pro každou píseň.'
+    default: 'Výchozí: každá píseň začne s velikostí 1, transpozicí 0, jedním sloupcem a zapnutými akordy.',
+    global: 'Společné: velikost, sloupce a zobrazení akordů se přenášejí mezi písněmi, transpozice se ukládá pro každou píseň.',
+    individual: 'Individuální: velikost, transpozice, sloupce i zobrazení akordů se ukládají zvlášť pro každou píseň.'
   }[SETTINGS_MODE];
   if (label) label.textContent = SETTINGS_MODE_LABELS[SETTINGS_MODE];
   if (btn) {
     btn.title = title;
     btn.setAttribute('aria-label', title);
+  }
+  const chordBtn = document.getElementById('toggleChords');
+  if (chordBtn) {
+    chordBtn.disabled = false;
+    chordBtn.title = SETTINGS_MODE === 'default'
+      ? 'Ve výchozím režimu je změna akordů jen dočasná pro aktuální otevření písně.'
+      : 'Přepnout zobrazení akordů';
   }
 }
 
@@ -345,20 +329,26 @@ function songKey(suffix){
 }
 
 function loadSongSettings(){
-  if (SETTINGS_MODE === 'default') return { t: 0, f: 1, cols: 1 };
+  if (SETTINGS_MODE === 'default') return { t: 0, f: 1, cols: 1, hideChords: false };
 
   const t = parseInt(localStorage.getItem(songKey('transpose')) || '0', 10);
   if (SETTINGS_MODE === 'global') {
     return {
       t: Number.isFinite(t) ? t : 0,
       f: clampScale(readNumber(ZPJ_FONT_KEY, 1)),
-      cols: normalizeCols(localStorage.getItem(ZPJ_COLS_KEY) || '1')
+      cols: normalizeCols(localStorage.getItem(ZPJ_COLS_KEY) || '1'),
+      hideChords: localStorage.getItem('hideChords') === '1'
     };
   }
 
   const f = clampScale(readNumber(songKey('font'), 1));
   const cols = normalizeCols(localStorage.getItem(songKey('cols')) || '1');
-  return { t: Number.isFinite(t) ? t : 0, f, cols };
+  return {
+    t: Number.isFinite(t) ? t : 0,
+    f,
+    cols,
+    hideChords: localStorage.getItem(songKey('hideChords')) === '1'
+  };
 }
 
 function saveTranspose(val){
@@ -377,6 +367,13 @@ function saveColumns(val){
   if (SETTINGS_MODE === 'individual') localStorage.setItem(songKey('cols'), cols);
 }
 
+function saveChordVisibility(hidden){
+  if (SETTINGS_MODE === 'default') return;
+  const val = hidden ? '1' : '0';
+  if (SETTINGS_MODE === 'global') localStorage.setItem('hideChords', val);
+  if (SETTINGS_MODE === 'individual') localStorage.setItem(songKey('hideChords'), val);
+}
+
 // aktuální transpozice pro re-render
 
 let justSwipedTs = 0;
@@ -384,21 +381,10 @@ let CHROME_HIDDEN = localStorage.getItem('chromeHidden') === '1';
 if (CHROME_HIDDEN) document.body.classList.add('chrome-hidden');
 
 /* --- Klíče nastavení --- */
-let AUTO_BTN_VISIBLE = localStorage.getItem('autoBtnVisible') !== '0';
-const AUTO_SPEED_KEY='zpj_autoSpeed';
-const AUTO_DELAY_KEY='zpj_autoDelay';
 const CHORD_COLOR_KEY='zpj_chordColor';
 const CHORD_SCALE_KEY='zpj_chordScale';
-const DEF_AUTO_SPEED = 10;      // px/s
-const DEF_AUTO_DELAY = 10;      // s
 const DEF_CHORD_COLOR = '#22c55e';
 const DEF_CHORD_SCALE = 1.05;
-
-/* --- Defaulty (požadováno) --- */
-let AUTO_SPEED = parseFloat(localStorage.getItem(AUTO_SPEED_KEY));
-if (isNaN(AUTO_SPEED)) AUTO_SPEED = 10;   // px/s
-let AUTO_DELAY = parseFloat(localStorage.getItem(AUTO_DELAY_KEY));
-if (isNaN(AUTO_DELAY)) AUTO_DELAY = 10;   // s
 
 let CHORD_COLOR = localStorage.getItem(CHORD_COLOR_KEY) || getComputedStyle(document.documentElement).getPropertyValue('--chordColor').trim() || '#22c55e';
 let CHORD_SCALE = parseFloat(localStorage.getItem(CHORD_SCALE_KEY));
@@ -407,181 +393,6 @@ if (isNaN(CHORD_SCALE)) CHORD_SCALE = 1.05; // poměr
 /* aplikuj barvu/scale hned na start */
 document.documentElement.style.setProperty('--chordColor', CHORD_COLOR);
 document.documentElement.style.setProperty('--chordScale', String(CHORD_SCALE));
-
-/* --- Auto scroll --- */
-let autoRunning = false;
-let _autoRaf = 0, _lastTs = 0, _autoDelayTO = 0;
-
-function getViewScrollState(){
-  const view = document.getElementById('view');
-  if (!view) return null;
-
-  const max = Math.max((view.scrollHeight || 0) - (view.clientHeight || 0), 0);
-  return {
-    target: view,
-    scrollTop: view.scrollTop || 0,
-    max
-  };
-}
-
-function setViewScrollTop(value){
-  const view = document.getElementById('view');
-  if (!view) return;
-  view.scrollTop = value;
-}
-
-function updateAutoBtnVisibility(){
-  const ico = document.getElementById('autoBtnIcon');
-  const floater = document.getElementById('autoScroll');
-  const toggle = document.getElementById('toggleAutoBtn');
-  if (ico) ico.textContent = AUTO_BTN_VISIBLE ? '✅' : '❌';
- if (toggle) toggle.setAttribute('aria-pressed', AUTO_BTN_VISIBLE ? 'true' : 'false');
-  if (floater){
-    floater.classList.toggle('hidden', !AUTO_BTN_VISIBLE);
-    floater.setAttribute('aria-hidden', AUTO_BTN_VISIBLE ? 'false' : 'true');
-  }
-}
-async function waitForScrollableView(minMax = 20, timeoutMs = 1500){
-  const t0 = performance.now();
-  while (performance.now() - t0 < timeoutMs){
-    // vynucení layoutu po reflow (sloupce + akordy)
-    updateChromeHeight();
-    relayoutChords();
-
-    const s = getViewScrollState();
-    if (s && s.max >= minMax) return s;
-
-    // počkej 1 frame
-    await new Promise(r => requestAnimationFrame(r));
-  }
-  return getViewScrollState(); // vrať co je, i kdyby bylo malé
-}
-  
-function setAutoIcon(state){
-  const btn = document.getElementById('autoScroll');
-  if (!btn) return;
-  if (state === 'running') btn.textContent = '■';
-  else if (state === 'waiting') btn.textContent = '…';
-  else btn.textContent = '∨';
-}
-function stopAutoScroll(){
-  autoRunning = false;
-  if(_autoRaf) cancelAnimationFrame(_autoRaf);
-  _autoRaf = 0; _lastTs = 0;
-  if(_autoDelayTO){ clearTimeout(_autoDelayTO); _autoDelayTO = 0; }
-  setAutoIcon('idle');
-}
-function startAutoScroll(){
-  if (autoRunning || _autoDelayTO) return;
-
-  const begin = async () => {
-    autoRunning = true;
-    _lastTs = 0;
-    setAutoIcon('running');
-// počkej, až bude #view opravdu scrollovatelný (PC/tablet často dopočítává layout později)
-await waitForScrollableView(20, 1500);
-
-    const tick = (ts) => {
-      if (!autoRunning) return;
-
-      if (!_lastTs) _lastTs = ts;
-      const dt = (ts - _lastTs) / 1000;
-      _lastTs = ts;
-
-const state = getViewScrollState();
-
-// když ještě není dopočítaný layout (typicky PC/tablet po renderu),
-// tak NEkonči, jen čekej další frame
-if (!state || state.max <= 0){
-  _autoRaf = requestAnimationFrame(tick);
-  return;
-}
-
-
- // když je max maličké (typicky ještě nedopočítaný layout), neukončuj, jen čekej
-if (state.max < 20){
-  _autoRaf = requestAnimationFrame(tick);
-  return;
-}
-
-// konec – až když jsme opravdu na konci
-if (state.scrollTop >= state.max - 2){
-  stopAutoScroll();
-  return;
-}
-
-
-const next = Math.min(state.max, state.scrollTop + AUTO_SPEED * dt);
-setViewScrollTop(next);
-
-
-      _autoRaf = requestAnimationFrame(tick);
-    };
-
-    _autoRaf = requestAnimationFrame(tick);
-  };
-
-
-
-if (AUTO_DELAY > 0){
-  const btn = document.getElementById('autoScroll');
-  let remaining = AUTO_DELAY;
-  setAutoIcon('waiting');
-  if (btn) btn.textContent = Math.ceil(remaining);
-
-  const tickCountdown = () => {
-    if (!_autoDelayTO) return;
-    remaining -= 0.25;
-    if (btn) btn.textContent = String(Math.max(0, Math.ceil(remaining)));
-  };
-
-  const iv = setInterval(tickCountdown, 250);
-
-  _autoDelayTO = setTimeout(() => {
-    clearInterval(iv);
-    _autoDelayTO = 0;
-    begin();
-  }, AUTO_DELAY * 1000);
-
-} else {
-  begin();
-}
-
-}
-
-function wireAutoScrollDesktopControls(){
-  const view = document.getElementById('view');
-  if (!view) return;
-
-  // když uživatel scrolluje ručně (kolečko/trackpad), autoscroll zastav
-  view.addEventListener('wheel', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
-
-  // když uživatel začne tahat / scrollovat dotykem, autoscroll zastav
-  view.addEventListener('touchstart', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
-
-  // klik do textu (myš / touch) může taky autoscroll stopnout
-  view.addEventListener('pointerdown', () => {
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-  }, { passive:true });
-
-  // mezerník = start/stop (na PC fakt příjemné)
-  window.addEventListener('keydown', (e) => {
-    if (e.code !== 'Space') return;
-
-    // když píšeš do inputu v panelu nastavení, neřeš
-    const tag = (document.activeElement?.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea') return;
-
-    e.preventDefault();
-    if (autoRunning || _autoDelayTO) stopAutoScroll();
-    else startAutoScroll();
-  });
-}
-
 
 /* --- CZ noty + transpozice (včetně Ab/Db atd.) --- */
 
@@ -956,6 +767,7 @@ CP_TEXT = text;
 	CP_TRANS = trans;
 	CURRENT_SCALE = settings.f;
 	COLS = settings.cols;
+	HIDE_CHORDS = settings.hideChords;
 	setScale(CURRENT_SCALE);
 	applyColumns();
 
@@ -1003,6 +815,7 @@ render(); document.getElementById('transposeValue').textContent = trans;
 	        saveFont(scale);
 	        saveColumns(COLS);
 	        saveTranspose(trans);
+	        saveChordVisibility(HIDE_CHORDS);
 	      }
 
 	      const nextSettings = loadSongSettings();
@@ -1010,6 +823,7 @@ render(); document.getElementById('transposeValue').textContent = trans;
 	      CP_TRANS = trans;
 	      scale = nextSettings.f;
 	      COLS = nextSettings.cols;
+	      HIDE_CHORDS = nextSettings.hideChords;
 	      setScale(scale);
 	      applyColumns();
 	      document.getElementById('transposeValue').textContent = trans;
@@ -1021,7 +835,7 @@ render(); document.getElementById('transposeValue').textContent = trans;
 
 document.getElementById('toggleChords').onclick = ()=>{
   HIDE_CHORDS = !HIDE_CHORDS;
-  localStorage.setItem('hideChords', HIDE_CHORDS ? '1' : '0');
+  saveChordVisibility(HIDE_CHORDS);
 
   // re-render podle stavu (plain vs segmenty)
   const view = document.getElementById('view');
@@ -1050,21 +864,7 @@ document.getElementById('toggleChords').onclick = ()=>{
     at.renderFinished.on(()=> updateChromeHeight());
   }
 
-  // 6) Auto-scroll: tlačítko + ikony
-  const tgl = document.getElementById('toggleAutoBtn');
-  if (tgl) tgl.onclick = ()=>{
-    AUTO_BTN_VISIBLE = !AUTO_BTN_VISIBLE;
-    localStorage.setItem('autoBtnVisible', AUTO_BTN_VISIBLE ? '1' : '0');
-    if (!AUTO_BTN_VISIBLE && (autoRunning || _autoDelayTO)) stopAutoScroll();
-    updateAutoBtnVisibility();
-  };
-  const autoBtn=document.getElementById('autoScroll');
-  if (autoBtn) autoBtn.onclick=()=>{ if (autoRunning || _autoDelayTO) stopAutoScroll(); else startAutoScroll(); };
-  updateAutoBtnVisibility();
-  setAutoIcon('idle');
-
-  
-  // 6.5) Sloupce 1/2
+  // 6) Sloupce 1/2
   const colsBtn = document.getElementById('toggleCols');
   if (colsBtn) colsBtn.onclick = ()=>{
     COLS = (COLS === 1) ? 2 : 1;
@@ -1077,12 +877,8 @@ document.getElementById('toggleChords').onclick = ()=>{
   // 7) Panel nastavení – předvyplň + ulož/reset
   const btnSettings = document.getElementById('btnSettings');
   const panel = document.getElementById('settingsPanel');
-  const speedInput = document.getElementById('speedInput');
-  const delayInput = document.getElementById('delayInput');
   const chordColorInput = document.getElementById('chordColorInput');
   const chordScaleInput = document.getElementById('chordScaleInput');
-  if (speedInput) speedInput.value = String(AUTO_SPEED);
-  if (delayInput) delayInput.value = String(AUTO_DELAY);
   if (chordColorInput) chordColorInput.value = CHORD_COLOR;
   if (chordScaleInput) chordScaleInput.value = String(CHORD_SCALE);
 
@@ -1098,12 +894,6 @@ document.getElementById('toggleChords').onclick = ()=>{
   }
 
   document.getElementById('settingsSave')?.addEventListener('click', ()=>{
-    const sp = Math.max(5, Math.min(300, Number(speedInput.value)||10));
-    AUTO_SPEED = sp; localStorage.setItem(AUTO_SPEED_KEY, String(sp));
-
-    const dl = Math.max(0, Math.min(30, Number(delayInput.value)||10));
-    AUTO_DELAY = dl; localStorage.setItem(AUTO_DELAY_KEY, String(dl));
-
     const col = chordColorInput.value || '#22c55e';
     CHORD_COLOR = col;
     document.documentElement.style.setProperty('--chordColor', col);
@@ -1121,16 +911,8 @@ document.getElementById('toggleChords').onclick = ()=>{
   });
 
   document.getElementById('settingsReset')?.addEventListener('click', () => {
-    if (speedInput)       speedInput.value       = String(DEF_AUTO_SPEED);
-    if (delayInput)       delayInput.value       = String(DEF_AUTO_DELAY);
     if (chordColorInput)  chordColorInput.value  = DEF_CHORD_COLOR;
     if (chordScaleInput)  chordScaleInput.value  = String(DEF_CHORD_SCALE);
-
-    AUTO_SPEED = DEF_AUTO_SPEED;
-    localStorage.setItem(AUTO_SPEED_KEY, String(DEF_AUTO_SPEED));
-
-    AUTO_DELAY = DEF_AUTO_DELAY;
-    localStorage.setItem(AUTO_DELAY_KEY, String(DEF_AUTO_DELAY));
 
     CHORD_COLOR = DEF_CHORD_COLOR;
     document.documentElement.style.setProperty('--chordColor', DEF_CHORD_COLOR);
@@ -1147,7 +929,6 @@ document.getElementById('toggleChords').onclick = ()=>{
   // 8) Ostatní drátování
 try { wireDoubleToggle(); } catch(e){ console.warn('wireDoubleToggle failed', e); }
 try { wireSwipeNavigation(); } catch(e){ console.warn('wireSwipeNavigation failed', e); }
-wireAutoScrollDesktopControls();
 updateChromeHeight();
 
 }
