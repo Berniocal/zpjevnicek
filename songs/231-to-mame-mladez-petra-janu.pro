@@ -35,7 +35,7 @@ doma [H7]řezali je málo,
 [A]jak se zdálo
 [H7]kam to vede se [E]ptám
 
-[A] [E]všechno chtějí hned 
+A [E]všechno chtějí hned 
 a všechno vědí líp
 a [E]když jim člověk moudře radí, 
 mají na to vtip 
